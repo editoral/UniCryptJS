@@ -69,9 +69,125 @@ demo.execute3 = function() {
 	return typeof(child.privateFunction);
 }
 demo.execute4 = function() {
-	var child = new demo.ChildClass1(10,20);
-	return child.privilegedFunction();
+	var base = new demo.BaseClass(10,20);
+	return base.privilegedFunction();
 }
+
+
+
+demo.snippet = {}
+
+demo.snippet.classBased = {}
+
+//Dies ist sowohl eine Funktion wie auch ein instantiierbares Objekt. 
+demo.snippet.Fahrzeug = function(anzahlRäder, führerAusweisKategorie, autobahnZulassung) {
+	// this ist eine Referenz auf sich selbst. Sehr verwirrend, da es ja eine Funktion ist und keine Klasse.
+	// Es handelt sich um die Attribute
+	this.anzahlRäder = anzahlRäder;
+	this.führerAusweisKategorie = führerAusweisKategorie;
+	this.autobahnZulassung = autobahnZulassung;
+	// super privat. Ohne privileged getter methode wird nie jemand den ölstand erfahren!
+	// Sehr wichtig ist dabei die Erkenntnis, dass diese privaten Variablen auch nicht von den
+	// EIGENEN public Methoden abgerufen werden können. Im Sinne von Java sind dies also keine private Attribute.
+	var ölstand = "leer";
+	//Wegen einem Implementierungsfehler
+	var that = this;
+
+	// Dasselbe gilt auch für private Methoden. Dies mag auf den ersten Blick ziemlich sinnlos sein.
+	// Hier ein möglicher Verwendungszweck ein dreifach Singleton.
+	var anzahlFreiePlätze = 3;
+	function esGibtNur3FahrzeugeAufDerErde() {
+		if (anzahlFreiePlätze > 0) {
+			anzahlFreiePlätze -= 1;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	this.gibMirEinNeuesFahrzeug = function() {
+		if(esGibtNur3FahrzeugeAufDerErde()) {
+			return new demo.snippet.Fahrzeug(5,"K",false);
+		} else {
+			throw new Error("CO2-Emissions Stop!");
+		}
+	}
+
+	//Viel besser aber wäre doch eine Möglichkeit von aussen auf die privaten Variablen zugreiffen zu könen.
+	//Dazu braucht es aber eine getter und setter Methode: Die Privileged Methode.
+	this.lassMichBitteDenÖlstandSehen = function() {
+		return "nicht " + ölstand;
+	}
+
+}
+
+
+//Und nun wird vererbt!
+Function.prototype.inherit = function(obj) {
+
+}
+
+Op = {}
+
+Op.Class = function()  {
+	var parent;
+	var methods;
+	var newClass = function() {
+		this.initialize.apply(this, arguments);
+	}
+	extend = function(destination, source) {   
+		for (var property in source) {
+			destination[property] = source[property];
+		}
+		destination.$super =  function(method) {
+			return this.$parent[method].apply(this.$parent, Array.prototype.slice.call(arguments, 1));
+		}
+		return destination;
+	}
+
+	if (typeof arguments[0] === 'function') {       
+		parent  = arguments[0];       
+		methods = arguments[1];     
+	} else {       
+		methods = arguments[0];     
+	}     
+
+	if (parent !== undefined) {       
+		extend(newClass.prototype, parent.prototype);       
+		newClass.prototype.$parent = parent.prototype;
+	}
+	extend(newClass.prototype, methods);  
+	newClass.prototype.constructor = newClass;      
+
+	if (!newClass.prototype.initialize) newClass.prototype.initialize = function(){};        
+
+	return newClass;   
+}
+
+
+Op.helper = {}
+
+// Op.helper.iterateObj = function* (obj) {
+// 	for (var key in obj) {
+// 		if (obj.hasOwnProperty(key)) {
+// 			yield obj[key];
+// 		}
+// 	}
+// }
+
+
+var Myclass = Op.Class({
+	initialize: function(name, age) {
+		this.name = name;
+		this.age  = age;
+	},
+	print: function() {
+		console.log(this.name + " " + this.age);
+	}
+});
+
+var inst = new Myclass("Bob",29);
+inst.print();
 unicrypt = {}
 
 unicrypt.helper = {}

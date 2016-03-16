@@ -1,34 +1,21 @@
+Bob 29
 
 [0m[0m
 [0m  A first example[0m
-[2K[0G  [31m  1) will write names but can't[0m
-[2K[0G  [32m  ✓[0m[90m will now have instance variables[0m
-[2K[0G  [32m  ✓[0m[90m calls a private function[0m
-[2K[0G  [31m  2) it calls a privileged[0m
+[2K[0G  [32m  √[0m[90m will write names but can't[0m
+[2K[0G  [32m  √[0m[90m will now have instance variables[0m
+[2K[0G  [32m  √[0m[90m calls a private function[0m
+[2K[0G  [32m  √[0m[90m it calls a privileged function[0m
+
+[0m  wie ich die closures und Instatntiirung teste[0m
+[2K[0G  [32m  √[0m[90m benutzt meine Klasse nicht als Klasse[0m
+[2K[0G  [32m  √[0m[90m will nun das Schlüsselwort new brauchen[0m
+[2K[0G  [32m  √[0m[90m probiert eine private Variable abzugreifen[0m
+[2K[0G  [32m  √[0m[90m kann drei Fahrzeuge geben[0m
+[2K[0G  [32m  √[0m[90m kann keine 4 Fahrzeuge geben[0m
+[2K[0G  [32m  √[0m[90m benutzt eine privileged Methode um den ölstand zu sehen[0m
+[2K[0G  [32m  √[0m[90m [0m
 
 
-[92m [0m[32m 2 passing[0m[90m (11ms)[0m
-[31m  2 failing[0m
-
-[0m  1) A first example will write names but can't:
-
-      [31mAssertionError: 'Tom Dimitri' == 'undefined Dimitri'[0m
-      [32m+ expected[0m [31m- actual[0m
-
-      [31m-Tom Dimitri[0m
-      [32m+undefined Dimitri[0m
-      [0m[90m
-      at Context.<anonymous> (test/demoTest.js:7:14)
-[0m
-[0m  2) A first example it calls a privileged:
-
-      [31mAssertionError: 30 == NaN[0m
-      [32m+ expected[0m [31m- actual[0m
-
-      [31m-30[0m
-      [32m+NaN[0m
-      [0m[90m
-      at Context.<anonymous> (test/demoTest.js:16:13)
-[0m
-
+[92m [0m[32m 11 passing[0m[90m (40ms)[0m
 

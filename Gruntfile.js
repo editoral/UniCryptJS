@@ -24,11 +24,21 @@ module.exports = function(grunt) {
 		          	quiet: false, // Optionally suppress output to standard out (defaults to false) 
 		          	clearRequireCache: false // Optionally clear the require cache before running tests (defaults to false) 
 		        },
-		        src: ['test/**/*.js']
+		        src: ['test/oopTest.js']
+      		},
+      		testDemo: {
+      			options: {
+		          	reporter: 'spec',
+		          	captureFile: 'results.txt', // Optionally capture the reporter output to a file 
+		          	quiet: false, // Optionally suppress output to standard out (defaults to false) 
+		          	clearRequireCache: false // Optionally clear the require cache before running tests (defaults to false) 
+		        },
+		        src: ['test/demoTest.js']		     
       		}
     	}
 	});
 
 
-	grunt.registerTask('default', ['concat', 'mochaTest']);
+	grunt.registerTask('default', ['concat:dist', 'mochaTest:test']);
+	grunt.registerTask('demo', ['concat:demoDist', 'mochaTest:testDemo']);
 };

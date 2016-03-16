@@ -69,6 +69,57 @@ demo.execute3 = function() {
 	return typeof(child.privateFunction);
 }
 demo.execute4 = function() {
-	var child = new demo.ChildClass1(10,20);
-	return child.privilegedFunction();
+	var base = new demo.BaseClass(10,20);
+	return base.privilegedFunction();
 }
+
+
+
+demo.snippet = {}
+
+demo.snippet.classBased = {}
+
+//Dies ist sowohl eine Funktion wie auch ein instantiierbares Objekt. 
+demo.snippet.Fahrzeug = function(anzahlRäder, führerAusweisKategorie, autobahnZulassung) {
+	// this ist eine Referenz auf sich selbst. Sehr verwirrend, da es ja eine Funktion ist und keine Klasse.
+	// Es handelt sich um die Attribute
+	this.anzahlRäder = anzahlRäder;
+	this.führerAusweisKategorie = führerAusweisKategorie;
+	this.autobahnZulassung = autobahnZulassung;
+	// super privat. Ohne privileged getter methode wird nie jemand den ölstand erfahren!
+	// Sehr wichtig ist dabei die Erkenntnis, dass diese privaten Variablen auch nicht von den
+	// EIGENEN public Methoden abgerufen werden können. Im Sinne von Java sind dies also keine private Attribute.
+	var ölstand = "leer";
+	//Wegen einem Implementierungsfehler
+	var that = this;
+
+	// Dasselbe gilt auch für private Methoden. Dies mag auf den ersten Blick ziemlich sinnlos sein.
+	// Hier ein möglicher Verwendungszweck ein dreifach Singleton.
+	var anzahlFreiePlätze = 3;
+	function esGibtNur3FahrzeugeAufDerErde() {
+		if (anzahlFreiePlätze > 0) {
+			anzahlFreiePlätze -= 1;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	this.gibMirEinNeuesFahrzeug = function() {
+		if(esGibtNur3FahrzeugeAufDerErde()) {
+			return new demo.snippet.Fahrzeug(5,"K",false);
+		} else {
+			throw new Error("CO2-Emissions Stop!");
+		}
+	}
+
+	//Viel besser aber wäre doch eine Möglichkeit von aussen auf die privaten Variablen zugreiffen zu könen.
+	//Dazu braucht es aber eine getter und setter Methode: Die Privileged Methode.
+	this.lassMichBitteDenÖlstandSehen = function() {
+		return "nicht " + ölstand;
+	}
+
+}
+
+
+//Und nun wird vererbt!
