@@ -33,8 +33,8 @@ demo.execute2 = function() {
 
 demo.BaseClass = function(var1, var2) {
 	if (!(this instanceof demo.BaseClass)) {
-        return new demo.BaseClass(var1, var2);
-    }
+		return new demo.BaseClass(var1, var2);
+	}
 	this.instanceVar1 = var1;
 	this.instanceVar2 = var2;
 	var privateVar = var1;
@@ -55,8 +55,8 @@ demo.BaseClass.prototype.function1 = function() {
 
 demo.ChildClass1 = function(var1) {
 	if (!(this instanceof demo.ChildClass1)) {
-        return new demo.ChildClass1(var1, var2);
-    }
+		return new demo.ChildClass1(var1, var2);
+	}
 	this.ChildClass1 = var1;
 	this.instanceVar2 = 'Hi';
 }
@@ -104,7 +104,7 @@ demo.snippet.Fahrzeug = function(anzahlRäder, führerAusweisKategorie, autobahn
 			return false;
 		}
 	}
-
+	// factory Methode
 	this.gibMirEinNeuesFahrzeug = function() {
 		if(esGibtNur3FahrzeugeAufDerErde()) {
 			return new demo.snippet.Fahrzeug(5,"K",false);
@@ -113,8 +113,8 @@ demo.snippet.Fahrzeug = function(anzahlRäder, führerAusweisKategorie, autobahn
 		}
 	}
 
-	//Viel besser aber wäre doch eine Möglichkeit von aussen auf die privaten Variablen zugreiffen zu könen.
-	//Dazu braucht es aber eine getter und setter Methode: Die Privileged Methode.
+	// Viel besser aber wäre doch eine Möglichkeit von aussen auf die privaten Variablen zugreiffen zu könen.
+	// Dazu braucht es aber eine getter und setter Methode: Die Privileged Methode.
 	this.lassMichBitteDenÖlstandSehen = function() {
 		return "nicht " + ölstand;
 	}
@@ -122,4 +122,58 @@ demo.snippet.Fahrzeug = function(anzahlRäder, führerAusweisKategorie, autobahn
 }
 
 
-//Und nun wird vererbt!
+// Und nun wird vererbt!
+
+// Damit es was zu erben gibt, wird eine public Methode hinzugefügt
+demo.snippet.Fahrzeug.prototype.ichFahrDavon = function() {
+	return "Brumm!";
+}
+demo.snippet.Fahrzeug.prototype.meinTreibstoff = function() {
+	return "Was brennbares";
+}
+
+
+// Dies ist ein gewöhnlicher Konstruktor der die Attribute initialisiert
+demo.snippet.Auto = function(farbe, marke, preis) {
+	// Wir wollen eine Typenprüfung
+	if (!((typeof preis === "number") && Math.floor(preis) === preis)) {
+		throw new Error("kein Integer");
+	}
+	// Neu wird verhindert, dass diese Funktion kein Objekt zurückliefert.
+	if (!(this instanceof demo.snippet.Auto)) {
+		// Es wird das Objekt auf dem herkömlichen Weg instantiiert
+		// Diese Funktion muss also im OOP Kontext verwendet werden
+		return new demo.snippet.Auto(farbe, marke, preis);
+	}
+	this.farbe = farbe;
+	this.marke = marke;
+	this.preis = preis;
+	// Da es ein Auto ist, wissen wir was wir beim Fahrzeug constructor setzten müssen
+	// Call führt eine Funktion aus, allerdings wird der Kontext der Funktion als erster Parameter übergeben!
+	demo.snippet.Fahrzeug.call(this, 4, 'B', true);
+}
+// Die Eigenschaft prototype des Objektes wird auf das Fahrzeug gesetzt
+// Nun sind alle Attribute und Methoden des Fahrzeuges auch für ein Auto vorhanden
+// Würden wir eine Instanz von Auto erstellen, so müssten wir beim Aufruf 
+// Auto(anzahlRäder, führerAusweisKategorie, autobahnZulassung) angeben.
+// Warum? Weil der Konstruktor ebenfalls überschrieben wurde und nun dem von Fahrzeug entspricht.
+demo.snippet.Auto.prototype = new demo.snippet.Fahrzeug();
+// Der Konstruktor muss explizit gesetzt werden. Es muss nämlich der Konsturktor von Auto aufgerufen werden und 
+// nicht derjenige von Fahrzeug. Dies funktioniert so schön, da demo.snippet.Auto eine Funktionsreferenz darstellt.
+demo.snippet.Auto.prototype.constructor = demo.snippet.Auto; 
+// dem neuen Objekt können methoden hinzugefügt werden oder bestehend können überschrieben werden.
+// Die Privileged Methode kann überschrieben oder gelöscht, nicht aber verändert werden. Das Geheimnis des Ölstandes bleibt sicher!
+
+// überschreiben
+demo.snippet.Auto.prototype.meinTreibstoff = function() {
+	return "Benzin";
+}
+// erweitern
+demo.snippet.Auto.prototype.scheibenwischer = function() {
+	return "wisch meinen " + this.marke;
+}
+
+
+var auto = new demo.snippet.Auto('Grün', "Audi", 1000);
+console.log(auto.anzahlRäder);
+console.log(auto.meinTreibstoff());
