@@ -1,9 +1,11 @@
-demo = {}
+"use strict";
+
+GLOBAL.demo = {}
 
 demo.jsObject = function() {
-	name = "Tom",
-	lastName = "Heinz",
-	concat = function() {
+	var name = "Tom";
+	var lastName = "Heinz";
+	var concat = function() {
 		return name + " " + lastName;
 	}
 }
@@ -39,7 +41,7 @@ demo.BaseClass = function(var1, var2) {
 	this.instanceVar2 = var2;
 	var privateVar = var1;
 	var privateVar2 = var2;
-	privateFunction = function() {
+	var privateFunction = function() {
 		return privateVar + privateVar2;
 	}
 
@@ -173,7 +175,14 @@ demo.snippet.Auto.prototype.scheibenwischer = function() {
 	return "wisch meinen " + this.marke;
 }
 
+// Es wird verwirrend. Dies ist nur zum Spass hier
+// ECMAScript 6 wird leider nicht von allen Browsern unterstützt
+// und ist erst am kommen. Deshalb nur der Vollständigkeitshalber hier beschrieben.
 
-var auto = new demo.snippet.Auto('Grün', "Audi", 1000);
-console.log(auto.anzahlRäder);
-console.log(auto.meinTreibstoff());
+
+// class Pflanzen {
+// 	constructor(vorkommen, grösse) {
+// 		this.vorkommen = vorkommen;
+// 		this.grösse = grösse;
+// 	}
+// }
