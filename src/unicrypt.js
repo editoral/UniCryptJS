@@ -1,4 +1,4 @@
-unicrypt = {}
+GLOBAL.unicrypt = {}
 
 unicrypt.helper = {}
 

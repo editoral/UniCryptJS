@@ -1,9 +1,11 @@
-demo = {}
+"use strict";
+
+GLOBAL.demo = {}
 
 demo.jsObject = function() {
-	name = "Tom",
-	lastName = "Heinz",
-	concat = function() {
+	var name = "Tom";
+	var lastName = "Heinz";
+	var concat = function() {
 		return name + " " + lastName;
 	}
 }
@@ -33,13 +35,13 @@ demo.execute2 = function() {
 
 demo.BaseClass = function(var1, var2) {
 	if (!(this instanceof demo.BaseClass)) {
-        return new demo.BaseClass(var1, var2);
-    }
+		return new demo.BaseClass(var1, var2);
+	}
 	this.instanceVar1 = var1;
 	this.instanceVar2 = var2;
 	var privateVar = var1;
 	var privateVar2 = var2;
-	privateFunction = function() {
+	var privateFunction = function() {
 		return privateVar + privateVar2;
 	}
 
@@ -55,8 +57,8 @@ demo.BaseClass.prototype.function1 = function() {
 
 demo.ChildClass1 = function(var1) {
 	if (!(this instanceof demo.ChildClass1)) {
-        return new demo.ChildClass1(var1, var2);
-    }
+		return new demo.ChildClass1(var1, var2);
+	}
 	this.ChildClass1 = var1;
 	this.instanceVar2 = 'Hi';
 }
@@ -104,7 +106,7 @@ demo.snippet.Fahrzeug = function(anzahlRäder, führerAusweisKategorie, autobahn
 			return false;
 		}
 	}
-
+	// factory Methode
 	this.gibMirEinNeuesFahrzeug = function() {
 		if(esGibtNur3FahrzeugeAufDerErde()) {
 			return new demo.snippet.Fahrzeug(5,"K",false);
@@ -113,8 +115,8 @@ demo.snippet.Fahrzeug = function(anzahlRäder, führerAusweisKategorie, autobahn
 		}
 	}
 
-	//Viel besser aber wäre doch eine Möglichkeit von aussen auf die privaten Variablen zugreiffen zu könen.
-	//Dazu braucht es aber eine getter und setter Methode: Die Privileged Methode.
+	// Viel besser aber wäre doch eine Möglichkeit von aussen auf die privaten Variablen zugreiffen zu könen.
+	// Dazu braucht es aber eine getter und setter Methode: Die Privileged Methode.
 	this.lassMichBitteDenÖlstandSehen = function() {
 		return "nicht " + ölstand;
 	}
@@ -122,12 +124,185 @@ demo.snippet.Fahrzeug = function(anzahlRäder, führerAusweisKategorie, autobahn
 }
 
 
-//Und nun wird vererbt!
+// Und nun wird vererbt!
+
+// Damit es was zu erben gibt, wird eine public Methode hinzugefügt
+demo.snippet.Fahrzeug.prototype.ichFahrDavon = function() {
+	return "Brumm!";
+}
+demo.snippet.Fahrzeug.prototype.meinTreibstoff = function() {
+	return "Was brennbares";
+}
+
+
+// Dies ist ein gewöhnlicher Konstruktor der die Attribute initialisiert
+demo.snippet.Auto = function(farbe, marke, preis) {
+	// Wir wollen eine Typenprüfung
+	if (!((typeof preis === "number") && Math.floor(preis) === preis)) {
+		throw new Error("kein Integer");
+	}
+	// Neu wird verhindert, dass diese Funktion kein Objekt zurückliefert.
+	if (!(this instanceof demo.snippet.Auto)) {
+		// Es wird das Objekt auf dem herkömlichen Weg instantiiert
+		// Diese Funktion muss also im OOP Kontext verwendet werden
+		return new demo.snippet.Auto(farbe, marke, preis);
+	}
+	this.farbe = farbe;
+	this.marke = marke;
+	this.preis = preis;
+	// Da es ein Auto ist, wissen wir was wir beim Fahrzeug constructor setzten müssen
+	// Call führt eine Funktion aus, allerdings wird der Kontext der Funktion als erster Parameter übergeben!
+	demo.snippet.Fahrzeug.call(this, 4, 'B', true);
+}
+// Die Eigenschaft prototype des Objektes wird auf das Fahrzeug gesetzt
+// Nun sind alle Attribute und Methoden des Fahrzeuges auch für ein Auto vorhanden
+// Würden wir eine Instanz von Auto erstellen, so müssten wir beim Aufruf 
+// Auto(anzahlRäder, führerAusweisKategorie, autobahnZulassung) angeben.
+// Warum? Weil der Konstruktor ebenfalls überschrieben wurde und nun dem von Fahrzeug entspricht.
+demo.snippet.Auto.prototype = new demo.snippet.Fahrzeug();
+// Der Konstruktor muss explizit gesetzt werden. Es muss nämlich der Konsturktor von Auto aufgerufen werden und 
+// nicht derjenige von Fahrzeug. Dies funktioniert so schön, da demo.snippet.Auto eine Funktionsreferenz darstellt.
+demo.snippet.Auto.prototype.constructor = demo.snippet.Auto; 
+// dem neuen Objekt können methoden hinzugefügt werden oder bestehend können überschrieben werden.
+// Die Privileged Methode kann überschrieben oder gelöscht, nicht aber verändert werden. Das Geheimnis des Ölstandes bleibt sicher!
+
+// überschreiben
+demo.snippet.Auto.prototype.meinTreibstoff = function() {
+	return "Benzin";
+}
+// erweitern
+demo.snippet.Auto.prototype.scheibenwischer = function() {
+	return "wisch meinen " + this.marke;
+}
+
+// Interface
+// Verhindert das eine Klasse ohne Vererbung instantiiert wird.
+
+demo.snippet.interface = {}
+
+demo.snippet.interface.Interface = function() {
+	// Handelt es sich beim constructor um diese funktion, so wurde das Interface noch nicht vererbt
+	// es wird ein Error geworfen. 
+	if(this.constructor === demo.snippet.interface.Interface) {
+		throw new Error("Interfaces shall not be instantiiated!");
+	}
+	
+}
+demo.snippet.interface.Interface.prototype.someMethod = function() {
+	return "wuff";
+}
+
+demo.snippet.interface.Class = function() {
+	this.secondMethod = function() {
+
+	}
+}
+
+demo.snippet.interface.Class.prototype = Object.create(demo.snippet.interface.Interface.prototype);
+demo.snippet.interface.Class.prototype.constructor = demo.snippet.interface.Class;
+
+
+//Interface zum zweiten. Andere Möglichkeit ein Interface zu definieren, dass nicht instantiiert werden kann.
+demo.snippet.interface2 = {}
+demo.snippet.interface2.Bankkonto = {
+	abheben : function(summe) {},
+	einzahlen : function(summe) {}
+}
+
+demo.snippet.interface2.UbsKonto = function(ursprungsKontostand) {
+	this.ursprungsKontostand = ursprungsKontostand;
+
+	//Überprüft ob alle Methoden implementiert wurden
+	//Na ja ist leider nicht so toll. 
+	var proto = this.__proto__.__proto__;
+	for(var prop in proto){
+		if (typeof proto[prop] === 'function') {
+			if(!demo.snippet.interface2.UbsKonto.prototype.hasOwnProperty(prop)) {
+				throw new Error('Interface not implemented');
+			}
+		}
+	}
+
+}
+
+demo.snippet.interface2.CSSKonto = function(ursprungsKontostand, policeNr) {
+	this.ursprungsKontostand = ursprungsKontostand;
+
+	var proto = this.__proto__.__proto__;
+	for(var prop in proto){
+		if (typeof proto[prop] === 'function') {
+			if(!demo.snippet.interface2.CSSKonto.prototype.hasOwnProperty(prop)) {
+				throw new Error('Interface not implemented');
+			}
+		}
+	}
+
+}
+demo.snippet.interface2.UbsKonto.prototype = Object.create(demo.snippet.interface2.Bankkonto);
+demo.snippet.interface2.CSSKonto.prototype = Object.create(demo.snippet.interface2.Bankkonto);
+
+demo.snippet.interface2.UbsKonto.prototype.constructor = demo.snippet.interface2.UbsKonto;
+demo.snippet.interface2.CSSKonto.prototype.constructor = demo.snippet.interface2.CSSKonto;
+
+demo.snippet.interface2.UbsKonto.prototype.abheben = function(summe) {
+	this.ursprungsKontostand -= summe;
+	return this.ursprungsKontostand;
+}
+
+demo.snippet.interface2.UbsKonto.prototype.einzahlen = function(summe) {
+	this.ursprungsKontostand += summe;
+	return this.ursprungsKontostand;
+}
+
+demo.snippet.interface2.CSSKonto.prototype.abheben = function(summe) {
+	this.ursprungsKontostand -= summe;
+	return this.ursprungsKontostand;
+}
+
+
+
+// Dies ist nur zum Spass hier
+// ECMAScript 6 wird leider nicht von allen Browsern unterstützt
+// und ist erst am kommen. Deshalb nur der Vollständigkeitshalber hier beschrieben.
+
+
+demo.snippet.classBased.Pflanze = class Pflanze {
+	constructor(vorkommen, grösse) {
+		this.vorkommen = vorkommen;
+		this.grösse = grösse;
+	}
+
+	get info() {
+		return this.vorkommen + " " + this.grösse;
+	}
+
+	static explain() {
+		return "Mit mir kann man Pflanzen erstellen."
+	}
+}
+
+
+demo.snippet.classBased.Baum = class Baum extends demo.snippet.classBased.Pflanze {
+	constructor(art, laubbaum, vorkommen, grösse) {
+		super(vorkommen, grösse);
+		this.art = art;
+		this.laubbaum = laubbaum;	
+	}
+	get info() {
+		return super.info() + " " + this.art + " " + this.laubbaum;
+	}
+}
+
+demo.snippet.classBased.returnBaum = function(art, laubbaum, vorkommen, grösse) {
+	return new demo.snippet.classBased.Baum(art, laubbaum, vorkommen, grösse);
+}
+
+
 Function.prototype.inherit = function(obj) {
 
 }
 
-Op = {}
+GLOBAL.Op = {}
 
 Op.Class = function()  {
 	var parent;
@@ -135,7 +310,7 @@ Op.Class = function()  {
 	var newClass = function() {
 		this.initialize.apply(this, arguments);
 	}
-	extend = function(destination, source) {   
+	var extend = function(destination, source) {   
 		for (var property in source) {
 			destination[property] = source[property];
 		}
@@ -188,7 +363,7 @@ var Myclass = Op.Class({
 
 var inst = new Myclass("Bob",29);
 inst.print();
-unicrypt = {}
+GLOBAL.unicrypt = {}
 
 unicrypt.helper = {}
 

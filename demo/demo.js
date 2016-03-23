@@ -1,5 +1,8 @@
 "use strict";
 
+
+
+
 GLOBAL.demo = {}
 
 demo.jsObject = function() {
@@ -175,14 +178,297 @@ demo.snippet.Auto.prototype.scheibenwischer = function() {
 	return "wisch meinen " + this.marke;
 }
 
-// Es wird verwirrend. Dies ist nur zum Spass hier
+// Interface
+// Verhindert das eine Klasse ohne Vererbung instantiiert wird.
+
+demo.snippet.interface = {}
+
+demo.snippet.interface.Interface = function() {
+	// Handelt es sich beim constructor um diese funktion, so wurde das Interface noch nicht vererbt
+	// es wird ein Error geworfen. 
+	if(this.constructor === demo.snippet.interface.Interface) {
+		throw new Error("Interfaces shall not be instantiiated!");
+	}
+	
+}
+demo.snippet.interface.Interface.prototype.someMethod = function() {
+	return "wuff";
+}
+
+demo.snippet.interface.Class = function() {
+	this.secondMethod = function() {
+
+	}
+}
+
+demo.snippet.interface.Class.prototype = Object.create(demo.snippet.interface.Interface.prototype);
+demo.snippet.interface.Class.prototype.constructor = demo.snippet.interface.Class;
+
+
+//Interface zum zweiten. Andere Möglichkeit ein Interface zu definieren, dass nicht instantiiert werden kann.
+demo.snippet.interface2 = {}
+demo.snippet.interface2.Bankkonto = {
+	abheben : function(summe) {},
+	einzahlen : function(summe) {}
+}
+
+demo.snippet.interface2.UbsKonto = function(ursprungsKontostand) {
+	this.ursprungsKontostand = ursprungsKontostand;
+
+	//Überprüft ob alle Methoden implementiert wurden
+	//Na ja ist leider nicht so toll. 
+	var proto = this.__proto__.__proto__;
+	for(var prop in proto){
+		if (typeof proto[prop] === 'function') {
+			if(!demo.snippet.interface2.UbsKonto.prototype.hasOwnProperty(prop)) {
+				throw new Error('Interface not implemented');
+			}
+		}
+	}
+
+}
+
+demo.snippet.interface2.CSSKonto = function(ursprungsKontostand, policeNr) {
+	this.ursprungsKontostand = ursprungsKontostand;
+
+	var proto = this.__proto__.__proto__;
+	for(var prop in proto){
+		if (typeof proto[prop] === 'function') {
+			if(!demo.snippet.interface2.CSSKonto.prototype.hasOwnProperty(prop)) {
+				throw new Error('Interface not implemented');
+			}
+		}
+	}
+
+}
+demo.snippet.interface2.UbsKonto.prototype = Object.create(demo.snippet.interface2.Bankkonto);
+demo.snippet.interface2.CSSKonto.prototype = Object.create(demo.snippet.interface2.Bankkonto);
+
+demo.snippet.interface2.UbsKonto.prototype.constructor = demo.snippet.interface2.UbsKonto;
+demo.snippet.interface2.CSSKonto.prototype.constructor = demo.snippet.interface2.CSSKonto;
+
+demo.snippet.interface2.UbsKonto.prototype.abheben = function(summe) {
+	this.ursprungsKontostand -= summe;
+	return this.ursprungsKontostand;
+}
+
+demo.snippet.interface2.UbsKonto.prototype.einzahlen = function(summe) {
+	this.ursprungsKontostand += summe;
+	return this.ursprungsKontostand;
+}
+
+demo.snippet.interface2.CSSKonto.prototype.abheben = function(summe) {
+	this.ursprungsKontostand -= summe;
+	return this.ursprungsKontostand;
+}
+
+// Erweiterung für abstrakte Klassen
+// Abstrakte Klassen werden als Interfaces behandelt. 
+
+demo.snippet.interface3 = {}
+demo.snippet.interface3.Bankkonto = function() {
+	this.abheben = function(summe) {}
+	this.einzahlen = function(summe) {}
+}
+
+demo.snippet.interface3.UbsKonto = function(ursprungsKontostand) {
+	this.ursprungsKontostand = ursprungsKontostand;
+
+	// Es wird nicht wirklich besser! Es funktioniert zwar, allerdings muss zwischen abstrakten Funktionen
+	// und bereits implementierten funktionen unterschieden werden.
+	// Ist ein interessanter Ansatz. 
+	var proto = new this.__proto__.__proto__();
+	var obj = Object.create(proto);
+	console.log(proto);
+
+	for(var prop in proto){
+		if (typeof proto[prop] === 'function') {
+			if(!demo.snippet.interface3.UbsKonto.prototype.hasOwnProperty(prop)) {
+				throw new Error('Interface not implemented');
+			}
+		}
+	}
+
+}
+
+demo.snippet.interface3.UbsKonto.prototype = Object.create(demo.snippet.interface3.Bankkonto);
+
+demo.snippet.interface3.UbsKonto.prototype.constructor = demo.snippet.interface3.UbsKonto;
+
+demo.snippet.interface3.UbsKonto.prototype.abheben = function(summe) {
+	this.ursprungsKontostand -= summe;
+	return this.ursprungsKontostand;
+}
+
+demo.snippet.interface3.UbsKonto.prototype.einzahlen = function(summe) {
+	this.ursprungsKontostand += summe;
+	return this.ursprungsKontostand;
+}
+
+// Konkrete Version einer Abstrakten Klasse
+
+demo.snippet.abstractClass = {}
+demo.snippet.abstractClass.Bankkonto = function() {
+	if(this.constructor === demo.snippet.abstractClass.Bankkonto) {
+		//throw new Error("Abstract classes shall not be instantiiated!");
+	}
+	this.ursprungsKontostand;
+	this.$abheben = function(summe) {}
+	this.einzahlen = function(summe) {
+		this.ursprungsKontostand += summe;
+		return this.ursprungsKon
+	}
+}
+
+demo.snippet.abstractClass.UbsKonto = function(ursprungsKontostand) {
+	this.ursprungsKontostand = ursprungsKontostand;
+
+	var proto = new this.__proto__.__proto__();
+	var obj = Object.create(proto);
+	//console.log(proto);
+
+	for(var prop in proto){
+		//1console.log(prop.match('\$') + " " + prop);
+		if (typeof proto[prop] === 'function' && prop.match('\\$')) {
+			prop = prop.substring(1);
+			if(!demo.snippet.abstractClass.UbsKonto.prototype.hasOwnProperty(prop)) {
+				throw new Error('Abstract not implemented');
+			}
+		}
+	}
+
+}
+
+demo.snippet.abstractClass.UbsKonto.prototype = Object.create(demo.snippet.abstractClass.Bankkonto);
+
+demo.snippet.abstractClass.UbsKonto.prototype.constructor = demo.snippet.abstractClass.UbsKonto;
+
+demo.snippet.abstractClass.UbsKonto.prototype.abheben = function(summe) {
+	this.ursprungsKontostand -= summe;
+	return this.ursprungsKontostand;
+}
+
+var x = new demo.snippet.abstractClass.UbsKonto(1000);
+
+
+// // Variablen zugriffsmodifizierer
+
+// demo.snippet.visibility = {}
+// demo.snippet.visibility.Werkzeug = function() {
+
+// }
+
+// demo.snippet.visibility.Werkzeug.prototype._private = function() {
+
+// }
+
+// demo.snippet.visibility.Hammer = function() {
+// 	var x = 10;
+
+
+// }
+
+// demo.snippet.visibility.Hammer.prototype = Object.create(demo.snippet.visibility.Werkzeug);
+// demo.snippet.visibility.Hammer.prototype.constructor = demo.snippet.visibility.Hammer;
+
+// demo.snippet.visibility.Hammer.prototype.getX = function() {
+// 	return this.x;
+// }
+
+// var hammer = new demo.snippet.visibility.Hammer();
+// console.log(hammer.getX());
+
+// Typenprüfung
+
+demo.snippet.typing = {}
+
+// Native Datentypen
+
+demo.snippet.typing.Types = function(type, val) {
+	switch(type) {
+		case 'int':
+			break;
+		case 'boolean':
+			break;
+		case 'byte':
+			break;
+		case 'char':
+			break;
+		case 'short':
+			break;
+		case 'long':
+			break;
+		case 'float':
+			break;
+		case 'double':
+			break;
+	}
+}
+demo.snippet.typing.Hammer = function(preis) {
+	this.preis = preis;
+}
+
+demo.snippet.typing.Nagel = function() {
+
+}
+
+
+// Dies ist nur zum Spass hier
 // ECMAScript 6 wird leider nicht von allen Browsern unterstützt
 // und ist erst am kommen. Deshalb nur der Vollständigkeitshalber hier beschrieben.
 
 
-// class Pflanzen {
-// 	constructor(vorkommen, grösse) {
-// 		this.vorkommen = vorkommen;
-// 		this.grösse = grösse;
-// 	}
-// }
+demo.snippet.classBased.Pflanze = class Pflanze {
+	constructor(vorkommen, grösse) {
+		this.vorkommen = vorkommen;
+		this.grösse = grösse;
+	}
+
+	get info() {
+		return this.vorkommen + " " + this.grösse;
+	}
+
+	static explain() {
+		return "Mit mir kann man Pflanzen erstellen."
+	}
+}
+
+
+demo.snippet.classBased.Baum = class Baum extends demo.snippet.classBased.Pflanze {
+	constructor(art, laubbaum, vorkommen, grösse) {
+		super(vorkommen, grösse);
+		this.art = art;
+		this.laubbaum = laubbaum;	
+	}
+	get info() {
+		return super.info() + " " + this.art + " " + this.laubbaum;
+	}
+}
+
+demo.snippet.classBased.returnBaum = function(art, laubbaum, vorkommen, grösse) {
+	return new demo.snippet.classBased.Baum(art, laubbaum, vorkommen, grösse);
+}
+
+
+
+GLOBAL.Op = {}
+
+Op.Class = function(obj) {
+	if(typeof obj.init !== 'function') {
+		obj.init = function() {}
+	}
+	var myClass = function() {
+
+	}	
+}
+
+
+demo.fw.BaseClass = Op.Class({
+	init: function(initParam) {
+
+	},
+	function1: function(param1, param2) {
+
+	},
+	x: 10
+})

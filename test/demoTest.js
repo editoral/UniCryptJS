@@ -64,3 +64,56 @@ describe('wie ich die closures und Instatntiirung teste' , function() {
         expect(fahrzeug.lassMichBitteDenÖlstandSehen()).to.be("nicht leer")
     });
 });
+
+describe('wie ich die Vererbung teste', function() {
+    it('testet ob der Konstruktor der Basisklasse Fahrzeug bei der Erstellung eines Autos aufgerufen wird', function() {
+        var auto = new demo.snippet.Auto('Grün', "Audi", 1000);
+        expect(auto.anzahlRäder).to.be(4);
+    });
+    it('auto ist ein Fahrzeug', function() {
+        var auto = new demo.snippet.Auto('Grün', "Audi", 1000);
+        expect(auto).to.be.a(demo.snippet.Fahrzeug);
+    });
+    it('hat die Mehtode mein Treibstoff überschrieben', function() {
+        var auto = new demo.snippet.Auto('Grün', "Audi", 1000);
+        expect(auto.meinTreibstoff()).to.be('Benzin')
+    });
+    it('auto kann die Mehtode von Fahrzeug brauchen', function() {
+        var auto = new demo.snippet.Auto('Grün', "Audi", 1000);
+        expect(auto.ichFahrDavon()).to.be("Brumm!");
+    });
+    it('kann die eigenen Funktionen verwenden', function() {
+        var auto = new demo.snippet.Auto('Grün', "Audi", 1000);
+        expect(auto.scheibenwischer()).to.be('wisch meinen Audi');
+    });
+    it('akzeptiert nur einen Integer als Preis', function() {
+        var test = function() {
+            var auto = new demo.snippet.Auto('Grün', "Audi", '1000');
+        }
+        expect(test).to.throwError();
+    });
+    it('wird selbst bei Aufruf als Funktion zu einer Instanz', function() {
+        var auto = demo.snippet.Auto('Grün', "Audi", 1000);
+        expect(auto).not.to.be.a('function');
+    });
+});
+
+describe('Eingebautes Klassenfeature aus ECMA6', function() {
+    it('instantiiert eine Klasse', function() {
+        const baum = new demo.snippet.classBased.returnBaum('tanne', true, 'Schweiz', '20m');
+        expect(baum).to.be.a(demo.snippet.classBased.Pflanze);
+    });
+});
+
+describe('Das gebaute Interface', function() {
+    it('klappt mit der Instatntiirung wenn alle Methoden implementiert wurden', function() {
+        var ubsKonto = new demo.snippet.interface2.UbsKonto(1000);
+        expect(ubsKonto.einzahlen(100)).to.be(1100);
+    });
+    it('klappt mit der Instatntiirung nicht mehr wenn eine Methode vergessen wurde', function() {
+        var test = function() {
+             var cssKonto = new demo.snippet.interface2.CSSKonto(1000);
+        }
+        expect(test).to.throwError();
+    });
+});
