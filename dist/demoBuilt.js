@@ -1,5 +1,8 @@
 "use strict";
 
+
+
+
 GLOBAL.demo = {}
 
 demo.jsObject = function() {
@@ -259,7 +262,219 @@ demo.snippet.interface2.CSSKonto.prototype.abheben = function(summe) {
 	return this.ursprungsKontostand;
 }
 
+// Erweiterung für abstrakte Klassen
+// Abstrakte Klassen werden als Interfaces behandelt. 
 
+demo.snippet.interface3 = {}
+demo.snippet.interface3.Bankkonto = function() {
+	this.abheben = function(summe) {}
+	this.einzahlen = function(summe) {}
+}
+
+demo.snippet.interface3.UbsKonto = function(ursprungsKontostand) {
+	this.ursprungsKontostand = ursprungsKontostand;
+
+	// Es wird nicht wirklich besser! Es funktioniert zwar, allerdings muss zwischen abstrakten Funktionen
+	// und bereits implementierten funktionen unterschieden werden.
+	// Ist ein interessanter Ansatz. 
+	var proto = new this.__proto__.__proto__();
+	var obj = Object.create(proto);
+	console.log(proto);
+
+	for(var prop in proto){
+		if (typeof proto[prop] === 'function') {
+			if(!demo.snippet.interface3.UbsKonto.prototype.hasOwnProperty(prop)) {
+				throw new Error('Interface not implemented');
+			}
+		}
+	}
+
+}
+
+demo.snippet.interface3.UbsKonto.prototype = Object.create(demo.snippet.interface3.Bankkonto);
+
+demo.snippet.interface3.UbsKonto.prototype.constructor = demo.snippet.interface3.UbsKonto;
+
+demo.snippet.interface3.UbsKonto.prototype.abheben = function(summe) {
+	this.ursprungsKontostand -= summe;
+	return this.ursprungsKontostand;
+}
+
+demo.snippet.interface3.UbsKonto.prototype.einzahlen = function(summe) {
+	this.ursprungsKontostand += summe;
+	return this.ursprungsKontostand;
+}
+
+// Konkrete Version einer Abstrakten Klasse
+
+demo.snippet.abstractClass = {}
+demo.snippet.abstractClass.Bankkonto = function() {
+	if(this.constructor === demo.snippet.abstractClass.Bankkonto) {
+		//throw new Error("Abstract classes shall not be instantiiated!");
+	}
+	this.ursprungsKontostand;
+	this.$abheben = function(summe) {}
+	this.einzahlen = function(summe) {
+		this.ursprungsKontostand += summe;
+		return this.ursprungsKon
+	}
+}
+
+demo.snippet.abstractClass.UbsKonto = function(ursprungsKontostand) {
+	this.ursprungsKontostand = ursprungsKontostand;
+
+	var proto = new this.__proto__.__proto__();
+	var obj = Object.create(proto);
+	//console.log(proto);
+
+	for(var prop in proto){
+		//1console.log(prop.match('\$') + " " + prop);
+		if (typeof proto[prop] === 'function' && prop.match('\\$')) {
+			prop = prop.substring(1);
+			if(!demo.snippet.abstractClass.UbsKonto.prototype.hasOwnProperty(prop)) {
+				throw new Error('Abstract not implemented');
+			}
+		}
+	}
+
+}
+
+demo.snippet.abstractClass.UbsKonto.prototype = Object.create(demo.snippet.abstractClass.Bankkonto);
+
+demo.snippet.abstractClass.UbsKonto.prototype.constructor = demo.snippet.abstractClass.UbsKonto;
+
+demo.snippet.abstractClass.UbsKonto.prototype.abheben = function(summe) {
+	this.ursprungsKontostand -= summe;
+	return this.ursprungsKontostand;
+}
+
+var x = new demo.snippet.abstractClass.UbsKonto(1000);
+
+
+// // Variablen zugriffsmodifizierer
+
+// demo.snippet.visibility = {}
+// demo.snippet.visibility.Werkzeug = function() {
+
+// }
+
+// demo.snippet.visibility.Werkzeug.prototype._private = function() {
+
+// }
+
+// demo.snippet.visibility.Hammer = function() {
+// 	var x = 10;
+
+
+// }
+
+// demo.snippet.visibility.Hammer.prototype = Object.create(demo.snippet.visibility.Werkzeug);
+// demo.snippet.visibility.Hammer.prototype.constructor = demo.snippet.visibility.Hammer;
+
+// demo.snippet.visibility.Hammer.prototype.getX = function() {
+// 	return this.x;
+// }
+
+// var hammer = new demo.snippet.visibility.Hammer();
+// console.log(hammer.getX());
+
+// Typenprüfung
+
+demo.snippet.typing = {}
+
+// Native Datentypen
+
+demo.snippet.typing.types = function(type, val) {
+	var h = new demo.snippet.typing.Helper();
+	switch(type) {
+		case 'int':
+			h.integer(val);
+			break;
+		case 'boolean':
+			h.boolean(val);
+			break;
+		case 'byte':
+			break;
+		case 'char':
+			break;
+		case 'short':
+			break;
+		case 'long':
+			break;
+		case 'float':
+			break;
+		case 'double':
+			break;
+		case 'String':
+			h.strTest(val);
+			break;
+		default:
+			h.obj(type,val);
+
+	}
+}
+
+demo.snippet.typing.Helper = function() {
+}
+
+demo.snippet.typing.Helper.prototype = {
+	integer: function(val) {
+		//Integer existiert in JavaScript nicht!
+		//Es wird eine Prüfung auf number gemacht und anschliesend geschaut,
+		//ob es Nachkomastellen hat.
+		if (!((typeof val === "number") && Math.floor(val) === val)) {
+			throw new Error("param " + val + " is not an integer!");
+		}
+	},
+	boolean: function() {
+		if (!(typeof val === "boolean")) {
+			throw new Error("param " + val + " is not a boolean!");
+		}	
+	},
+	strTest: function() {
+		if (!(typeof val === "boolean")) {
+			throw new Error("param " + val + " is not a boolean!");
+		}	
+	},
+	obj: function(type, val) {
+		if (typeof val === "object") {
+			console.log('hi ' + val.constructor.name);
+			if(!(val.constructor.name === type)) {
+				throw new Error("param " + val + " is not from type " + type + "!");
+			}
+		} else {
+			throw new Error("param " + val + " is not an object!");
+		}
+	}
+}
+
+demo.snippet.typing.Hammer = function Hammer(preis) {
+	this.preis = preis;
+}
+
+demo.snippet.typing.Nagel = function Nagel() {
+	var paramType = ['int length', 'int width'];
+	for(var i = 0; i < paramType.length; i++) {
+		var res = paramType[i].split(" ");
+		demo.snippet.typing.types(res[0], arguments[i]);
+		this[res[1]] = arguments[i];
+	}
+
+}
+
+demo.snippet.typing.Nagel.prototype.einschlagen = function() {
+	var paramType = ['Hammer hammer'];
+	for(var i = 0; i < paramType.length; i++) {
+		var res = paramType[i].split(" ");
+		demo.snippet.typing.types(res[0], arguments[i]);
+		this[res[1]] = arguments[i];
+	}
+}
+
+
+var nagel = new demo.snippet.typing.Nagel(10,20);
+var hammer = new demo.snippet.typing.Hammer(100);
+nagel.einschlagen(hammer);
 
 // Dies ist nur zum Spass hier
 // ECMAScript 6 wird leider nicht von allen Browsern unterstützt
@@ -298,71 +513,98 @@ demo.snippet.classBased.returnBaum = function(art, laubbaum, vorkommen, grösse)
 }
 
 
-Function.prototype.inherit = function(obj) {
-
-}
 
 GLOBAL.Op = {}
 
-Op.Class = function()  {
-	var parent;
-	var methods;
-	var newClass = function() {
-		this.initialize.apply(this, arguments);
+Op.Class = function(obj) {
+	if(typeof obj.init !== 'function') {
+		obj.init = function() {}
 	}
-	var extend = function(destination, source) {   
-		for (var property in source) {
-			destination[property] = source[property];
-		}
-		destination.$super =  function(method) {
-			return this.$parent[method].apply(this.$parent, Array.prototype.slice.call(arguments, 1));
-		}
-		return destination;
-	}
+	var myClass = function() {
 
-	if (typeof arguments[0] === 'function') {       
-		parent  = arguments[0];       
-		methods = arguments[1];     
-	} else {       
-		methods = arguments[0];     
-	}     
-
-	if (parent !== undefined) {       
-		extend(newClass.prototype, parent.prototype);       
-		newClass.prototype.$parent = parent.prototype;
-	}
-	extend(newClass.prototype, methods);  
-	newClass.prototype.constructor = newClass;      
-
-	if (!newClass.prototype.initialize) newClass.prototype.initialize = function(){};        
-
-	return newClass;   
+	}	
 }
 
 
-Op.helper = {}
+Op
 
-// Op.helper.iterateObj = function* (obj) {
-// 	for (var key in obj) {
-// 		if (obj.hasOwnProperty(key)) {
-// 			yield obj[key];
-// 		}
+
+demo.fw = {}
+
+demo.fw.BaseClass = Op.Class({
+	init: function(initParam) {
+
+	},
+	function1: function(param1, param2) {
+
+	},
+	x: 10
+})
+// Function.prototype.inherit = function(obj) {
+
+// }
+
+// GLOBAL.Op = {}
+
+// Op.Class = function()  {
+// 	var parent;
+// 	var methods;
+// 	var newClass = function() {
+// 		this.initialize.apply(this, arguments);
 // 	}
+// 	var extend = function(destination, source) {   
+// 		for (var property in source) {
+// 			destination[property] = source[property];
+// 		}
+// 		destination.$super =  function(method) {
+// 			return this.$parent[method].apply(this.$parent, Array.prototype.slice.call(arguments, 1));
+// 		}
+// 		return destination;
+// 	}
+
+// 	if (typeof arguments[0] === 'function') {       
+// 		parent  = arguments[0];       
+// 		methods = arguments[1];     
+// 	} else {       
+// 		methods = arguments[0];     
+// 	}     
+
+// 	if (parent !== undefined) {       
+// 		extend(newClass.prototype, parent.prototype);       
+// 		newClass.prototype.$parent = parent.prototype;
+// 	}
+// 	extend(newClass.prototype, methods);  
+// 	newClass.prototype.constructor = newClass;      
+
+// 	if (!newClass.prototype.initialize) newClass.prototype.initialize = function(){};        
+
+// 	return newClass;   
 // }
 
 
-var Myclass = Op.Class({
-	initialize: function(name, age) {
-		this.name = name;
-		this.age  = age;
-	},
-	print: function() {
-		console.log(this.name + " " + this.age);
-	}
-});
+// Op.helper = {}
 
-var inst = new Myclass("Bob",29);
-inst.print();
+// // Op.helper.iterateObj = function* (obj) {
+// // 	for (var key in obj) {
+// // 		if (obj.hasOwnProperty(key)) {
+// // 			yield obj[key];
+// // 		}
+// // 	}
+// // }
+
+
+// var Myclass = Op.Class({
+// 	initialize: function(name, age) {
+// 		this.name = name;
+// 		this.age  = age;
+// 	},
+// 	print: function() {
+// 		console.log(this.name + " " + this.age);
+// 	}
+// });
+
+// var inst = new Myclass("Bob",29);
+// inst.print();
 GLOBAL.unicrypt = {}
 
 unicrypt.helper = {}

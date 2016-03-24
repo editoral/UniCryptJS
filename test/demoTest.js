@@ -117,3 +117,28 @@ describe('Das gebaute Interface', function() {
         expect(test).to.throwError();
     });
 });
+
+describe('Typisierung mit Hammer', function() {
+    it('testet typisierung mit integer', function() {
+        var test = function()  {
+            var nagel = new demo.snippet.typing.Nagel('10',20);    
+        }
+        expect(test).to.throwError();
+    });
+
+    it('testet typisierung nach objekttypen', function() {
+        var nagel = new demo.snippet.typing.Nagel(10,20);
+        var hammer = new demo.snippet.typing.Hammer(100);
+        var test = function()  {
+            hammer.einschlagen(nagel);    
+        }
+        expect(test).to.throwError();
+    });
+
+});
+
+describe('', function() {
+    it('', function() {
+
+    });
+});

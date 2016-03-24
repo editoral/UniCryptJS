@@ -384,11 +384,14 @@ demo.snippet.typing = {}
 
 // Native Datentypen
 
-demo.snippet.typing.Types = function(type, val) {
+demo.snippet.typing.types = function(type, val) {
+	var h = new demo.snippet.typing.Helper();
 	switch(type) {
 		case 'int':
+			h.integer(val);
 			break;
 		case 'boolean':
+			h.boolean(val);
 			break;
 		case 'byte':
 			break;
@@ -402,16 +405,76 @@ demo.snippet.typing.Types = function(type, val) {
 			break;
 		case 'double':
 			break;
+		case 'String':
+			h.strTest(val);
+			break;
+		default:
+			h.obj(type,val);
+
 	}
 }
-demo.snippet.typing.Hammer = function(preis) {
+
+demo.snippet.typing.Helper = function() {
+}
+
+demo.snippet.typing.Helper.prototype = {
+	integer: function(val) {
+		//Integer existiert in JavaScript nicht!
+		//Es wird eine Prüfung auf number gemacht und anschliesend geschaut,
+		//ob es Nachkomastellen hat.
+		if (!((typeof val === "number") && Math.floor(val) === val)) {
+			throw new Error("param " + val + " is not an integer!");
+		}
+	},
+	boolean: function() {
+		if (!(typeof val === "boolean")) {
+			throw new Error("param " + val + " is not a boolean!");
+		}	
+	},
+	strTest: function() {
+		if (!(typeof val === "boolean")) {
+			throw new Error("param " + val + " is not a boolean!");
+		}	
+	},
+	obj: function(type, val) {
+		if (typeof val === "object") {
+			console.log('hi ' + val.constructor.name);
+			if(!(val.constructor.name === type)) {
+				throw new Error("param " + val + " is not from type " + type + "!");
+			}
+		} else {
+			throw new Error("param " + val + " is not an object!");
+		}
+	}
+}
+
+demo.snippet.typing.Hammer = function Hammer(preis) {
 	this.preis = preis;
 }
 
-demo.snippet.typing.Nagel = function() {
+demo.snippet.typing.Nagel = function Nagel() {
+	var paramType = ['int length', 'int width'];
+	for(var i = 0; i < paramType.length; i++) {
+		var res = paramType[i].split(" ");
+		demo.snippet.typing.types(res[0], arguments[i]);
+		this[res[1]] = arguments[i];
+	}
 
 }
 
+demo.snippet.typing.Nagel.prototype.einschlagen = function() {
+	var paramType = ['Hammer hammer'];
+	for(var i = 0; i < paramType.length; i++) {
+		var res = paramType[i].split(" ");
+		demo.snippet.typing.types(res[0], arguments[i]);
+		this[res[1]] = arguments[i];
+	}
+}
+
+
+var nagel = new demo.snippet.typing.Nagel(10,20);
+var hammer = new demo.snippet.typing.Hammer(100);
+nagel.einschlagen(hammer);
 
 // Dies ist nur zum Spass hier
 // ECMAScript 6 wird leider nicht von allen Browsern unterstützt
@@ -453,15 +516,46 @@ demo.snippet.classBased.returnBaum = function(art, laubbaum, vorkommen, grösse)
 
 GLOBAL.Op = {}
 
-Op.Class = function(obj) {
+/** 
+* Creates a new Klass
+* 
+* @param{}
+**/
+Op.Class = function() {
+
+
+
+	//Makes sure, that there is a constructor function avaliable
 	if(typeof obj.init !== 'function') {
 		obj.init = function() {}
 	}
-	var myClass = function() {
 
-	}	
+	var newClass = function() {}
+	var newClass = 
+
+	for(prop in obj) {
+		switch(typeof prop) {
+			case 'number':
+			case 'boolean':
+			case 'string':
+
+				break;
+		}
+	}
+
+	return newClass;	
 }
 
+//Intern functions. Should not be used from the outside.
+Op._ = {}
+
+Op._.Helper = {}
+
+Op._.Helper
+
+
+
+demo.fw = {}
 
 demo.fw.BaseClass = Op.Class({
 	init: function(initParam) {
