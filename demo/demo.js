@@ -472,9 +472,9 @@ demo.snippet.typing.Nagel.prototype.einschlagen = function() {
 }
 
 
-var nagel = new demo.snippet.typing.Nagel(10,20);
-var hammer = new demo.snippet.typing.Hammer(100);
-nagel.einschlagen(hammer);
+// var nagel = new demo.snippet.typing.Nagel(10,20);
+// var hammer = new demo.snippet.typing.Hammer(100);
+// nagel.einschlagen(hammer);
 
 // Dies ist nur zum Spass hier
 // ECMAScript 6 wird leider nicht von allen Browsern unterstützt
@@ -517,31 +517,58 @@ demo.snippet.classBased.returnBaum = function(art, laubbaum, vorkommen, grösse)
 GLOBAL.Op = {}
 
 /** 
-* Creates a new Klass
+* Creates a new Class
 * 
-* @param{}
+* @param {string} name - The name of the new Class
+* @param {object} actual class - JavaScript Object to define the Class
 **/
 Op.Class = function() {
-
-
+	//Fetch the parameters
+	var className = arguments[0];
+	var obj = arguments[1];
 
 	//Makes sure, that there is a constructor function avaliable
-	if(typeof obj.init !== 'function') {
-		obj.init = function() {}
+	if(!obj.hasOwnProperty('init') || typeof obj.init !== 'function') {
+		obj.init = function init() {}
 	}
 
-	var newClass = function() {}
-	var newClass = 
+	//newClass.prototype.constructor = obj.init;
+	var newClass = function() {
+		//assign functions and variables
+		for(var prop in obj) {
+			if(!(prop === 'init')) {
+				if(['number', 'boolean', 'string', 'object'].indexOf(typeof obj[prop]) >= 0) {
+					this[prop] = obj[prop];
+				}
+			}
+		}
+		obj.init.apply(this, arguments);
+	}
 
-	for(prop in obj) {
-		switch(typeof prop) {
-			case 'number':
-			case 'boolean':
-			case 'string':
-
-				break;
+	for(var prop in obj) {
+		if(!(prop === 'init')) {
+			if(typeof obj[prop] === 'function') {
+				newClass.prototype[prop] = obj[prop];					
+			}
 		}
 	}
+
+	// //assign functions and variables
+	// for(var prop in obj) {
+	// 	if(!(prop === 'init')) {
+	// 		switch(typeof obj[prop]) {
+	// 			case 'number':
+	// 			case 'boolean':
+	// 			case 'string':
+	// 			case 'object':
+	// 				newClass.prototype.constructor[prop] = obj[prop];					
+	// 				break;
+	// 			case 'function':
+	// 				newClass.prototype[prop] = obj[prop];
+	// 				break;
+	// 		}
+	// 	}
+	// }
 
 	return newClass;	
 }
@@ -557,12 +584,18 @@ Op._.Helper
 
 demo.fw = {}
 
-demo.fw.BaseClass = Op.Class({
+demo.fw.BaseClass = Op.Class('BaseClass', {
+	constructorParam: null,
 	init: function(initParam) {
-
+		this.constructorParam = initParam;
 	},
 	function1: function(param1, param2) {
-
+		return param1 + param2;
 	},
 	x: 10
-})
+});
+
+//console.log(demo.fw.BaseClass.prototype.constructor.name);
+
+var myFunc = new demo.fw.BaseClass(20);
+console.log(myFunc.function1(10, 30));

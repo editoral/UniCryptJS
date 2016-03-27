@@ -516,17 +516,44 @@ demo.snippet.classBased.returnBaum = function(art, laubbaum, vorkommen, grösse)
 
 GLOBAL.Op = {}
 
-Op.Class = function(obj) {
+/** 
+* Creates a new Class
+* 
+* @param {string} name - The name of the new Class
+* @param {object} actual class - JavaScript Object to define the Class
+**/
+Op.Class = function() {
+
+
+
+	//Makes sure, that there is a constructor function avaliable
 	if(typeof obj.init !== 'function') {
 		obj.init = function() {}
 	}
-	var myClass = function() {
 
-	}	
+	var newClass = function() {}
+	var newClass = 
+
+	for(prop in obj) {
+		switch(typeof prop) {
+			case 'number':
+			case 'boolean':
+			case 'string':
+
+				break;
+		}
+	}
+
+	return newClass;	
 }
 
+//Intern functions. Should not be used from the outside.
+Op._ = {}
 
-Op
+Op._.Helper = {}
+
+Op._.Helper
+
 
 
 demo.fw = {}
