@@ -84,6 +84,42 @@ demo.snippet = {}
 
 demo.snippet.classBased = {}
 
+// Dies ist nur zum Spass hier
+// ECMAScript 6 wird leider nicht von allen Browsern unterstützt
+// und ist erst am kommen. Deshalb nur der Vollständigkeitshalber hier beschrieben.
+
+
+demo.snippet.classBased.Pflanze = class Pflanze {
+	constructor(vorkommen, grösse) {
+		this.vorkommen = vorkommen;
+		this.grösse = grösse;
+	}
+
+	get info() {
+		return this.vorkommen + " " + this.grösse;
+	}
+
+	static explain() {
+		return "Mit mir kann man Pflanzen erstellen."
+	}
+}
+
+
+demo.snippet.classBased.Baum = class Baum extends demo.snippet.classBased.Pflanze {
+	constructor(art, laubbaum, vorkommen, grösse) {
+		super(vorkommen, grösse);
+		this.art = art;
+		this.laubbaum = laubbaum;	
+	}
+	get info() {
+		return super.info() + " " + this.art + " " + this.laubbaum;
+	}
+}
+
+demo.snippet.classBased.returnBaum = function(art, laubbaum, vorkommen, grösse) {
+	return new demo.snippet.classBased.Baum(art, laubbaum, vorkommen, grösse);
+}
+
 //Dies ist sowohl eine Funktion wie auch ein instantiierbares Objekt. 
 demo.snippet.Fahrzeug = function(anzahlRäder, führerAusweisKategorie, autobahnZulassung) {
 	// this ist eine Referenz auf sich selbst. Sehr verwirrend, da es ja eine Funktion ist und keine Klasse.
@@ -388,28 +424,28 @@ demo.snippet.typing.types = function(type, val) {
 	var h = new demo.snippet.typing.Helper();
 	switch(type) {
 		case 'int':
-			h.integer(val);
-			break;
+		h.integer(val);
+		break;
 		case 'boolean':
-			h.boolean(val);
-			break;
+		h.boolean(val);
+		break;
 		case 'byte':
-			break;
+		break;
 		case 'char':
-			break;
+		break;
 		case 'short':
-			break;
+		break;
 		case 'long':
-			break;
+		break;
 		case 'float':
-			break;
+		break;
 		case 'double':
-			break;
+		break;
 		case 'String':
-			h.strTest(val);
-			break;
+		h.strTest(val);
+		break;
 		default:
-			h.obj(type,val);
+		h.obj(type,val);
 
 	}
 }
@@ -476,45 +512,92 @@ demo.snippet.typing.Nagel.prototype.einschlagen = function() {
 // var hammer = new demo.snippet.typing.Hammer(100);
 // nagel.einschlagen(hammer);
 
-// Dies ist nur zum Spass hier
-// ECMAScript 6 wird leider nicht von allen Browsern unterstützt
-// und ist erst am kommen. Deshalb nur der Vollständigkeitshalber hier beschrieben.
-
-
-demo.snippet.classBased.Pflanze = class Pflanze {
-	constructor(vorkommen, grösse) {
-		this.vorkommen = vorkommen;
-		this.grösse = grösse;
-	}
-
-	get info() {
-		return this.vorkommen + " " + this.grösse;
-	}
-
-	static explain() {
-		return "Mit mir kann man Pflanzen erstellen."
-	}
-}
-
-
-demo.snippet.classBased.Baum = class Baum extends demo.snippet.classBased.Pflanze {
-	constructor(art, laubbaum, vorkommen, grösse) {
-		super(vorkommen, grösse);
-		this.art = art;
-		this.laubbaum = laubbaum;	
-	}
-	get info() {
-		return super.info() + " " + this.art + " " + this.laubbaum;
-	}
-}
-
-demo.snippet.classBased.returnBaum = function(art, laubbaum, vorkommen, grösse) {
-	return new demo.snippet.classBased.Baum(art, laubbaum, vorkommen, grösse);
-}
-
 
 
 GLOBAL.Op = {}
+
+//Intern functions. Should not be used from the outside.
+Op._ = {}
+
+Op._.helper = {}
+
+/**
+ * JavaScript Rename Function
+ * @author Nate Ferrero
+ * @license Public Domain
+ * @date Apr 5th, 2014
+ */
+Op._.helper.renameFunction = function (name, fn) {
+    return (new Function("return function (call) { return function " + name +
+        " () { return call(this, arguments) }; };")())(Function.apply.bind(fn));
+};  
+
+Op._.typing = {}
+
+Op._.typing.TestTypes = function() {
+
+}
+
+Op._.typing.TestTypes.prototype = {
+	integer: function(val) {
+		//As there is no such things as Integer in JavaScript, because every number is internally represented as floating
+		//point value, it is only possible to test if it is a number.
+		//Afterwards it can be determined, wether it is an Integer
+		if (!((typeof val === "number") && Math.floor(val) === val)) {
+			throw new Error("param " + val + " is not an integer!");
+		}
+	},
+	boolean: function() {
+		if (!(typeof val === "boolean")) {
+			throw new Error("param " + val + " is not a boolean!");
+		}	
+	},
+	strTest: function() {
+		if (!(typeof val === "boolean")) {
+			throw new Error("param " + val + " is not a boolean!");
+		}	
+	},
+	obj: function(type, val) {
+		if (typeof val === "object") {
+			if(!(val.constructor.name === type)) {
+				throw new Error("param " + val + " is not from type " + type + "!");
+			}
+		} else {
+			throw new Error("param " + val + " is not an object!");
+		}
+	}
+}
+
+Op._.typing.testTypes = function(type, val) {
+	var h = new Op._.typing.TestTypes();
+	switch(type) {
+		case 'int':
+		h.integer(val);
+		break;
+		case 'boolean':
+		h.boolean(val);
+		break;
+		case 'byte':
+		break;
+		case 'char':
+		break;
+		case 'short':
+		break;
+		case 'long':
+		break;
+		case 'float':
+		break;
+		case 'double':
+		break;
+		case 'String':
+		h.strTest(val);
+		break;
+		default:
+		h.obj(type,val);
+
+	}
+}
+
 
 /** 
 * Creates a new Class
@@ -532,9 +615,9 @@ Op.Class = function() {
 		obj.init = function init() {}
 	}
 
-	//newClass.prototype.constructor = obj.init;
+	//define a new constructor
 	var newClass = function() {
-		//assign functions and variables
+		//assign all instance variables
 		for(var prop in obj) {
 			if(!(prop === 'init')) {
 				if(['number', 'boolean', 'string', 'object'].indexOf(typeof obj[prop]) >= 0) {
@@ -542,44 +625,51 @@ Op.Class = function() {
 				}
 			}
 		}
+		//execute the defined init function, as the oop constructor
 		obj.init.apply(this, arguments);
 	}
 
+	//name the new Class
+	newClass = Op._.helper.renameFunction(className, newClass);
+
+	//append all defined functions to prototype of the new JavaScript function
+	//they will be wrapped in another function to ensure the right types of the parameters
 	for(var prop in obj) {
 		if(!(prop === 'init')) {
 			if(typeof obj[prop] === 'function') {
-				newClass.prototype[prop] = obj[prop];					
+				var paramType = obj[prop].prototype._paramType_;
+				//If the type of the Params are spezified a wrapper is defined
+				if(Array.isArray(paramType)) {
+					if(paramType.length !== obj[prop].length) {
+						throw new Error("Parameter types and number of Parameters missmatch!");
+					}
+					var execFunc = obj[prop];
+					var typingWrapper = function() {
+						for(var i = 0; i < paramType.length; i++) {
+							Op._.typing.testTypes(paramType[i], arguments[i]);
+						}
+						return execFunc.apply(this, arguments);
+					}
+					newClass.prototype[prop] = typingWrapper;
+				} else {
+					newClass.prototype[prop] = obj[prop];
+				}
 			}
 		}
 	}
 
-	// //assign functions and variables
-	// for(var prop in obj) {
-	// 	if(!(prop === 'init')) {
-	// 		switch(typeof obj[prop]) {
-	// 			case 'number':
-	// 			case 'boolean':
-	// 			case 'string':
-	// 			case 'object':
-	// 				newClass.prototype.constructor[prop] = obj[prop];					
-	// 				break;
-	// 			case 'function':
-	// 				newClass.prototype[prop] = obj[prop];
-	// 				break;
-	// 		}
-	// 	}
-	// }
-
-	return newClass;	
+	return newClass;
 }
 
-//Intern functions. Should not be used from the outside.
-Op._ = {}
 
-Op._.Helper = {}
-
-Op._.Helper
-
+Function.prototype.paramType = function paramType() {
+	var arr = arguments[0];
+	if(!Array.isArray(arr)) {
+		throw new Error("Parameter types need to be in an array!");
+	}
+	this.prototype._paramType_ = arr;
+	return this;
+}
 
 
 demo.fw = {}
@@ -591,11 +681,21 @@ demo.fw.BaseClass = Op.Class('BaseClass', {
 	},
 	function1: function(param1, param2) {
 		return param1 + param2;
-	},
+	}.paramType(['int', 'int']),
 	x: 10
+});
+
+demo.fw.SecondBaseClass = Op.Class('SecondBaseClass', {
+	functionCombine: function(param1, param2) {
+		return param1.constructorParam + param2;
+	}.paramType(['BaseClass', 'int'])
 });
 
 //console.log(demo.fw.BaseClass.prototype.constructor.name);
 
-var myFunc = new demo.fw.BaseClass(20);
-console.log(myFunc.function1(10, 30));
+var myBaseClass = new demo.fw.BaseClass(20);
+//console.log(myBaseClass.constructor.name);
+var mySecClass = new demo.fw.SecondBaseClass();
+console.log(mySecClass.functionCombine(myBaseClass, 30));
+
+
