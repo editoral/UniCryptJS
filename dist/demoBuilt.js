@@ -352,7 +352,7 @@ demo.snippet.abstractClass.Bankkonto = function() {
 	this.$abheben = function(summe) {}
 	this.einzahlen = function(summe) {
 		this.ursprungsKontostand += summe;
-		return this.ursprungsKon
+		return this.ursprungsKontostand
 	}
 }
 
@@ -568,14 +568,19 @@ Op._.typing.TestTypes.prototype = {
 			throw new Error("param " + val + " is not an integer!");
 		}
 	},
-	boolean: function() {
+	boolean: function(val) {
 		if (!(typeof val === "boolean")) {
 			throw new Error("param " + val + " is not a boolean!");
 		}	
 	},
-	strTest: function() {
-		if (!(typeof val === "boolean")) {
-			throw new Error("param " + val + " is not a boolean!");
+	strTest: function(val) {
+		if (!(typeof val === "string")) {
+			throw new Error("param " + val + " is not a string!");
+		}	
+	},
+	untypedObj: function(val) {
+		if (!(typeof val === "object")) {
+			throw new Error("param " + val + " is not an object!");
 		}	
 	},
 	obj: function(type, val) {
@@ -593,10 +598,10 @@ Op._.typing.testTypes = function(type, val) {
 	var h = new Op._.typing.TestTypes();
 	switch(type) {
 		case 'int':
-		h.integer(val);
+			h.integer(val);
 		break;
 		case 'boolean':
-		h.boolean(val);
+			h.boolean(val);
 		break;
 		case 'byte':
 		break;
@@ -611,11 +616,12 @@ Op._.typing.testTypes = function(type, val) {
 		case 'double':
 		break;
 		case 'String':
-		h.strTest(val);
+			h.strTest(val);
 		break;
+		case 'object':
+			h.untypedObj(val);
 		default:
-		h.obj(type,val);
-
+			h.obj(type,val);
 	}
 }
 
@@ -624,12 +630,16 @@ Op._.typing.testTypes = function(type, val) {
 * Creates a new Class
 * 
 * @param {string} name - The name of the new Class
-* @param {object} actual class - JavaScript Object to define the Class
+* @param {object} actualClass - JavaScript Object to define the Class
+* @param {function} [inheritClass] - An existing base class to inherit from
 **/
 Op.Class = function() {
 	//Fetch the parameters
 	var className = arguments[0];
 	var obj = arguments[1];
+	// optional parameter: Class to inherit
+	var baseClass = arguments[2];
+	var isChild = typeof baseClass === 'function' ? true : false;
 
 	//Makes sure, that there is a constructor function avaliable
 	if(!obj.hasOwnProperty('init') || typeof obj.init !== 'function') {
@@ -657,6 +667,16 @@ Op.Class = function() {
 
 	//name the new Class
 	newClass = Op._.helper.renameFunction(className, newClass);
+
+	//Start inheritance
+	if(isChild) {
+		newClass.prototype = Object.create(baseClass.prototype);
+		newClass.prototype.constructor = newClass;
+		// call the constructor of the baseClass
+		newClass.prototype.$$super = function() {
+			baseClass.apply(this, arguments);
+		}
+	}
 
 	//append all defined functions to prototype of the new JavaScript function
 	//they will be wrapped in another function to ensure the right types of the parameters
@@ -704,13 +724,42 @@ demo.fw.SecondBaseClass = Op.Class('SecondBaseClass', {
 	}.paramType(['BaseClass', 'int'])
 });
 
+demo.fw.ChildClass = Op.Class('SecondBaseClass', {
+	init: function(initStrParam, intForSuperClass) {
+		this.strConstructorParam = initStrParam;
+		this.$$super(intForSuperClass);
+	}.paramType(['String', 'int']),
+	y: 20,
+	strConstructorParam: null,
+	testSuper: function() {
+		return this.strConstructorParam + " " + this.constructorParam;
+	}
+
+}, demo.fw.BaseClass);
+
+
 //console.log(demo.fw.BaseClass.prototype.constructor.name);
 
 var myBaseClass = new demo.fw.BaseClass(20);
 //console.log(myBaseClass.constructor.name);
-var mySecClass = new demo.fw.SecondBaseClass();
-console.log(mySecClass.functionCombine(myBaseClass, 30));
+//var mySecClass = new demo.fw.SecondBaseClass();
+//console.log(mySecClass.functionCombine(myBaseClass, 30));
 
+var childClass = new demo.fw.ChildClass('My super int:', 10);
+//nsole.log(childClass.function1());
+
+/*
+
+Konventionen:
+
+init ist der Konstruktor
+function() {} wurde um paramType erwietert
+				es wird ein Array mit den Typen in richtiger reihenfolge erwartet
+Op.Class bekommt als parameter einen name und ein klassenobjekt
+this.$$super ist die Super konstruktor funktion.
+
+
+*/
 
 
 // Function.prototype.inherit = function(obj) {

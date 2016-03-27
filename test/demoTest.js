@@ -112,10 +112,10 @@ describe('Das gebaute Interface', function() {
     });
     it('klappt mit der Instatntiirung nicht mehr wenn eine Methode vergessen wurde', function() {
         var test = function() {
-           var cssKonto = new demo.snippet.interface2.CSSKonto(1000);
-       }
-       expect(test).to.throwError();
-   });
+         var cssKonto = new demo.snippet.interface2.CSSKonto(1000);
+     }
+     expect(test).to.throwError();
+ });
 });
 
 describe('Typisierung mit Hammer', function() {
@@ -160,7 +160,7 @@ describe('tests with Op FW classes generation and with typing', function() {
         var myBaseClass = new demo.fw.BaseClass(20);    
         var test = function() {
             myBaseClass.function1('10',10);    
-        } 
+        }
         expect(test).to.throwError(); 
     });
 
@@ -178,11 +178,26 @@ describe('tests with Op FW classes generation and with typing', function() {
         var test = function() {
             return mySecClass.functionCombine(myBaseClass, 30);    
         } 
-        expect(test()).to.be(50); 
+        expect(test()).to.be(50);
     });
 });
 
 
+describe('tests with Op FW inheritance', function() {
+    it('assigns a variable trough super constructor', function() {
+        var childClass = new demo.fw.ChildClass('My super int:', 10);
+        expect(childClass.testSuper()).to.be('My super int: 10');
+    });
+
+    it('checks for the super class attribute', function() {
+        var childClass = new demo.fw.ChildClass('My super int:', 10);
+        expect(childClass.x).to.be(10);
+    });
+    it('checks for the super class function', function() {
+        var childClass = new demo.fw.ChildClass('My super int:', 10);
+        expect(childClass.function1(20, 40)).to.be(60);
+    });
+});
 
 
 
