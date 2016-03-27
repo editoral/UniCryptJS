@@ -6,7 +6,7 @@ var build = require('../dist/demoBuilt.js');
 describe('A first example', function() {
     it('will write names but can\'t', function () {
       assert.notEqual("Tom Dimitri", demo.execute());
-    });
+  });
     it('will now have instance variables', function() {
     	assert.equal("Tom Dimitri", demo.execute2());
     });
@@ -112,10 +112,10 @@ describe('Das gebaute Interface', function() {
     });
     it('klappt mit der Instatntiirung nicht mehr wenn eine Methode vergessen wurde', function() {
         var test = function() {
-             var cssKonto = new demo.snippet.interface2.CSSKonto(1000);
-        }
-        expect(test).to.throwError();
-    });
+           var cssKonto = new demo.snippet.interface2.CSSKonto(1000);
+       }
+       expect(test).to.throwError();
+   });
 });
 
 describe('Typisierung mit Hammer', function() {
@@ -136,6 +136,55 @@ describe('Typisierung mit Hammer', function() {
     });
 
 });
+
+describe('tests with Op FW classes generation and with typing', function() {
+    it('instantiiate a base class and get public attribute', function() {
+        var myBaseClass = new demo.fw.BaseClass(20);
+        expect(myBaseClass.x).to.be(10);
+    });
+    it('instantiiate a base class and tests the constructor assignement', function() {
+        var myBaseClass = new demo.fw.BaseClass(20);
+        expect(myBaseClass.constructorParam).to.be(20);
+    });
+    it('instantiiate a base class and tests a function', function() {
+        var myBaseClass = new demo.fw.BaseClass(20);
+        expect(myBaseClass.function1(20,20)).to.be(40);
+    });
+    it('tests typing correctnes with integers in the constructor', function() {
+        var test = function() {
+            var myBaseClass = new demo.fw.BaseClass('20');    
+        }
+        expect(test).to.throwError();
+    });
+    it('tests typing correctnes with integers in a function param', function() {
+        var myBaseClass = new demo.fw.BaseClass(20);    
+        var test = function() {
+            myBaseClass.function1('10',10);    
+        } 
+        expect(test).to.throwError(); 
+    });
+
+    it('tests typing correctnes with objects in a function param throwing Error', function() {
+        var myBaseClass = new demo.fw.BaseClass(20);    
+        var mySecClass = new demo.fw.SecondBaseClass();
+        var test = function() {
+            mySecClass.functionCombine('10', 30);    
+        } 
+        expect(test).to.throwError(); 
+    });
+    it('tests typing correctnes with objects in a function param working', function() {
+        var myBaseClass = new demo.fw.BaseClass(20);    
+        var mySecClass = new demo.fw.SecondBaseClass();
+        var test = function() {
+            return mySecClass.functionCombine(myBaseClass, 30);    
+        } 
+        expect(test()).to.be(50); 
+    });
+});
+
+
+
+
 
 describe('', function() {
     it('', function() {

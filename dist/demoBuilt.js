@@ -84,6 +84,42 @@ demo.snippet = {}
 
 demo.snippet.classBased = {}
 
+// Dies ist nur zum Spass hier
+// ECMAScript 6 wird leider nicht von allen Browsern unterstützt
+// und ist erst am kommen. Deshalb nur der Vollständigkeitshalber hier beschrieben.
+
+
+demo.snippet.classBased.Pflanze = class Pflanze {
+	constructor(vorkommen, grösse) {
+		this.vorkommen = vorkommen;
+		this.grösse = grösse;
+	}
+
+	get info() {
+		return this.vorkommen + " " + this.grösse;
+	}
+
+	static explain() {
+		return "Mit mir kann man Pflanzen erstellen."
+	}
+}
+
+
+demo.snippet.classBased.Baum = class Baum extends demo.snippet.classBased.Pflanze {
+	constructor(art, laubbaum, vorkommen, grösse) {
+		super(vorkommen, grösse);
+		this.art = art;
+		this.laubbaum = laubbaum;	
+	}
+	get info() {
+		return super.info() + " " + this.art + " " + this.laubbaum;
+	}
+}
+
+demo.snippet.classBased.returnBaum = function(art, laubbaum, vorkommen, grösse) {
+	return new demo.snippet.classBased.Baum(art, laubbaum, vorkommen, grösse);
+}
+
 //Dies ist sowohl eine Funktion wie auch ein instantiierbares Objekt. 
 demo.snippet.Fahrzeug = function(anzahlRäder, führerAusweisKategorie, autobahnZulassung) {
 	// this ist eine Referenz auf sich selbst. Sehr verwirrend, da es ja eine Funktion ist und keine Klasse.
@@ -388,28 +424,28 @@ demo.snippet.typing.types = function(type, val) {
 	var h = new demo.snippet.typing.Helper();
 	switch(type) {
 		case 'int':
-			h.integer(val);
-			break;
+		h.integer(val);
+		break;
 		case 'boolean':
-			h.boolean(val);
-			break;
+		h.boolean(val);
+		break;
 		case 'byte':
-			break;
+		break;
 		case 'char':
-			break;
+		break;
 		case 'short':
-			break;
+		break;
 		case 'long':
-			break;
+		break;
 		case 'float':
-			break;
+		break;
 		case 'double':
-			break;
+		break;
 		case 'String':
-			h.strTest(val);
-			break;
+		h.strTest(val);
+		break;
 		default:
-			h.obj(type,val);
+		h.obj(type,val);
 
 	}
 }
@@ -472,49 +508,117 @@ demo.snippet.typing.Nagel.prototype.einschlagen = function() {
 }
 
 
-var nagel = new demo.snippet.typing.Nagel(10,20);
-var hammer = new demo.snippet.typing.Hammer(100);
-nagel.einschlagen(hammer);
-
-// Dies ist nur zum Spass hier
-// ECMAScript 6 wird leider nicht von allen Browsern unterstützt
-// und ist erst am kommen. Deshalb nur der Vollständigkeitshalber hier beschrieben.
+// var nagel = new demo.snippet.typing.Nagel(10,20);
+// var hammer = new demo.snippet.typing.Hammer(100);
+// nagel.einschlagen(hammer);
 
 
-demo.snippet.classBased.Pflanze = class Pflanze {
-	constructor(vorkommen, grösse) {
-		this.vorkommen = vorkommen;
-		this.grösse = grösse;
-	}
-
-	get info() {
-		return this.vorkommen + " " + this.grösse;
-	}
-
-	static explain() {
-		return "Mit mir kann man Pflanzen erstellen."
-	}
-}
-
-
-demo.snippet.classBased.Baum = class Baum extends demo.snippet.classBased.Pflanze {
-	constructor(art, laubbaum, vorkommen, grösse) {
-		super(vorkommen, grösse);
-		this.art = art;
-		this.laubbaum = laubbaum;	
-	}
-	get info() {
-		return super.info() + " " + this.art + " " + this.laubbaum;
-	}
-}
-
-demo.snippet.classBased.returnBaum = function(art, laubbaum, vorkommen, grösse) {
-	return new demo.snippet.classBased.Baum(art, laubbaum, vorkommen, grösse);
-}
-
+//Op Framework to add class based inheritance as known from Java
 
 
 GLOBAL.Op = {}
+
+//Extend the function prototype, so it is possible to assign a paramType
+Function.prototype.paramType = function paramType() {
+	var arr = arguments[0];
+	if(!Array.isArray(arr)) {
+		throw new Error("Parameter types need to be in an array!");
+	}
+	this.prototype._paramType_ = arr;
+	return this;
+}
+
+//Intern functions. Should not be used from the outside.
+Op._ = {}
+
+Op._.helper = {}
+
+Op._.helper.matchParamsArgs = function(paramType, args) {
+	if(paramType.length !== args.length) {
+		throw new Error("Number of parameter types and number of parameters missmatch!");
+	}
+	for(var i = 0; i < paramType.length; i++) {
+		Op._.typing.testTypes(paramType[i], args[i]);
+	}	
+}
+
+/**
+ * JavaScript Rename Function
+ * @author Nate Ferrero
+ * @license Public Domain
+ * @date Apr 5th, 2014
+ */
+Op._.helper.renameFunction = function (name, fn) {
+    return (new Function("return function (call) { return function " + name +
+        " () { return call(this, arguments) }; };")())(Function.apply.bind(fn));
+};  
+
+Op._.typing = {}
+
+Op._.typing.TestTypes = function() {
+
+}
+
+Op._.typing.TestTypes.prototype = {
+	integer: function(val) {
+		//As there is no such things as Integer in JavaScript, because every number is internally represented as floating
+		//point value, it is only possible to test if it is a number.
+		//Afterwards it can be determined, wether it is an Integer
+		if (!((typeof val === "number") && Math.floor(val) === val)) {
+			throw new Error("param " + val + " is not an integer!");
+		}
+	},
+	boolean: function() {
+		if (!(typeof val === "boolean")) {
+			throw new Error("param " + val + " is not a boolean!");
+		}	
+	},
+	strTest: function() {
+		if (!(typeof val === "boolean")) {
+			throw new Error("param " + val + " is not a boolean!");
+		}	
+	},
+	obj: function(type, val) {
+		if (typeof val === "object") {
+			if(!(val.constructor.name === type)) {
+				throw new Error("param " + val + " is not from type " + type + "!");
+			}
+		} else {
+			throw new Error("param " + val + " is not an object!");
+		}
+	}
+}
+
+Op._.typing.testTypes = function(type, val) {
+	var h = new Op._.typing.TestTypes();
+	switch(type) {
+		case 'int':
+		h.integer(val);
+		break;
+		case 'boolean':
+		h.boolean(val);
+		break;
+		case 'byte':
+		break;
+		case 'char':
+		break;
+		case 'short':
+		break;
+		case 'long':
+		break;
+		case 'float':
+		break;
+		case 'double':
+		break;
+		case 'String':
+		h.strTest(val);
+		break;
+		default:
+		h.obj(type,val);
+
+	}
+}
+
 
 /** 
 * Creates a new Class
@@ -523,50 +627,92 @@ GLOBAL.Op = {}
 * @param {object} actual class - JavaScript Object to define the Class
 **/
 Op.Class = function() {
-
-
+	//Fetch the parameters
+	var className = arguments[0];
+	var obj = arguments[1];
 
 	//Makes sure, that there is a constructor function avaliable
-	if(typeof obj.init !== 'function') {
-		obj.init = function() {}
+	if(!obj.hasOwnProperty('init') || typeof obj.init !== 'function') {
+		obj.init = function init() {}
 	}
 
-	var newClass = function() {}
-	var newClass = 
+	//define a new constructor
+	var newClass = function() {
+		//Tests the typing
+		var paramType = obj.init.prototype._paramType_;
+		if(Array.isArray(paramType)) {
+			Op._.helper.matchParamsArgs(paramType, arguments);
+		}
+		//assign all instance variables
+		for(var prop in obj) {
+			if(!(prop === 'init')) {
+				if(['number', 'boolean', 'string', 'object'].indexOf(typeof obj[prop]) >= 0) {
+					this[prop] = obj[prop];
+				}
+			}
+		}
+		//execute the defined init function, as the oop constructor
+		obj.init.apply(this, arguments);
+	}
 
-	for(prop in obj) {
-		switch(typeof prop) {
-			case 'number':
-			case 'boolean':
-			case 'string':
+	//name the new Class
+	newClass = Op._.helper.renameFunction(className, newClass);
 
-				break;
+	//append all defined functions to prototype of the new JavaScript function
+	//they will be wrapped in another function to ensure the right types of the parameters
+	for(var prop in obj) {
+		if(!(prop === 'init')) {
+			if(typeof obj[prop] === 'function') {
+				var paramType = obj[prop].prototype._paramType_;
+				//If the type of the Params are spezified a wrapper is defined
+				if(Array.isArray(paramType)) {
+					var execFunc = obj[prop];
+					var typingWrapper = function() {
+						Op._.helper.matchParamsArgs(paramType, arguments);
+						return execFunc.apply(this, arguments);
+					}
+					newClass.prototype[prop] = typingWrapper;
+				} else {
+					newClass.prototype[prop] = obj[prop];
+				}
+			}
 		}
 	}
 
-	return newClass;	
+	return newClass;
 }
 
-//Intern functions. Should not be used from the outside.
-Op._ = {}
-
-Op._.Helper = {}
-
-Op._.Helper
 
 
 
 demo.fw = {}
 
-demo.fw.BaseClass = Op.Class({
+demo.fw.BaseClass = Op.Class('BaseClass', {
+	constructorParam: null,
 	init: function(initParam) {
-
-	},
+		this.constructorParam = initParam;
+	}.paramType(['int']),
 	function1: function(param1, param2) {
-
-	},
+		return param1 + param2;
+	}.paramType(['int', 'int']),
 	x: 10
-})
+});
+
+demo.fw.SecondBaseClass = Op.Class('SecondBaseClass', {
+	functionCombine: function(param1, param2) {
+		return param1.constructorParam + param2;
+	}.paramType(['BaseClass', 'int'])
+});
+
+//console.log(demo.fw.BaseClass.prototype.constructor.name);
+
+var myBaseClass = new demo.fw.BaseClass(20);
+//console.log(myBaseClass.constructor.name);
+var mySecClass = new demo.fw.SecondBaseClass();
+console.log(mySecClass.functionCombine(myBaseClass, 30));
+
+
+
 // Function.prototype.inherit = function(obj) {
 
 // }

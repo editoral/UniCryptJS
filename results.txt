@@ -1,4 +1,4 @@
-hi Hammer
+50
 
 [0m[0m
 [0m  A first example[0m
@@ -35,9 +35,18 @@ hi Hammer
 [2K[0G  [32m  √[0m[90m testet typisierung mit integer[0m
 [2K[0G  [32m  √[0m[90m testet typisierung nach objekttypen[0m
 
+[0m  tests with Op FW classes generation and with typing[0m
+[2K[0G  [32m  √[0m[90m instantiiate a base class and get public attribute[0m
+[2K[0G  [32m  √[0m[90m instantiiate a base class and tests the constructor assignement[0m
+[2K[0G  [32m  √[0m[90m instantiiate a base class and tests a function[0m
+[2K[0G  [32m  √[0m[90m tests typing correctnes with integers in the constructor[0m
+[2K[0G  [32m  √[0m[90m tests typing correctnes with integers in a function param[0m
+[2K[0G  [32m  √[0m[90m tests typing correctnes with objects in a function param throwing Error[0m
+[2K[0G  [32m  √[0m[90m tests typing correctnes with objects in a function param working[0m
+
 [0m  [0m
 [2K[0G  [32m  √[0m[90m [0m
 
 
-[92m [0m[32m 23 passing[0m[90m (76ms)[0m
+[92m [0m[32m 30 passing[0m[90m (47ms)[0m
 
