@@ -1,32 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>JSDoc: Source: demo.js</title>
-
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
-</head>
-
-<body>
-
-<div id="main">
-
-    <h1 class="page-title">Source: demo.js</h1>
-
-    
-
-
-
-    
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>"use strict";
+"use strict";
 
 
 
@@ -205,7 +177,7 @@ demo.snippet.Fahrzeug.prototype.meinTreibstoff = function() {
 // Dies ist ein gewöhnlicher Konstruktor der die Attribute initialisiert
 demo.snippet.Auto = function(farbe, marke, preis) {
 	// Wir wollen eine Typenprüfung
-	if (!((typeof preis === "number") &amp;&amp; Math.floor(preis) === preis)) {
+	if (!((typeof preis === "number") && Math.floor(preis) === preis)) {
 		throw new Error("kein Integer");
 	}
 	// Neu wird verhindert, dass diese Funktion kein Objekt zurückliefert.
@@ -393,7 +365,7 @@ demo.snippet.abstractClass.UbsKonto = function(ursprungsKontostand) {
 
 	for(var prop in proto){
 		//1console.log(prop.match('\$') + " " + prop);
-		if (typeof proto[prop] === 'function' &amp;&amp; prop.match('\\$')) {
+		if (typeof proto[prop] === 'function' && prop.match('\\$')) {
 			prop = prop.substring(1);
 			if(!demo.snippet.abstractClass.UbsKonto.prototype.hasOwnProperty(prop)) {
 				throw new Error('Abstract not implemented');
@@ -486,7 +458,7 @@ demo.snippet.typing.Helper.prototype = {
 		//Integer existiert in JavaScript nicht!
 		//Es wird eine Prüfung auf number gemacht und anschliesend geschaut,
 		//ob es Nachkomastellen hat.
-		if (!((typeof val === "number") &amp;&amp; Math.floor(val) === val)) {
+		if (!((typeof val === "number") && Math.floor(val) === val)) {
 			throw new Error("param " + val + " is not an integer!");
 		}
 	},
@@ -518,7 +490,7 @@ demo.snippet.typing.Hammer = function Hammer(preis) {
 
 demo.snippet.typing.Nagel = function Nagel() {
 	var paramType = ['int length', 'int width'];
-	for(var i = 0; i &lt; paramType.length; i++) {
+	for(var i = 0; i < paramType.length; i++) {
 		var res = paramType[i].split(" ");
 		demo.snippet.typing.types(res[0], arguments[i]);
 		this[res[1]] = arguments[i];
@@ -528,7 +500,7 @@ demo.snippet.typing.Nagel = function Nagel() {
 
 demo.snippet.typing.Nagel.prototype.einschlagen = function() {
 	var paramType = ['Hammer hammer'];
-	for(var i = 0; i &lt; paramType.length; i++) {
+	for(var i = 0; i < paramType.length; i++) {
 		var res = paramType[i].split(" ");
 		demo.snippet.typing.types(res[0], arguments[i]);
 		this[res[1]] = arguments[i];
@@ -565,7 +537,7 @@ Op._.helper.matchParamsArgs = function(paramType, args) {
 	if(paramType.length !== args.length) {
 		throw new Error("Number of parameter types and number of parameters missmatch!");
 	}
-	for(var i = 0; i &lt; paramType.length; i++) {
+	for(var i = 0; i < paramType.length; i++) {
 		Op._.typing.testTypes(paramType[i], args[i]);
 	}	
 }
@@ -592,7 +564,7 @@ Op._.typing.TestTypes.prototype = {
 		//As there is no such things as Integer in JavaScript, because every number is internally represented as floating
 		//point value, it is only possible to test if it is a number.
 		//Afterwards it can be determined, wether it is an Integer
-		if (!((typeof val === "number") &amp;&amp; Math.floor(val) === val)) {
+		if (!((typeof val === "number") && Math.floor(val) === val)) {
 			throw new Error("param " + val + " is not an integer!");
 		}
 	},
@@ -789,26 +761,83 @@ this.$$super ist die Super konstruktor funktion.
 
 */
 
-</code></pre>
-        </article>
-    </section>
+
+// Function.prototype.inherit = function(obj) {
+
+// }
+
+// GLOBAL.Op = {}
+
+// Op.Class = function()  {
+// 	var parent;
+// 	var methods;
+// 	var newClass = function() {
+// 		this.initialize.apply(this, arguments);
+// 	}
+// 	var extend = function(destination, source) {   
+// 		for (var property in source) {
+// 			destination[property] = source[property];
+// 		}
+// 		destination.$super =  function(method) {
+// 			return this.$parent[method].apply(this.$parent, Array.prototype.slice.call(arguments, 1));
+// 		}
+// 		return destination;
+// 	}
+
+// 	if (typeof arguments[0] === 'function') {       
+// 		parent  = arguments[0];       
+// 		methods = arguments[1];     
+// 	} else {       
+// 		methods = arguments[0];     
+// 	}     
+
+// 	if (parent !== undefined) {       
+// 		extend(newClass.prototype, parent.prototype);       
+// 		newClass.prototype.$parent = parent.prototype;
+// 	}
+// 	extend(newClass.prototype, methods);  
+// 	newClass.prototype.constructor = newClass;      
+
+// 	if (!newClass.prototype.initialize) newClass.prototype.initialize = function(){};        
+
+// 	return newClass;   
+// }
 
 
+// Op.helper = {}
+
+// // Op.helper.iterateObj = function* (obj) {
+// // 	for (var key in obj) {
+// // 		if (obj.hasOwnProperty(key)) {
+// // 			yield obj[key];
+// // 		}
+// // 	}
+// // }
 
 
-</div>
+// var Myclass = Op.Class({
+// 	initialize: function(name, age) {
+// 		this.name = name;
+// 		this.age  = age;
+// 	},
+// 	print: function() {
+// 		console.log(this.name + " " + this.age);
+// 	}
+// });
 
-<nav>
-    <h2><a href="index.html">Home</a></h2>
-</nav>
+// var inst = new Myclass("Bob",29);
+// inst.print();
+GLOBAL.unicrypt = {}
 
-<br class="clear">
+unicrypt.helper = {}
 
-<footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Mar 30 2016 14:09:58 GMT+0200 (Mitteleuropäische Sommerzeit)
-</footer>
+unicrypt.helper.math = {}
 
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
-</body>
-</html>
+unicrypt.helper.math.MathUtil = function() {
+	var z = 0;
+	for (var i = 0; i < 10; i++) {
+		z = i;
+	}
+	return i
+}
+
