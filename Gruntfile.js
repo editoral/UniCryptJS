@@ -11,11 +11,11 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				src: ['src/*.js'],
-				dest: 'dist/built.js',
+				dest: 'dist/build.js',
 			},
 			demoDist: {
 				src: ['demo/*.js', 'src/*.js'],
-				dest: 'dist/demoBuilt.js'
+				dest: 'dist/demoBuild.js'
 			}
 		},
 		mochaTest: {
@@ -35,7 +35,7 @@ module.exports = function(grunt) {
 		          	quiet: false, // Optionally suppress output to standard out (defaults to false) 
 		          	clearRequireCache: false // Optionally clear the require cache before running tests (defaults to false) 
 		        },
-		        src: ['test/demoTest.js']		     
+		        src: ['test/oopTest.js', 'test/demoTest.js']		     
       		}
     	},
 	    jsdoc : {

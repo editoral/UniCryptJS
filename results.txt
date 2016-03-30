@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 [0m[0m
 [0m  A first example[0m
@@ -54,3 +55,17 @@
 
 [92m [0m[32m 33 passing[0m[90m (52ms)[0m
 
+=======
+[31m>> [39mMocha exploded!
+[31m>> [39mSyntaxError: Unexpected token :[31m
+>> [39m    at exports.runInThisContext (vm.js:53:16)[31m
+>> [39m    at Module._compile (module.js:373:25)[31m
+>> [39m    at Object.Module._extensions..js (module.js:416:10)[31m
+>> [39m    at Module.load (module.js:343:32)[31m
+>> [39m    at Function.Module._load (module.js:300:12)[31m
+>> [39m    at Module.require (module.js:353:17)[31m
+>> [39m    at require (internal/module.js:12:17)[31m
+>> [39m    at C:\Users\marce\git\junicrypt\node_modules\mocha\lib\mocha.js:216:27[31m
+>> [39m    at Array.forEach (native)[31m
+>> [39m    at Mocha.loadFiles (C:\Users\marce\git\junicrypt\node_modules\mocha\lib\mocha.js:213:14)
+>>>>>>> 8b7f4be36f1c8a1f20b78d650106f40034e4a936
