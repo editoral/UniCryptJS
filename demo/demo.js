@@ -553,6 +553,10 @@ Op._.helper.renameFunction = function (name, fn) {
         " () { return call(this, arguments) }; };")())(Function.apply.bind(fn));
 };  
 
+Op._.helper.isAbstractParam = function(param) {
+	return param.match(/^[\$][a-zA-Z0-9]/) ? true : false;
+}
+
 Op._.typing = {}
 
 Op._.typing.TestTypes = function() {
@@ -638,7 +642,19 @@ Op.Class = function() {
 	var className = arguments[0];
 	var obj = arguments[1];
 	// optional parameter: Class to inherit
-	var baseClass = arguments[2];
+	var inheritanceObj = arguments[2];
+	var baseClass;
+	if(inheritanceObj && inheritanceObj.hasOwnProperty('extends')) {
+		baseClass = inheritanceObj['extends'];
+	}
+	// Option parameters
+	var options = arguments[3];
+	var isAbstract = false;
+	if(options && options.hasOwnProperty('abstract')) {
+		isAbstract = options['abstract'];
+	}	
+
+
 	var isChild = typeof baseClass === 'function' ? true : false;
 
 	//Makes sure, that there is a constructor function avaliable
@@ -681,21 +697,37 @@ Op.Class = function() {
 	//append all defined functions to prototype of the new JavaScript function
 	//they will be wrapped in another function to ensure the right types of the parameters
 	for(var prop in obj) {
-		if(!(prop === 'init')) {
-			if(typeof obj[prop] === 'function') {
+		if(!(prop === 'init') && typeof obj[prop] === 'function') {
+			// tests wheter it is an abstract param
+			if(!Op._.helper.isAbstractParam(prop)) {
 				var paramType = obj[prop].prototype._paramType_;
 				//If the type of the Params are spezified a wrapper is defined
 				if(Array.isArray(paramType)) {
 					var execFunc = obj[prop];
 					var typingWrapper = function() {
+						//Tests for the correctnes of the typing
 						Op._.helper.matchParamsArgs(paramType, arguments);
+						//Execute the actual function
 						return execFunc.apply(this, arguments);
 					}
 					newClass.prototype[prop] = typingWrapper;
 				} else {
+					//If no typing is spezified, the function can just be executed
 					newClass.prototype[prop] = obj[prop];
+				}			
+			} else {
+				// It is an abstract function, so check if the method has been overwritten
+				prop = prop.substring(1);
+				if(!obj.hasOwnProperty(prop) && typeof obj[prop] === 'function') {
+					isAbstract = true
 				}
 			}
+		}
+	}
+
+	if(isAbstract) {
+		newClass.prototype.constructor = function() {
+			throw new Error('There are method signatures which are not implemented! It is therefore an abstract Class');
 		}
 	}
 
@@ -703,6 +735,14 @@ Op.Class = function() {
 }
 
 
+Op.AbstractClass = function() {
+	var args = arguments;
+	var options = {
+		'abstract': true
+	}
+	args[3] = options;
+	return Op.Class.apply(this, args)
+}
 
 
 demo.fw = {}
@@ -724,7 +764,7 @@ demo.fw.SecondBaseClass = Op.Class('SecondBaseClass', {
 	}.paramType(['BaseClass', 'int'])
 });
 
-demo.fw.ChildClass = Op.Class('SecondBaseClass', {
+demo.fw.ChildClass = Op.Class('ChildClass', {
 	init: function(initStrParam, intForSuperClass) {
 		this.strConstructorParam = initStrParam;
 		this.$$super(intForSuperClass);
@@ -735,7 +775,27 @@ demo.fw.ChildClass = Op.Class('SecondBaseClass', {
 		return this.strConstructorParam + " " + this.constructorParam;
 	}
 
-}, demo.fw.BaseClass);
+}, {
+	'extends': demo.fw.BaseClass	
+});
+
+
+demo.fw.AbstractClass = Op.AbstractClass('AbstractClass', {
+	init: function(constructorParam) {
+		this.constructorParam = constructorParam;
+		this.z = 40;
+	},
+	z: 20,
+	constructorParam: null,
+	$abstractFunction: function() {}
+
+})
+
+demo.fw.ExtendsAbstract = Op.AbstractClass('ExtendsAbstract', {
+
+}, {
+	'extends': demo.fw.AbstractClass
+})
 
 
 //console.log(demo.fw.BaseClass.prototype.constructor.name);
@@ -748,8 +808,11 @@ var myBaseClass = new demo.fw.BaseClass(20);
 var childClass = new demo.fw.ChildClass('My super int:', 10);
 //nsole.log(childClass.function1());
 
-/*
 
+
+
+
+/*
 Konventionen:
 
 init ist der Konstruktor

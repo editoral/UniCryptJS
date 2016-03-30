@@ -638,7 +638,11 @@ Op.Class = function() {
 	var className = arguments[0];
 	var obj = arguments[1];
 	// optional parameter: Class to inherit
-	var baseClass = arguments[2];
+	var inheritanceObj = arguments[2];
+	var baseClass;
+	if(inheritanceObj && inheritanceObj.hasOwnProperty('extends')) {
+		baseClass = inheritanceObj['extends'];
+	}
 	var isChild = typeof baseClass === 'function' ? true : false;
 
 	//Makes sure, that there is a constructor function avaliable
@@ -703,6 +707,9 @@ Op.Class = function() {
 }
 
 
+Op.AbstractClass = function() {
+
+}
 
 
 demo.fw = {}
@@ -724,7 +731,7 @@ demo.fw.SecondBaseClass = Op.Class('SecondBaseClass', {
 	}.paramType(['BaseClass', 'int'])
 });
 
-demo.fw.ChildClass = Op.Class('SecondBaseClass', {
+demo.fw.ChildClass = Op.Class('ChildClass', {
 	init: function(initStrParam, intForSuperClass) {
 		this.strConstructorParam = initStrParam;
 		this.$$super(intForSuperClass);
@@ -735,7 +742,11 @@ demo.fw.ChildClass = Op.Class('SecondBaseClass', {
 		return this.strConstructorParam + " " + this.constructorParam;
 	}
 
-}, demo.fw.BaseClass);
+}, {
+	'extends': demo.fw.BaseClass	
+});
+
+
 
 
 //console.log(demo.fw.BaseClass.prototype.constructor.name);
