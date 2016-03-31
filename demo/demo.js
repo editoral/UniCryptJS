@@ -525,23 +525,19 @@ Function.prototype.paramType = function paramType() {
 		throw new Error("Parameter types need to be in an array!");
 	}
 	this.prototype._paramType_ = arr;
-	//console.log(this.prototype);
 	return this;
 }
 
+//Extend the function prototype, so the return param of the function is typed
+Function.prototype.returnType = function returnType() {
+	var str = arguments[0];
+	if(typeof str !== 'string') {
+		throw new Error("Return specification must be a string!");
+	}
+	this.prototype._returnType_ = str;
+	return this;
+}
 
-//Extend the function prototype for a clone Function
-Function.prototype.cloneFunction = function() {
-    var that = this;
-    var temp = function temporary() { return that.apply(this, arguments); };
-    //temp.prototype = that.prototype;
-    for(var key in this) {
-        if (this.hasOwnProperty(key)) {
-            temp[key] = this[key];
-        }
-    }
-    return temp;
-};
 
 
 //Intern functions. Should not be used from the outside.
@@ -556,6 +552,18 @@ Op._.helper.matchParamsArgs = function(paramType, args) {
 	for(var i = 0; i < paramType.length; i++) {
 		Op._.typing.testTypes(paramType[i], args[i]);
 	}	
+}
+
+Op._.helper.matchReturnType = function(returnType, result, name) {
+	var didPass = true;
+	try {
+		Op._.typing.testTypes(returnType, result);	
+	} catch(err) {
+		didPass = false;
+	}
+	if(!didPass) {
+		throw new Error('The return value from function ' + name + ' was not from type ' + returnType);
+	}
 }
 
 /**
@@ -717,28 +725,31 @@ Op.Class = function() {
 		if(!(prop === 'init') && typeof obj[prop] === 'function') {
 			// tests wheter it is an abstract param
 			if(!Op._.helper.isAbstractParam(prop)) {
-				var paramType = obj[prop].prototype._paramType_;
+				//var paramType = obj[prop].prototype._paramType_;
 				//console.log(paramType);
 				//If the type of the Params are spezified a wrapper is defined
-				if(Array.isArray(paramType)) {
+
 					//var execFunc = obj[prop];
-					var typingWrapper = function() {
-						//Tests for the correctnes of the typing
-						var self = arguments.callee;
-						var execFuncIntern = self.prototype.toExecFunc;
-						var intParamType = self.prototype._paramType_;
+				var typingWrapper = function() {
+					//Tests for the correctnes of the typing
+					var self = arguments.callee;
+					var execFuncIntern = self.prototype.toExecFunc;
+					var intParamType = self.prototype._paramType_;
+					var intReturnType = self.prototype._returnType_;
+					if (Array.isArray(intParamType)) {
 						Op._.helper.matchParamsArgs(intParamType, arguments);
-						//Execute the actual function
-						return execFuncIntern.apply(this, arguments);
 					}
-					Op._.helper.renameFunction(prop, typingWrapper);
-					typingWrapper.prototype = obj[prop].prototype; 
-					typingWrapper.prototype.toExecFunc = obj[prop];
-					newClass.prototype[prop] = typingWrapper;
-				} else {
-					//If no typing is spezified, the function can just be executed
-					newClass.prototype[prop] = obj[prop];
-				}			
+					//Execute the actual function
+					var result = execFuncIntern.apply(this, arguments);
+					if(intReturnType) {
+						Op._.helper.matchReturnType(intReturnType, result, self.name);	
+					}
+					return result;
+				}
+				//typingWrapper = Op._.helper.renameFunction(prop, typingWrapper);
+				typingWrapper.prototype = obj[prop].prototype; 
+				typingWrapper.prototype.toExecFunc = obj[prop];
+				newClass.prototype[prop] = typingWrapper;			
 			} else {
 				// It is an abstract function, so check if the method has been overwritten
 				prop = prop.substring(1);
@@ -853,11 +864,11 @@ demo.fw.ExtendsAbstract = Op.AbstractClass('ExtendsAbstract', {
 			//function to test the typing
 			tester: function() {
 				return 'ok';
-			}.paramType(['int', 'boolean', 'string']),
+			}.paramType(['int', 'boolean', 'string']).returnType('string'),
 			//second function to test typing
 			functionTyping2: function() {
 				return 'oki';
-			}.paramType(['Constructorless', 'object'])
+			}.paramType(['Constructorless', 'object']).returnType('int')
 		});
 
 var baseClass = new BaseClass(10);

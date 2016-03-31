@@ -98,12 +98,12 @@ describe('wie ich die Vererbung teste', function() {
     });
 });
 
-describe('Eingebautes Klassenfeature aus ECMA6', function() {
-    it('instantiiert eine Klasse', function() {
-        const baum = new demo.snippet.classBased.returnBaum('tanne', true, 'Schweiz', '20m');
-        expect(baum).to.be.a(demo.snippet.classBased.Pflanze);
-    });
-});
+// describe('Eingebautes Klassenfeature aus ECMA6', function() {
+//     it('instantiiert eine Klasse', function() {
+//         const baum = new demo.snippet.classBased.returnBaum('tanne', true, 'Schweiz', '20m');
+//         expect(baum).to.be.a(demo.snippet.classBased.Pflanze);
+//     });
+// });
 
 describe('Das gebaute Interface', function() {
     it('klappt mit der Instatntiirung wenn alle Methoden implementiert wurden', function() {

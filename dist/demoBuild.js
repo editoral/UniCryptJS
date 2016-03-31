@@ -1,4 +1,4 @@
-"use strict";
+//"use strict";
 
 
 
@@ -89,36 +89,36 @@ demo.snippet.classBased = {}
 // und ist erst am kommen. Deshalb nur der Vollständigkeitshalber hier beschrieben.
 
 
-demo.snippet.classBased.Pflanze = class Pflanze {
-	constructor(vorkommen, grösse) {
-		this.vorkommen = vorkommen;
-		this.grösse = grösse;
-	}
+// demo.snippet.classBased.Pflanze = class Pflanze {
+// 	constructor(vorkommen, grösse) {
+// 		this.vorkommen = vorkommen;
+// 		this.grösse = grösse;
+// 	}
 
-	get info() {
-		return this.vorkommen + " " + this.grösse;
-	}
+// 	get info() {
+// 		return this.vorkommen + " " + this.grösse;
+// 	}
 
-	static explain() {
-		return "Mit mir kann man Pflanzen erstellen."
-	}
-}
+// 	static explain() {
+// 		return "Mit mir kann man Pflanzen erstellen."
+// 	}
+// }
 
 
-demo.snippet.classBased.Baum = class Baum extends demo.snippet.classBased.Pflanze {
-	constructor(art, laubbaum, vorkommen, grösse) {
-		super(vorkommen, grösse);
-		this.art = art;
-		this.laubbaum = laubbaum;	
-	}
-	get info() {
-		return super.info() + " " + this.art + " " + this.laubbaum;
-	}
-}
+// demo.snippet.classBased.Baum = class Baum extends demo.snippet.classBased.Pflanze {
+// 	constructor(art, laubbaum, vorkommen, grösse) {
+// 		super(vorkommen, grösse);
+// 		this.art = art;
+// 		this.laubbaum = laubbaum;	
+// 	}
+// 	get info() {
+// 		return super.info() + " " + this.art + " " + this.laubbaum;
+// 	}
+// }
 
-demo.snippet.classBased.returnBaum = function(art, laubbaum, vorkommen, grösse) {
-	return new demo.snippet.classBased.Baum(art, laubbaum, vorkommen, grösse);
-}
+// demo.snippet.classBased.returnBaum = function(art, laubbaum, vorkommen, grösse) {
+// 	return new demo.snippet.classBased.Baum(art, laubbaum, vorkommen, grösse);
+// }
 
 //Dies ist sowohl eine Funktion wie auch ein instantiierbares Objekt. 
 demo.snippet.Fahrzeug = function(anzahlRäder, führerAusweisKategorie, autobahnZulassung) {
@@ -528,19 +528,42 @@ Function.prototype.paramType = function paramType() {
 	return this;
 }
 
+//Extend the function prototype, so the return param of the function is typed
+Function.prototype.returnType = function returnType() {
+	var str = arguments[0];
+	if(typeof str !== 'string') {
+		throw new Error("Return specification must be a string!");
+	}
+	this.prototype._returnType_ = str;
+	return this;
+}
+
+
+
 //Intern functions. Should not be used from the outside.
 Op._ = {}
 
 Op._.helper = {}
 
 Op._.helper.matchParamsArgs = function(paramType, args) {
-	console.log(paramType.length + " " + args.length);
 	if(paramType.length !== args.length) {
 		throw new Error("Number of parameter types and number of parameters missmatch!");
 	}
 	for(var i = 0; i < paramType.length; i++) {
 		Op._.typing.testTypes(paramType[i], args[i]);
 	}	
+}
+
+Op._.helper.matchReturnType = function(returnType, result, name) {
+	var didPass = true;
+	try {
+		Op._.typing.testTypes(returnType, result);	
+	} catch(err) {
+		didPass = false;
+	}
+	if(!didPass) {
+		throw new Error('The return value from function ' + name + ' was not from type ' + returnType);
+	}
 }
 
 /**
@@ -702,22 +725,31 @@ Op.Class = function() {
 		if(!(prop === 'init') && typeof obj[prop] === 'function') {
 			// tests wheter it is an abstract param
 			if(!Op._.helper.isAbstractParam(prop)) {
-				var paramType = obj[prop].prototype._paramType_;
+				//var paramType = obj[prop].prototype._paramType_;
+				//console.log(paramType);
 				//If the type of the Params are spezified a wrapper is defined
-				if(Array.isArray(paramType)) {
-					var execFunc = obj[prop];
-					var typingWrapper = function() {
-						//Tests for the correctnes of the typing
-						console.log(paramType);
-						Op._.helper.matchParamsArgs(paramType, arguments);
-						//Execute the actual function
-						return execFunc.apply(this, arguments);
+
+					//var execFunc = obj[prop];
+				var typingWrapper = function() {
+					//Tests for the correctnes of the typing
+					var self = arguments.callee;
+					var execFuncIntern = self.prototype.toExecFunc;
+					var intParamType = self.prototype._paramType_;
+					var intReturnType = self.prototype._returnType_;
+					if (Array.isArray(intParamType)) {
+						Op._.helper.matchParamsArgs(intParamType, arguments);
 					}
-					newClass.prototype[prop] = typingWrapper;
-				} else {
-					//If no typing is spezified, the function can just be executed
-					newClass.prototype[prop] = obj[prop];
-				}			
+					//Execute the actual function
+					var result = execFuncIntern.apply(this, arguments);
+					if(intReturnType) {
+						Op._.helper.matchReturnType(intReturnType, result, self.name);	
+					}
+					return result;
+				}
+				//typingWrapper = Op._.helper.renameFunction(prop, typingWrapper);
+				typingWrapper.prototype = obj[prop].prototype; 
+				typingWrapper.prototype.toExecFunc = obj[prop];
+				newClass.prototype[prop] = typingWrapper;			
 			} else {
 				// It is an abstract function, so check if the method has been overwritten
 				prop = prop.substring(1);
@@ -832,19 +864,16 @@ demo.fw.ExtendsAbstract = Op.AbstractClass('ExtendsAbstract', {
 			//function to test the typing
 			tester: function() {
 				return 'ok';
-			}.paramType(['int', 'boolean', 'string']),
+			}.paramType(['int', 'boolean', 'string']).returnType('string'),
 			//second function to test typing
 			functionTyping2: function() {
-				return 'ok';
+				return 'oki';
 			}.paramType(['Constructorless', 'object'])
 		});
 
 var baseClass = new BaseClass(10);
-for(var prop in baseClass) {
-	console.log('prop: ' + prop);
-}
-console.log(' ' + baseClass.tester)
 baseClass.tester(10, true, 'hallo');
+//console.log(baseClass.tester.prototype._paramType_)
 
 /*
 Konventionen:
