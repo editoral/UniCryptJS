@@ -1,4 +1,4 @@
-"use strict";
+//"use strict";
 
 
 
@@ -89,36 +89,36 @@ demo.snippet.classBased = {}
 // und ist erst am kommen. Deshalb nur der Vollständigkeitshalber hier beschrieben.
 
 
-demo.snippet.classBased.Pflanze = class Pflanze {
-	constructor(vorkommen, grösse) {
-		this.vorkommen = vorkommen;
-		this.grösse = grösse;
-	}
+// demo.snippet.classBased.Pflanze = class Pflanze {
+// 	constructor(vorkommen, grösse) {
+// 		this.vorkommen = vorkommen;
+// 		this.grösse = grösse;
+// 	}
 
-	get info() {
-		return this.vorkommen + " " + this.grösse;
-	}
+// 	get info() {
+// 		return this.vorkommen + " " + this.grösse;
+// 	}
 
-	static explain() {
-		return "Mit mir kann man Pflanzen erstellen."
-	}
-}
+// 	static explain() {
+// 		return "Mit mir kann man Pflanzen erstellen."
+// 	}
+// }
 
 
-demo.snippet.classBased.Baum = class Baum extends demo.snippet.classBased.Pflanze {
-	constructor(art, laubbaum, vorkommen, grösse) {
-		super(vorkommen, grösse);
-		this.art = art;
-		this.laubbaum = laubbaum;	
-	}
-	get info() {
-		return super.info() + " " + this.art + " " + this.laubbaum;
-	}
-}
+// demo.snippet.classBased.Baum = class Baum extends demo.snippet.classBased.Pflanze {
+// 	constructor(art, laubbaum, vorkommen, grösse) {
+// 		super(vorkommen, grösse);
+// 		this.art = art;
+// 		this.laubbaum = laubbaum;	
+// 	}
+// 	get info() {
+// 		return super.info() + " " + this.art + " " + this.laubbaum;
+// 	}
+// }
 
-demo.snippet.classBased.returnBaum = function(art, laubbaum, vorkommen, grösse) {
-	return new demo.snippet.classBased.Baum(art, laubbaum, vorkommen, grösse);
-}
+// demo.snippet.classBased.returnBaum = function(art, laubbaum, vorkommen, grösse) {
+// 	return new demo.snippet.classBased.Baum(art, laubbaum, vorkommen, grösse);
+// }
 
 //Dies ist sowohl eine Funktion wie auch ein instantiierbares Objekt. 
 demo.snippet.Fahrzeug = function(anzahlRäder, führerAusweisKategorie, autobahnZulassung) {
@@ -529,6 +529,21 @@ Function.prototype.paramType = function paramType() {
 	return this;
 }
 
+
+//Extend the function prototype for a clone Function
+Function.prototype.cloneFunction = function() {
+    var that = this;
+    var temp = function temporary() { return that.apply(this, arguments); };
+    //temp.prototype = that.prototype;
+    for(var key in this) {
+        if (this.hasOwnProperty(key)) {
+            temp[key] = this[key];
+        }
+    }
+    return temp;
+};
+
+
 //Intern functions. Should not be used from the outside.
 Op._ = {}
 
@@ -706,15 +721,19 @@ Op.Class = function() {
 				//console.log(paramType);
 				//If the type of the Params are spezified a wrapper is defined
 				if(Array.isArray(paramType)) {
-					var execFunc = obj[prop];
+					//var execFunc = obj[prop];
 					var typingWrapper = function() {
 						//Tests for the correctnes of the typing
-						console.log(execFunc.toString());
-						//Op._.helper.matchParamsArgs(myParamType, arguments);
+						var self = arguments.callee;
+						var execFuncIntern = self.prototype.toExecFunc;
+						var intParamType = self.prototype._paramType_;
+						Op._.helper.matchParamsArgs(intParamType, arguments);
 						//Execute the actual function
-						return execFunc.apply(this, arguments);
+						return execFuncIntern.apply(this, arguments);
 					}
+					Op._.helper.renameFunction(prop, typingWrapper);
 					typingWrapper.prototype = obj[prop].prototype; 
+					typingWrapper.prototype.toExecFunc = obj[prop];
 					newClass.prototype[prop] = typingWrapper;
 				} else {
 					//If no typing is spezified, the function can just be executed
@@ -843,7 +862,7 @@ demo.fw.ExtendsAbstract = Op.AbstractClass('ExtendsAbstract', {
 
 var baseClass = new BaseClass(10);
 baseClass.tester(10, true, 'hallo');
-console.log(baseClass.tester.prototype._paramType_)
+//console.log(baseClass.tester.prototype._paramType_)
 
 /*
 Konventionen:
