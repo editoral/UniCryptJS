@@ -1,71 +1,27 @@
-<<<<<<< HEAD
-
-[0m[0m
-[0m  A first example[0m
-[2K[0G  [32m  √[0m[90m will write names but can't[0m
-[2K[0G  [32m  √[0m[90m will now have instance variables[0m
-[2K[0G  [32m  √[0m[90m calls a private function[0m
-[2K[0G  [32m  √[0m[90m it calls a privileged function[0m
-
-[0m  wie ich die closures und Instatntiirung teste[0m
-[2K[0G  [32m  √[0m[90m benutzt meine Klasse nicht als Klasse[0m
-[2K[0G  [32m  √[0m[90m will nun das Schlüsselwort new brauchen[0m
-[2K[0G  [32m  √[0m[90m probiert eine private Variable abzugreifen[0m
-[2K[0G  [32m  √[0m[90m kann drei Fahrzeuge geben[0m
-[2K[0G  [32m  √[0m[90m kann keine 4 Fahrzeuge geben[0m
-[2K[0G  [32m  √[0m[90m benutzt eine privileged Methode um den ölstand zu sehen[0m
-
-[0m  wie ich die Vererbung teste[0m
-[2K[0G  [32m  √[0m[90m testet ob der Konstruktor der Basisklasse Fahrzeug bei der Erstellung eines Autos aufgerufen wird[0m
-[2K[0G  [32m  √[0m[90m auto ist ein Fahrzeug[0m
-[2K[0G  [32m  √[0m[90m hat die Mehtode mein Treibstoff überschrieben[0m
-[2K[0G  [32m  √[0m[90m auto kann die Mehtode von Fahrzeug brauchen[0m
-[2K[0G  [32m  √[0m[90m kann die eigenen Funktionen verwenden[0m
-[2K[0G  [32m  √[0m[90m akzeptiert nur einen Integer als Preis[0m
-[2K[0G  [32m  √[0m[90m wird selbst bei Aufruf als Funktion zu einer Instanz[0m
-
-[0m  Eingebautes Klassenfeature aus ECMA6[0m
-[2K[0G  [32m  √[0m[90m instantiiert eine Klasse[0m
-
-[0m  Das gebaute Interface[0m
-[2K[0G  [32m  √[0m[90m klappt mit der Instatntiirung wenn alle Methoden implementiert wurden[0m
-[2K[0G  [32m  √[0m[90m klappt mit der Instatntiirung nicht mehr wenn eine Methode vergessen wurde[0m
-
-[0m  Typisierung mit Hammer[0m
-[2K[0G  [32m  √[0m[90m testet typisierung mit integer[0m
-[2K[0G  [32m  √[0m[90m testet typisierung nach objekttypen[0m
-
-[0m  tests with Op FW classes generation and with typing[0m
-[2K[0G  [32m  √[0m[90m instantiiate a base class and get public attribute[0m
-[2K[0G  [32m  √[0m[90m instantiiate a base class and tests the constructor assignement[0m
-[2K[0G  [32m  √[0m[90m instantiiate a base class and tests a function[0m
-[2K[0G  [32m  √[0m[90m tests typing correctnes with integers in the constructor[0m
-[2K[0G  [32m  √[0m[90m tests typing correctnes with integers in a function param[0m
-[2K[0G  [32m  √[0m[90m tests typing correctnes with objects in a function param throwing Error[0m
-[2K[0G  [32m  √[0m[90m tests typing correctnes with objects in a function param working[0m
-
-[0m  tests with Op FW inheritance[0m
-[2K[0G  [32m  √[0m[90m assigns a variable trough super constructor[0m
-[2K[0G  [32m  √[0m[90m checks for the super class attribute[0m
-[2K[0G  [32m  √[0m[90m checks for the super class function[0m
-
-[0m  [0m
-[2K[0G  [32m  √[0m[90m [0m
-
-
-[92m [0m[32m 33 passing[0m[90m (52ms)[0m
-
-=======
+1 1
+prop: preInitVariable
+prop: x
+prop: toBeOverwritten
+prop: tester
+prop: functionTyping2
+ function () {
+						//Tests for the correctnes of the typing
+						console.log(paramType);
+						Op._.helper.matchParamsArgs(paramType, arguments);
+						//Execute the actual function
+						return execFunc.apply(this, arguments);
+					}
+[ 'Constructorless', 'object' ]
+2 3
 [31m>> [39mMocha exploded!
-[31m>> [39mSyntaxError: Unexpected token :[31m
->> [39m    at exports.runInThisContext (vm.js:53:16)[31m
->> [39m    at Module._compile (module.js:373:25)[31m
+[31m>> [39mError: Number of parameter types and number of parameters missmatch![31m
+>> [39m    at Object.Op._.helper.matchParamsArgs (C:\Users\Marcel\git\UniCryptJS\dist\demoBuild.js:539:9)[31m
+>> [39m    at BaseClass.typingWrapper [as tester] (C:\Users\Marcel\git\UniCryptJS\dist\demoBuild.js:712:19)[31m
+>> [39m    at Object.<anonymous> (C:\Users\Marcel\git\UniCryptJS\dist\demoBuild.js:847:11)[31m
+>> [39m    at Module._compile (module.js:409:26)[31m
 >> [39m    at Object.Module._extensions..js (module.js:416:10)[31m
 >> [39m    at Module.load (module.js:343:32)[31m
 >> [39m    at Function.Module._load (module.js:300:12)[31m
 >> [39m    at Module.require (module.js:353:17)[31m
 >> [39m    at require (internal/module.js:12:17)[31m
->> [39m    at C:\Users\marce\git\junicrypt\node_modules\mocha\lib\mocha.js:216:27[31m
->> [39m    at Array.forEach (native)[31m
->> [39m    at Mocha.loadFiles (C:\Users\marce\git\junicrypt\node_modules\mocha\lib\mocha.js:213:14)
->>>>>>> 8b7f4be36f1c8a1f20b78d650106f40034e4a936
+>> [39m    at Object.<anonymous> (C:\Users\Marcel\git\UniCryptJS\test\oopTest.js:3:13)

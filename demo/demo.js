@@ -525,6 +525,7 @@ Function.prototype.paramType = function paramType() {
 		throw new Error("Parameter types need to be in an array!");
 	}
 	this.prototype._paramType_ = arr;
+	//console.log(this.prototype);
 	return this;
 }
 
@@ -603,27 +604,28 @@ Op._.typing.testTypes = function(type, val) {
 	switch(type) {
 		case 'int':
 			h.integer(val);
-		break;
+			break;
 		case 'boolean':
 			h.boolean(val);
-		break;
+			break;
 		case 'byte':
-		break;
+			break;
 		case 'char':
-		break;
+			break;
 		case 'short':
-		break;
+			break;
 		case 'long':
-		break;
+			break;
 		case 'float':
-		break;
+			break;
 		case 'double':
-		break;
-		case 'String':
+			break;
+		case 'string':
 			h.strTest(val);
-		break;
+			break;
 		case 'object':
 			h.untypedObj(val);
+			break;
 		default:
 			h.obj(type,val);
 	}
@@ -701,15 +703,18 @@ Op.Class = function() {
 			// tests wheter it is an abstract param
 			if(!Op._.helper.isAbstractParam(prop)) {
 				var paramType = obj[prop].prototype._paramType_;
+				//console.log(paramType);
 				//If the type of the Params are spezified a wrapper is defined
 				if(Array.isArray(paramType)) {
 					var execFunc = obj[prop];
 					var typingWrapper = function() {
 						//Tests for the correctnes of the typing
-						Op._.helper.matchParamsArgs(paramType, arguments);
+						console.log(execFunc.toString());
+						//Op._.helper.matchParamsArgs(myParamType, arguments);
 						//Execute the actual function
 						return execFunc.apply(this, arguments);
 					}
+					typingWrapper.prototype = obj[prop].prototype; 
 					newClass.prototype[prop] = typingWrapper;
 				} else {
 					//If no typing is spezified, the function can just be executed
@@ -768,12 +773,15 @@ demo.fw.ChildClass = Op.Class('ChildClass', {
 	init: function(initStrParam, intForSuperClass) {
 		this.strConstructorParam = initStrParam;
 		this.$$super(intForSuperClass);
-	}.paramType(['String', 'int']),
+	}.paramType(['string', 'int']),
 	y: 20,
 	strConstructorParam: null,
 	testSuper: function() {
 		return this.strConstructorParam + " " + this.constructorParam;
-	}
+	},
+	functionTyping: function() {
+		return 'ok';
+	}.paramType(['int', 'boolean', 'string']),
 
 }, {
 	'extends': demo.fw.BaseClass	
@@ -800,17 +808,42 @@ demo.fw.ExtendsAbstract = Op.AbstractClass('ExtendsAbstract', {
 
 //console.log(demo.fw.BaseClass.prototype.constructor.name);
 
-var myBaseClass = new demo.fw.BaseClass(20);
-//console.log(myBaseClass.constructor.name);
-//var mySecClass = new demo.fw.SecondBaseClass();
-//console.log(mySecClass.functionCombine(myBaseClass, 30));
+// var myBaseClass = new demo.fw.BaseClass(20);
+// //console.log(myBaseClass.constructor.name);
+// var mySecClass = new demo.fw.SecondBaseClass();
+// //console.log(mySecClass.functionCombine(myBaseClass, 30));
 
-var childClass = new demo.fw.ChildClass('My super int:', 10);
-//nsole.log(childClass.function1());
-
-
+// var childClass = new demo.fw.ChildClass('My super int:', 10);
+// console.log(childClass.functionTyping(10,true,'ew'));
 
 
+
+
+		var BaseClass = Op.Class('BaseClass', {
+			//in constructor assigned variable
+			preInitVariable: null,
+			//instance variable with preset value
+			x: 20,
+			//variable to override
+			toBeOverwritten: null,
+			// constructor function
+			init: function(initVar) {
+				this.preInitVariable = initVar;
+			//paramType, spezifies input type
+			}.paramType(['int']),
+			//function to test the typing
+			tester: function() {
+				return 'ok';
+			}.paramType(['int', 'boolean', 'string']),
+			//second function to test typing
+			functionTyping2: function() {
+				return 'oki';
+			}.paramType(['Constructorless', 'object'])
+		});
+
+var baseClass = new BaseClass(10);
+baseClass.tester(10, true, 'hallo');
+console.log(baseClass.tester.prototype._paramType_)
 
 /*
 Konventionen:

@@ -1,6 +1,6 @@
 var assert = require('assert');
 var expect = require('expect.js');
-var build = require('../dist/demoBuilt.js');
+var build = require('../dist/demoBuild.js');
 
 
 describe('A first example', function() {

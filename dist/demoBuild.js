@@ -534,6 +534,7 @@ Op._ = {}
 Op._.helper = {}
 
 Op._.helper.matchParamsArgs = function(paramType, args) {
+	console.log(paramType.length + " " + args.length);
 	if(paramType.length !== args.length) {
 		throw new Error("Number of parameter types and number of parameters missmatch!");
 	}
@@ -552,6 +553,10 @@ Op._.helper.renameFunction = function (name, fn) {
     return (new Function("return function (call) { return function " + name +
         " () { return call(this, arguments) }; };")())(Function.apply.bind(fn));
 };  
+
+Op._.helper.isAbstractParam = function(param) {
+	return param.match(/^[\$][a-zA-Z0-9]/) ? true : false;
+}
 
 Op._.typing = {}
 
@@ -599,27 +604,28 @@ Op._.typing.testTypes = function(type, val) {
 	switch(type) {
 		case 'int':
 			h.integer(val);
-		break;
+			break;
 		case 'boolean':
 			h.boolean(val);
-		break;
+			break;
 		case 'byte':
-		break;
+			break;
 		case 'char':
-		break;
+			break;
 		case 'short':
-		break;
+			break;
 		case 'long':
-		break;
+			break;
 		case 'float':
-		break;
+			break;
 		case 'double':
-		break;
+			break;
 		case 'string':
 			h.strTest(val);
-		break;
+			break;
 		case 'object':
 			h.untypedObj(val);
+			break;
 		default:
 			h.obj(type,val);
 	}
@@ -638,7 +644,19 @@ Op.Class = function() {
 	var className = arguments[0];
 	var obj = arguments[1];
 	// optional parameter: Class to inherit
-	var baseClass = arguments[2];
+	var inheritanceObj = arguments[2];
+	var baseClass;
+	if(inheritanceObj && inheritanceObj.hasOwnProperty('extends')) {
+		baseClass = inheritanceObj['extends'];
+	}
+	// Option parameters
+	var options = arguments[3];
+	var isAbstract = false;
+	if(options && options.hasOwnProperty('abstract')) {
+		isAbstract = options['abstract'];
+	}	
+
+
 	var isChild = typeof baseClass === 'function' ? true : false;
 
 	//Makes sure, that there is a constructor function avaliable
@@ -681,21 +699,38 @@ Op.Class = function() {
 	//append all defined functions to prototype of the new JavaScript function
 	//they will be wrapped in another function to ensure the right types of the parameters
 	for(var prop in obj) {
-		if(!(prop === 'init')) {
-			if(typeof obj[prop] === 'function') {
+		if(!(prop === 'init') && typeof obj[prop] === 'function') {
+			// tests wheter it is an abstract param
+			if(!Op._.helper.isAbstractParam(prop)) {
 				var paramType = obj[prop].prototype._paramType_;
 				//If the type of the Params are spezified a wrapper is defined
 				if(Array.isArray(paramType)) {
 					var execFunc = obj[prop];
 					var typingWrapper = function() {
+						//Tests for the correctnes of the typing
+						console.log(paramType);
 						Op._.helper.matchParamsArgs(paramType, arguments);
+						//Execute the actual function
 						return execFunc.apply(this, arguments);
 					}
 					newClass.prototype[prop] = typingWrapper;
 				} else {
+					//If no typing is spezified, the function can just be executed
 					newClass.prototype[prop] = obj[prop];
+				}			
+			} else {
+				// It is an abstract function, so check if the method has been overwritten
+				prop = prop.substring(1);
+				if(!obj.hasOwnProperty(prop) && typeof obj[prop] === 'function') {
+					isAbstract = true
 				}
 			}
+		}
+	}
+
+	if(isAbstract) {
+		newClass.prototype.constructor = function() {
+			throw new Error('There are method signatures which are not implemented! It is therefore an abstract Class');
 		}
 	}
 
@@ -703,6 +738,14 @@ Op.Class = function() {
 }
 
 
+Op.AbstractClass = function() {
+	var args = arguments;
+	var options = {
+		'abstract': true
+	}
+	args[3] = options;
+	return Op.Class.apply(this, args)
+}
 
 
 demo.fw = {}
@@ -724,7 +767,7 @@ demo.fw.SecondBaseClass = Op.Class('SecondBaseClass', {
 	}.paramType(['BaseClass', 'int'])
 });
 
-demo.fw.ChildClass = Op.Class('SecondBaseClass', {
+demo.fw.ChildClass = Op.Class('ChildClass', {
 	init: function(initStrParam, intForSuperClass) {
 		this.strConstructorParam = initStrParam;
 		this.$$super(intForSuperClass);
@@ -733,23 +776,77 @@ demo.fw.ChildClass = Op.Class('SecondBaseClass', {
 	strConstructorParam: null,
 	testSuper: function() {
 		return this.strConstructorParam + " " + this.constructorParam;
-	}
+	},
+	functionTyping: function() {
+		return 'ok';
+	}.paramType(['int', 'boolean', 'string']),
 
-}, demo.fw.BaseClass);
+}, {
+	'extends': demo.fw.BaseClass	
+});
+
+
+demo.fw.AbstractClass = Op.AbstractClass('AbstractClass', {
+	init: function(constructorParam) {
+		this.constructorParam = constructorParam;
+		this.z = 40;
+	},
+	z: 20,
+	constructorParam: null,
+	$abstractFunction: function() {}
+
+})
+
+demo.fw.ExtendsAbstract = Op.AbstractClass('ExtendsAbstract', {
+
+}, {
+	'extends': demo.fw.AbstractClass
+})
 
 
 //console.log(demo.fw.BaseClass.prototype.constructor.name);
 
-var myBaseClass = new demo.fw.BaseClass(20);
-//console.log(myBaseClass.constructor.name);
-//var mySecClass = new demo.fw.SecondBaseClass();
-//console.log(mySecClass.functionCombine(myBaseClass, 30));
+// var myBaseClass = new demo.fw.BaseClass(20);
+// //console.log(myBaseClass.constructor.name);
+// var mySecClass = new demo.fw.SecondBaseClass();
+// //console.log(mySecClass.functionCombine(myBaseClass, 30));
 
-var childClass = new demo.fw.ChildClass('My super int:', 10);
-//nsole.log(childClass.function1());
+// var childClass = new demo.fw.ChildClass('My super int:', 10);
+// console.log(childClass.functionTyping(10,true,'ew'));
+
+
+
+
+		var BaseClass = Op.Class('BaseClass', {
+			//in constructor assigned variable
+			preInitVariable: null,
+			//instance variable with preset value
+			x: 20,
+			//variable to override
+			toBeOverwritten: null,
+			// constructor function
+			init: function(initVar) {
+				this.preInitVariable = initVar;
+			//paramType, spezifies input type
+			}.paramType(['int']),
+			//function to test the typing
+			tester: function() {
+				return 'ok';
+			}.paramType(['int', 'boolean', 'string']),
+			//second function to test typing
+			functionTyping2: function() {
+				return 'ok';
+			}.paramType(['Constructorless', 'object'])
+		});
+
+var baseClass = new BaseClass(10);
+for(var prop in baseClass) {
+	console.log('prop: ' + prop);
+}
+console.log(' ' + baseClass.tester)
+baseClass.tester(10, true, 'hallo');
 
 /*
-
 Konventionen:
 
 init ist der Konstruktor
