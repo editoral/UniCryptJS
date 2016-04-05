@@ -121,13 +121,5 @@ describe('Class declaration and inheritance', function() {
     	}
     	expect(test).to.not.throwError();
     });
-    it('', function() {
 
-    });
-    it('', function() {
-
-    });
-    it('', function() {
-
-    });
 });

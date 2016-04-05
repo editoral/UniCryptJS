@@ -566,29 +566,108 @@ Op._.helper.matchReturnType = function(returnType, result, name) {
 	}
 }
 
+Op._.helper.FunctionOverload = function FunctionOverload(obj) {
+	this.obj = obj;
+	this.prepOverload = {};
+	this.overloadedFunctions = {};
+	this.loopFunctions();
+	this.prepareOverloadedFunctions();
+}
+
+Op._.helper.FunctionOverload.prototype.prepareOverloadedFunctions = function() {
+	console.log(this.prepOverload);
+	for(var prop in this.prepOverload) {
+		var distributor = function() {
+			var args = Array.prototype.slice.call(arguments);
+			var len = args.length;
+			console.log(prop);
+			for(var fn in prop) {
+				//console.log(prop[fn]);
+				//var paramType = prop[fn].prototype._paramType_;
+				//console.log(paramType);
+			}
+
+		}
+		distributor.prototype = this.prepOverload[prop];
+		this.overloadedFunctions[prop] = distributor;
+	}
+}
+
+Op._.helper.FunctionOverload.prototype.loopFunctions = function() {
+	for(var prop in this.obj) {
+		this.addFunction(prop, this.obj[prop])
+	}
+}
+
+Op._.helper.FunctionOverload.prototype.addFunction = function(name, fn) {
+	if(this.isOverloaded(name)) {
+		var endName = this.retrieveRealName(name);
+		if(!this.prepOverload.hasOwnProperty(endName)) {
+			this.prepOverload[endName] = {}
+		}
+		this.prepOverload[endName][name] = fn;
+		this.prepOverload[endName][name].prototype = fn.prototype;
+	}
+}
+
+Op._.helper.FunctionOverload.prototype.isOverloaded = function(name){
+	return name.match(/[^\s]+[0-9]+/) ? true : false;
+}
+
+
+Op._.helper.FunctionOverload.prototype.retrieveRealName = function(name) {
+	return name.match(/[^\s]*[a-zA-Z][^0-9]/)[0];
+}
+
+var meinObj = {
+	function1: function function1() {
+		return 'meep';
+	},
+	function2: function function2() {
+		return 'beep';
+	},
+	function3: function function3() {
+		return 'zeep';
+	},
+}
+var meinObj2 = {
+	fn1: function fn1() {
+		return 'meep';
+	}.paramType(['int']),
+	fn2: function fn2() {
+		return 'beep';
+	},
+	fn3: function fn3() {
+		return 'zeep';
+	},
+}
+//var tester = new Op._.helper.FunctionOverload(meinObj);
+var tester2 = new Op._.helper.FunctionOverload(meinObj2);
+console.log(tester2.overloadedFunctions.fn());
+
 /**
  * JavaScript Rename Function
  * @author Nate Ferrero
  * @license Public Domain
  * @date Apr 5th, 2014
  */
-Op._.helper.renameFunction = function (name, fn) {
-    return (new Function("return function (call) { return function " + name +
-        " () { return call(this, arguments) }; };")())(Function.apply.bind(fn));
-};  
+ Op._.helper.renameFunction = function (name, fn) {
+ 	return (new Function("return function (call) { return function " + name +
+ 		" () { return call(this, arguments) }; };")())(Function.apply.bind(fn));
+ 	};  
 
-Op._.helper.isAbstractParam = function(param) {
-	return param.match(/^[\$][a-zA-Z0-9]/) ? true : false;
-}
+ 	Op._.helper.isAbstractParam = function(param) {
+ 		return param.match(/^[\$][a-zA-Z0-9]/) ? true : false;
+ 	}
 
-Op._.typing = {}
+ 	Op._.typing = {}
 
-Op._.typing.TestTypes = function() {
+ 	Op._.typing.TestTypes = function() {
 
-}
+ 	}
 
-Op._.typing.TestTypes.prototype = {
-	integer: function(val) {
+ 	Op._.typing.TestTypes.prototype = {
+ 		integer: function(val) {
 		//As there is no such things as Integer in JavaScript, because every number is internally represented as floating
 		//point value, it is only possible to test if it is a number.
 		//Afterwards it can be determined, wether it is an Integer
@@ -626,31 +705,31 @@ Op._.typing.testTypes = function(type, val) {
 	var h = new Op._.typing.TestTypes();
 	switch(type) {
 		case 'int':
-			h.integer(val);
-			break;
+		h.integer(val);
+		break;
 		case 'boolean':
-			h.boolean(val);
-			break;
+		h.boolean(val);
+		break;
 		case 'byte':
-			break;
+		break;
 		case 'char':
-			break;
+		break;
 		case 'short':
-			break;
+		break;
 		case 'long':
-			break;
+		break;
 		case 'float':
-			break;
+		break;
 		case 'double':
-			break;
+		break;
 		case 'string':
-			h.strTest(val);
-			break;
+		h.strTest(val);
+		break;
 		case 'object':
-			h.untypedObj(val);
-			break;
+		h.untypedObj(val);
+		break;
 		default:
-			h.obj(type,val);
+		h.obj(type,val);
 	}
 }
 
@@ -723,6 +802,7 @@ Op.Class = function() {
 	//they will be wrapped in another function to ensure the right types of the parameters
 	for(var prop in obj) {
 		if(!(prop === 'init') && typeof obj[prop] === 'function') {
+
 			// tests wheter it is an abstract param
 			if(!Op._.helper.isAbstractParam(prop)) {
 				//var paramType = obj[prop].prototype._paramType_;
@@ -730,7 +810,7 @@ Op.Class = function() {
 				//If the type of the Params are spezified a wrapper is defined
 
 					//var execFunc = obj[prop];
-				var typingWrapper = function() {
+					var typingWrapper = function() {
 					//Tests for the correctnes of the typing
 					var self = arguments.callee;
 					var execFuncIntern = self.prototype.toExecFunc;
@@ -752,18 +832,31 @@ Op.Class = function() {
 				newClass.prototype[prop] = typingWrapper;			
 			} else {
 				// It is an abstract function, so check if the method has been overwritten
-				prop = prop.substring(1);
-				if(!obj.hasOwnProperty(prop) && typeof obj[prop] === 'function') {
-					isAbstract = true
-				}
+				isAbstract = true;
+				newClass.prototype[prop] = obj[prop];
 			}
 		}
 	}
+	//checks if all abstract methods from parent are implemented
+	if (isChild) {
+		for(var prop in baseClass.prototype) {
+			if(Op._.helper.isAbstractParam(prop)) {
+				prop = prop.substring(1);
+				if(!(obj.hasOwnProperty(prop) && typeof obj[prop] === 'function')) {
+					isAbstract = true
+				}				
+			}
+		}		
+	}
+
 
 	if(isAbstract) {
-		newClass.prototype.constructor = function() {
+		newClassConst = function() {
 			throw new Error('There are method signatures which are not implemented! It is therefore an abstract Class');
 		}
+		newClassConst.prototype = Object.create(newClass.prototype);
+		newClassConst.prototype.constructor = newClassConst;
+		newClass = newClassConst;
 	}
 
 	return newClass;
@@ -771,11 +864,12 @@ Op.Class = function() {
 
 
 Op.AbstractClass = function() {
-	var args = arguments;
+	var args = Array.prototype.slice.call(arguments);
 	var options = {
 		'abstract': true
 	}
 	args[3] = options;
+	//console.log(args[3]);
 	return Op.Class.apply(this, args)
 }
 
@@ -829,11 +923,22 @@ demo.fw.AbstractClass = Op.AbstractClass('AbstractClass', {
 
 })
 
-demo.fw.ExtendsAbstract = Op.AbstractClass('ExtendsAbstract', {
-
+demo.fw.ExtendsAbstract = Op.Class('ExtendsAbstract', {
+	init: function(constructorParam) {
+		this.constructorParam = constructorParam;
+		this.z = 40;
+	},
+	z: 20,
+	abstractFunction: function() {
+		
+	}
 }, {
 	'extends': demo.fw.AbstractClass
 })
+
+var abstractClass = new demo.fw.ExtendsAbstract(20);
+//var abstractClass2 = new demo.fw.AbstractClass(20);
+
 
 
 //console.log(demo.fw.BaseClass.prototype.constructor.name);
@@ -849,7 +954,7 @@ demo.fw.ExtendsAbstract = Op.AbstractClass('ExtendsAbstract', {
 
 
 
-		var BaseClass = Op.Class('BaseClass', {
+var BaseClass = Op.Class('BaseClass', {
 			//in constructor assigned variable
 			preInitVariable: null,
 			//instance variable with preset value
@@ -860,7 +965,7 @@ demo.fw.ExtendsAbstract = Op.AbstractClass('ExtendsAbstract', {
 			init: function(initVar) {
 				this.preInitVariable = initVar;
 			//paramType, spezifies input type
-			}.paramType(['int']),
+		}.paramType(['int']),
 			//function to test the typing
 			tester: function() {
 				return 'ok';
