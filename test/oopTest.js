@@ -8,7 +8,7 @@ describe('Class declaration and inheritance', function() {
 	var ChildClass;
 	before(function() {
 		// Named Base class
-		BaseClass = Op.Class('BaseClass', {
+		BaseClass = Op.Class('BaseClass', null,{
 			//in constructor assigned variable
 			preInitVariable: null,
 			//instance variable with preset value
@@ -30,7 +30,9 @@ describe('Class declaration and inheritance', function() {
 			}.paramType(['Constructorless', 'object'])
 		});
 		//Childclass inherits from BaseClass
-		ChildClass = Op.Class('ChildClass', {
+		ChildClass = Op.Class('ChildClass',{
+                'extends': demo.fw.BaseClass    
+            }, {
 			//oberride
 			toBeOverwritten: 30,
 			//Own constructor assigned Variable
@@ -47,11 +49,9 @@ describe('Class declaration and inheritance', function() {
 			combineVarsFromBothConstructors: function() {
 				return preInitVariable + preInitVarChild;
 			}
-		}, {
-            'extends': demo.fw.BaseClass    
-        });
+		});
 
-		ClassWithoutConstructor = Op.Class('Constructorless', {
+		ClassWithoutConstructor = Op.Class('Constructorless', null,{
 
 		});
 

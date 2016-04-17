@@ -3,7 +3,8 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
  	grunt.loadNpmTasks('grunt-mocha-test');
  	grunt.loadNpmTasks('grunt-jsdoc');
-
+ 	grunt.loadNpmTasks('grunt-execute');
+ 	
 	grunt.initConfig({
 		concat: {
 			options: {
@@ -14,7 +15,7 @@ module.exports = function(grunt) {
 				dest: 'dist/build.js',
 			},
 			demoDist: {
-				src: ['demo/*.js', 'src/*.js'],
+				src: ['src/oop.js', 'demo/*.js'],
 				dest: 'dist/demoBuild.js'
 			}
 		},
@@ -51,10 +52,16 @@ module.exports = function(grunt) {
 	                destination: 'demoDoc'
 	            }
 	        }
+	    },
+	    execute : {
+	    	demo : {
+	    		src: ['dist/demoBuild.js']
+	    	}
 	    }
 	});
 
 
 	grunt.registerTask('default', ['concat:dist', 'mochaTest:test']);
 	grunt.registerTask('demo', ['concat:demoDist', 'jsdoc:demo', 'mochaTest:testDemo']);
+	grunt.registerTask('runDemo', ['concat:demoDist', 'execute:demo'])
 };

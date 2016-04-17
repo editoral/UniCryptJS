@@ -63,5 +63,5 @@ functionTyping
 [2K[0G  [32m  √[0m[90m [0m
 
 
-[92m [0m[32m 41 passing[0m[90m (121ms)[0m
+[92m [0m[32m 41 passing[0m[90m (154ms)[0m
 
