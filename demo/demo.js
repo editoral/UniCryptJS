@@ -538,6 +538,15 @@ Function.prototype.returnType = function returnType() {
 	return this;
 }
 
+Function.prototype.storeFunction = function storeFunction() {
+	var obj = arguments[0];
+	if(typeof obj !== 'object') {
+		console.log(obj);
+		throw new Error("Parameter needs to be an object with functions inside");
+	}
+	this.prototype._storedFunctions_ = arguments[0];
+	return this;
+}
 
 
 //Intern functions. Should not be used from the outside.
@@ -574,28 +583,47 @@ Op._.helper.FunctionOverload = function FunctionOverload(obj) {
 	this.prepareOverloadedFunctions();
 }
 
+Op._.helper.FunctionOverload.prototype.retrieveOverloadedFunctions = function retrieveOverloadedFunctions() {
+	return this.overloadedFunctions;
+}
+
 Op._.helper.FunctionOverload.prototype.prepareOverloadedFunctions = function() {
-	console.log(this.prepOverload);
 	for(var prop in this.prepOverload) {
-		var distributor = function() {
+		var distributor = function distributor() {
+			var self = arguments.callee;
 			var args = Array.prototype.slice.call(arguments);
 			var len = args.length;
-			console.log(prop);
-			for(var fn in prop) {
-				//console.log(prop[fn]);
-				//var paramType = prop[fn].prototype._paramType_;
-				//console.log(paramType);
+			var executables = self.prototype._storedFunctions_;
+			//console.log('hi: ' + prop);
+			var executed = false;
+			var result;
+			var lastErrorMsg = '';
+			for(var fn in executables) {
+				var paramType = executables[fn].prototype._paramType_;
+				if(len === paramType.length) {
+					try {
+						result = executables[fn].apply(this,args);
+						executed = true;			
+					} catch(err) {
+						console.log(err);
+						lastErrorMsg = err;
+					}	
+				}
 			}
+			return result;
 
-		}
-		distributor.prototype = this.prepOverload[prop];
+		}.storeFunction(this.prepOverload[prop]);
+		//distributor.prototype = this.prepOverload[prop].prototype;
 		this.overloadedFunctions[prop] = distributor;
+		this.overloadedFunctions[prop].prototype = distributor.prototype;
 	}
 }
 
 Op._.helper.FunctionOverload.prototype.loopFunctions = function() {
 	for(var prop in this.obj) {
-		this.addFunction(prop, this.obj[prop])
+		if(typeof this.obj[prop] === 'function') {
+			this.addFunction(prop, this.obj[prop])
+		}
 	}
 }
 
@@ -631,19 +659,19 @@ var meinObj = {
 	},
 }
 var meinObj2 = {
-	fn1: function fn1() {
+	fn1: function fn1(test) {
 		return 'meep';
 	}.paramType(['int']),
-	fn2: function fn2() {
+	fn2: function fn2(test, val) {
 		return 'beep';
-	},
+	}.paramType(['string']),
 	fn3: function fn3() {
 		return 'zeep';
-	},
+	}.paramType(['int', 'string']),
 }
 //var tester = new Op._.helper.FunctionOverload(meinObj);
-var tester2 = new Op._.helper.FunctionOverload(meinObj2);
-console.log(tester2.overloadedFunctions.fn());
+//var tester2 = new Op._.helper.FunctionOverload(meinObj2);
+//console.log(tester2.overloadedFunctions.fn(10));
 
 /**
  * JavaScript Rename Function
@@ -652,22 +680,41 @@ console.log(tester2.overloadedFunctions.fn());
  * @date Apr 5th, 2014
  */
  Op._.helper.renameFunction = function (name, fn) {
- 	return (new Function("return function (call) { return function " + name +
- 		" () { return call(this, arguments) }; };")())(Function.apply.bind(fn));
- 	};  
+ 	return (new Function("return function (call) { return function " + name + " () { return call(this, arguments) }; };")())(Function.apply.bind(fn));
+ };  
 
- 	Op._.helper.isAbstractParam = function(param) {
- 		return param.match(/^[\$][a-zA-Z0-9]/) ? true : false;
- 	}
+ Op._.helper.isAbstractParam = function(param) {
+ 	return param.match(/^[\$][a-zA-Z0-9]/) ? true : false;
+ }
 
- 	Op._.typing = {}
+Op._.helper.generateTypingWrapper = function() {
+	var typingWrapper = function() {
+		//Tests for the correctnes of the typing
+		var self = arguments.callee;
+		var execFuncIntern = self.prototype.toExecFunc;
+		var intParamType = self.prototype._paramType_;
+		var intReturnType = self.prototype._returnType_;
+		if (Array.isArray(intParamType)) {
+			Op._.helper.matchParamsArgs(intParamType, arguments);
+		}
+		//Execute the actual function
+		var result = execFuncIntern.apply(this, arguments);
+		if(intReturnType) {
+			Op._.helper.matchReturnType(intReturnType, result, self.name);	
+		}
+		return result;
+	}
+	return typingWrapper;
+}
 
- 	Op._.typing.TestTypes = function() {
+ Op._.typing = {}
 
- 	}
+ Op._.typing.TestTypes = function() {
 
- 	Op._.typing.TestTypes.prototype = {
- 		integer: function(val) {
+ }
+
+ Op._.typing.TestTypes.prototype = {
+ 	integer: function(val) {
 		//As there is no such things as Integer in JavaScript, because every number is internally represented as floating
 		//point value, it is only possible to test if it is a number.
 		//Afterwards it can be determined, wether it is an Integer
@@ -745,6 +792,8 @@ Op.Class = function() {
 	//Fetch the parameters
 	var className = arguments[0];
 	var obj = arguments[1];
+	//Function Overload
+	var functionOverload = new Op._.helper.FunctionOverload(obj);
 	// optional parameter: Class to inherit
 	var inheritanceObj = arguments[2];
 	var baseClass;
@@ -810,22 +859,7 @@ Op.Class = function() {
 				//If the type of the Params are spezified a wrapper is defined
 
 					//var execFunc = obj[prop];
-					var typingWrapper = function() {
-					//Tests for the correctnes of the typing
-					var self = arguments.callee;
-					var execFuncIntern = self.prototype.toExecFunc;
-					var intParamType = self.prototype._paramType_;
-					var intReturnType = self.prototype._returnType_;
-					if (Array.isArray(intParamType)) {
-						Op._.helper.matchParamsArgs(intParamType, arguments);
-					}
-					//Execute the actual function
-					var result = execFuncIntern.apply(this, arguments);
-					if(intReturnType) {
-						Op._.helper.matchReturnType(intReturnType, result, self.name);	
-					}
-					return result;
-				}
+				var typingWrapper = Op._.helper.generateTypingWrapper();
 				//typingWrapper = Op._.helper.renameFunction(prop, typingWrapper);
 				typingWrapper.prototype = obj[prop].prototype; 
 				typingWrapper.prototype.toExecFunc = obj[prop];
@@ -849,6 +883,10 @@ Op.Class = function() {
 		}		
 	}
 
+	var overloadedFunctions = functionOverload.retrieveOverloadedFunctions();
+	for(var fn in overloadedFunctions) {
+		console.log(fn);
+	}
 
 	if(isAbstract) {
 		newClassConst = function() {

@@ -1,6 +1,9 @@
+function
+functionTyping
 
 [0m[0m
 [0m  Class declaration and inheritance[0m
+functionTyping
 [2K[0G  [32m  √[0m[90m checks typing correctness in constructor[0m
 [2K[0G  [32m  √[0m[90m checks typing correctness in function parameter int[0m
 [2K[0G  [32m  √[0m[90m checks typing correctness in function parameter int[0m
@@ -10,9 +13,6 @@
 [2K[0G  [32m  √[0m[90m checks typing correctness wrong nr of params[0m
 [2K[0G  [32m  √[0m[90m checks typing correctness in function parameter with named classes[0m
 [2K[0G  [32m  √[0m[90m checks typing correctness in function parameter with named classes working[0m
-[2K[0G  [32m  √[0m[90m [0m
-[2K[0G  [32m  √[0m[90m [0m
-[2K[0G  [32m  √[0m[90m [0m
 
 [0m  A first example[0m
 [2K[0G  [32m  √[0m[90m will write names but can't[0m
@@ -63,5 +63,5 @@
 [2K[0G  [32m  √[0m[90m [0m
 
 
-[92m [0m[32m 44 passing[0m[90m (58ms)[0m
+[92m [0m[32m 41 passing[0m[90m (121ms)[0m
 
