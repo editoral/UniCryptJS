@@ -384,9 +384,16 @@ Op.Class = function() {
 		}		
 	}
 
+	//Append overloadedFunctions.
+	//They override possible functions with same name
 	var overloadedFunctions = functionOverload.retrieveOverloadedFunctions();
 	for(var fn in overloadedFunctions) {
-		console.log(fn);
+		console.log(overloadedFunctions.func);
+		//var typingWrapper = Op._.helper.generateTypingWrapper();
+		//typingWrapper = Op._.helper.renameFunction(prop, typingWrapper);
+		//typingWrapper.prototype = overloadedFunctions[fn].prototype; 
+		//typingWrapper.prototype.toExecFunc = overloadedFunctions[fn];
+		newClass.prototype[fn] = overloadedFunctions[fn];
 	}
 
 	if(isAbstract) {

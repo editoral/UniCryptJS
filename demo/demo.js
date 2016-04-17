@@ -633,3 +633,22 @@ this.$$super ist die Super konstruktor funktion.
 
 */
 
+
+
+var BaseClass = Op.Class('BaseClass', null,{
+            func1: function(int1) {
+                return int1;
+            }.paramType(['int']).returnType('int'),
+            func2: function(int1, int2) {
+                return int1 + int2;
+            }.paramType(['int','int']).returnType('int'),
+            func2: function(int1, int2, string1) {
+                return string1 + (int1 + int2);
+            }.paramType(['int','int', 'string']).returnType('string'),
+            func4: function(string1) {
+                return string1 + ' : one single argument';
+            }.paramType(['string']).returnType('string')
+        });
+
+var baseClass = new BaseClass();
+var result = baseClass.func(10);
