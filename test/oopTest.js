@@ -26,14 +26,20 @@ describe('Class declaration and inheritance', function() {
 			}.paramType(['int', 'boolean', 'string']),
 			//second function to test typing
 			functionTyping2: function() {
-				return 'ok';
-			}.paramType(['Constructorless', 'object'])
+				return 'maybe';
+			}.paramType(['Constructorless', 'object']),
+            functionTyping3: function() {
+                return '20';
+            }.paramType(['string']).returnType('int'),
+            functionTyping4: function() {
+                return 20;
+            }.paramType(['int']).returnType('int')
 		});
 		//Childclass inherits from BaseClass
 		ChildClass = Op.Class('ChildClass',{
-                'extends': demo.fw.BaseClass    
+                'extends': BaseClass    
             }, {
-			//oberride
+			//override
 			toBeOverwritten: 30,
 			//Own constructor assigned Variable
 			preInitVarChild: null,
@@ -47,7 +53,7 @@ describe('Class declaration and inheritance', function() {
 				return this.x + this.y;
 			},
 			combineVarsFromBothConstructors: function() {
-				return preInitVariable + preInitVarChild;
+				return this.preInitVariable + this.preInitVarChild;
 			}
 		});
 
@@ -56,6 +62,7 @@ describe('Class declaration and inheritance', function() {
 		});
 
 	});
+    //Checking static typing
     it('checks typing correctness in constructor', function() {
     	var test = function () {
     		var b = new BaseClass('10');
@@ -121,5 +128,42 @@ describe('Class declaration and inheritance', function() {
     	}
     	expect(test).to.not.throwError();
     });
+    it('test typing correctness of return value', function() {
+        var baseClass = new BaseClass(10);
+        var test = function() {
+            baseClass.functionTyping3('hallo');
+        }
+        expect(test).to.throwError();
+    });
+    it('test typing correctness of return value 2', function() {
+        var baseClass = new BaseClass(10);
+        var test = function() {
+            baseClass.functionTyping4(10);
+        }
+        expect(test).to.not.throwError();
+    });      
+    //Testing correct Class generation
+    it('tests correctness of properties in Baseclass', function() {
+        var baseClass = new BaseClass(10);
+        var number = baseClass.preInitVariable + baseClass.x;
+        expect(number).to.be(30);
+    });
+    it('tests correctness of properties in ChildClass', function() {
+        var childClass = new ChildClass(20,50);
+        expect(childClass.combineVarsChildParent()).to.be(39);
+    });
+    it('tests correctness of overwriting properties in ChildClass', function() {
+        var childClass = new ChildClass(20,50);
+        expect(childClass.toBeOverwritten).to.be(30);
+    });
+    it('tests constructor and superconstructor in ChildClass', function() {
+        var childClass = new ChildClass(20,50);
+        expect(childClass.combineVarsFromBothConstructors()).to.be(70);
+    });
+    it('', function() {
 
+    });
+    it('', function() {
+
+    });
 });

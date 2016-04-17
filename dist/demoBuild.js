@@ -133,28 +133,28 @@ Op._.helper.FunctionOverload.prototype.retrieveRealName = function(name) {
 	return name.match(/[^\s]*[a-zA-Z][^0-9]/)[0];
 }
 
-var meinObj = {
-	function1: function function1() {
-		return 'meep';
-	},
-	function2: function function2() {
-		return 'beep';
-	},
-	function3: function function3() {
-		return 'zeep';
-	},
-}
-var meinObj2 = {
-	fn1: function fn1(test) {
-		return 'meep';
-	}.paramType(['int']),
-	fn2: function fn2(test, val) {
-		return 'beep';
-	}.paramType(['string']),
-	fn3: function fn3() {
-		return 'zeep';
-	}.paramType(['int', 'string']),
-}
+// var meinObj = {
+// 	function1: function function1() {
+// 		return 'meep';
+// 	},
+// 	function2: function function2() {
+// 		return 'beep';
+// 	},
+// 	function3: function function3() {
+// 		return 'zeep';
+// 	},
+// }
+// var meinObj2 = {
+// 	fn1: function fn1(test) {
+// 		return 'meep';
+// 	}.paramType(['int']),
+// 	fn2: function fn2(test, val) {
+// 		return 'beep';
+// 	}.paramType(['string']),
+// 	fn3: function fn3() {
+// 		return 'zeep';
+// 	}.paramType(['int', 'string']),
+// }
 //var tester = new Op._.helper.FunctionOverload(meinObj);
 //var tester2 = new Op._.helper.FunctionOverload(meinObj2);
 //console.log(tester2.overloadedFunctions.fn(10));
@@ -308,13 +308,16 @@ Op.Class = function() {
 		if(Array.isArray(paramType)) {
 			Op._.helper.matchParamsArgs(paramType, arguments);
 		}
-		//assign all instance variables
-		for(var prop in obj) {
-			if(!(prop === 'init')) {
-				if(['number', 'boolean', 'string', 'object'].indexOf(typeof obj[prop]) >= 0) {
-					this[prop] = obj[prop];
+		if(!this._initializedProps_){
+			//assign all instance variables
+			for(var prop in obj) {
+				if(!(prop === 'init')) {
+					if(['number', 'boolean', 'string', 'object'].indexOf(typeof obj[prop]) >= 0) {
+						this[prop] = obj[prop];
+					}
 				}
 			}
+			this._initializedProps_ = true;
 		}
 		//execute the defined init function, as the oop constructor
 		obj.init.apply(this, arguments);
@@ -331,7 +334,19 @@ Op.Class = function() {
 		newClass.prototype.$$super = function() {
 			baseClass.apply(this, arguments);
 		}
+		var oldObj = baseClass.prototype._objPreserve_;
+		for(var prop in oldObj) {
+			if(!(prop === 'init')) {
+				if(['number', 'boolean', 'string', 'object'].indexOf(typeof oldObj[prop]) >= 0) {
+					if(!obj.hasOwnProperty(prop)) {
+						obj[prop] = oldObj[prop];
+					}
+				}
+			}
+		}
 	}
+	//Preserve properties from parent
+	newClass.prototype._objPreserve_ = obj;
 
 	//append all defined functions to prototype of the new JavaScript function
 	//they will be wrapped in another function to ensure the right types of the parameters
@@ -382,6 +397,7 @@ Op.Class = function() {
 		newClassConst.prototype.constructor = newClassConst;
 		newClass = newClassConst;
 	}
+
 
 	return newClass;
 }
@@ -993,30 +1009,30 @@ var abstractClass = new demo.fw.ExtendsAbstract(20);
 
 
 
-var BaseClass = Op.Class('BaseClass', null,{
-			//in constructor assigned variable
-			preInitVariable: null,
-			//instance variable with preset value
-			x: 20,
-			//variable to override
-			toBeOverwritten: null,
-			// constructor function
-			init: function(initVar) {
-				this.preInitVariable = initVar;
-			//paramType, spezifies input type
-		}.paramType(['int']),
-			//function to test the typing
-			tester: function() {
-				return 'ok';
-			}.paramType(['int', 'boolean', 'string']).returnType('string'),
-			//second function to test typing
-			functionTyping2: function() {
-				return 'oki';
-			}.paramType(['Constructorless', 'object']).returnType('int')
-		});
+// var BaseClass = Op.Class('BaseClass', null,{
+// 			//in constructor assigned variable
+// 			preInitVariable: null,
+// 			//instance variable with preset value
+// 			x: 20,
+// 			//variable to override
+// 			toBeOverwritten: null,
+// 			// constructor function
+// 			init: function(initVar) {
+// 				this.preInitVariable = initVar;
+// 			//paramType, spezifies input type
+// 		}.paramType(['int']),
+// 			//function to test the typing
+// 			tester: function() {
+// 				return 'ok';
+// 			}.paramType(['int', 'boolean', 'string']).returnType('string'),
+// 			//second function to test typing
+// 			functionTyping2: function() {
+// 				return 'oki';
+// 			}.paramType(['Constructorless', 'object']).returnType('int')
+// 		});
 
-var baseClass = new BaseClass(10);
-baseClass.tester(10, true, 'hallo');
+// var baseClass = new BaseClass(10);
+// baseClass.tester(10, true, 'hallo');
 //console.log(baseClass.tester.prototype._paramType_)
 
 /*

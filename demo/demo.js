@@ -595,30 +595,30 @@ var abstractClass = new demo.fw.ExtendsAbstract(20);
 
 
 
-var BaseClass = Op.Class('BaseClass', null,{
-			//in constructor assigned variable
-			preInitVariable: null,
-			//instance variable with preset value
-			x: 20,
-			//variable to override
-			toBeOverwritten: null,
-			// constructor function
-			init: function(initVar) {
-				this.preInitVariable = initVar;
-			//paramType, spezifies input type
-		}.paramType(['int']),
-			//function to test the typing
-			tester: function() {
-				return 'ok';
-			}.paramType(['int', 'boolean', 'string']).returnType('string'),
-			//second function to test typing
-			functionTyping2: function() {
-				return 'oki';
-			}.paramType(['Constructorless', 'object']).returnType('int')
-		});
+// var BaseClass = Op.Class('BaseClass', null,{
+// 			//in constructor assigned variable
+// 			preInitVariable: null,
+// 			//instance variable with preset value
+// 			x: 20,
+// 			//variable to override
+// 			toBeOverwritten: null,
+// 			// constructor function
+// 			init: function(initVar) {
+// 				this.preInitVariable = initVar;
+// 			//paramType, spezifies input type
+// 		}.paramType(['int']),
+// 			//function to test the typing
+// 			tester: function() {
+// 				return 'ok';
+// 			}.paramType(['int', 'boolean', 'string']).returnType('string'),
+// 			//second function to test typing
+// 			functionTyping2: function() {
+// 				return 'oki';
+// 			}.paramType(['Constructorless', 'object']).returnType('int')
+// 		});
 
-var baseClass = new BaseClass(10);
-baseClass.tester(10, true, 'hallo');
+// var baseClass = new BaseClass(10);
+// baseClass.tester(10, true, 'hallo');
 //console.log(baseClass.tester.prototype._paramType_)
 
 /*
