@@ -651,4 +651,5 @@ var BaseClass = Op.Class('BaseClass', null,{
         });
 
 var baseClass = new BaseClass();
-var result = baseClass.func(10);
+//var result = baseClass.func(10);
+//console.log(result);

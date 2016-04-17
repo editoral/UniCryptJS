@@ -25,13 +25,13 @@ describe('Class declaration and inheritance', function() {
 				return 'ok';
 			}.paramType(['int', 'boolean', 'string']),
 			//second function to test typing
-			functionTyping2: function() {
+			functionTypingTwo: function() {
 				return 'maybe';
 			}.paramType(['Constructorless', 'object']),
-            functionTyping3: function() {
+            functionTypingThree: function() {
                 return '20';
             }.paramType(['string']).returnType('int'),
-            functionTyping4: function() {
+            functionTypingFour: function() {
                 return 20;
             }.paramType(['int']).returnType('int')
 		});
@@ -116,7 +116,7 @@ describe('Class declaration and inheritance', function() {
 		var baseClass = new BaseClass(10);
 		var childClass = new ChildClass(10,20);
 		var test = function() {
-    		baseClass.functionTyping2(childClass, {});
+    		baseClass.functionTypingTwo(childClass, {});
     	}
     	expect(test).to.throwError();
     });
@@ -124,21 +124,21 @@ describe('Class declaration and inheritance', function() {
 		var baseClass = new BaseClass(10);
 		var constLess = new ClassWithoutConstructor(10,20);
 		var test = function() {
-    		baseClass.functionTyping2(constLess, {});
+    		baseClass.functionTypingTwo(constLess, {});
     	}
     	expect(test).to.not.throwError();
     });
     it('test typing correctness of return value', function() {
         var baseClass = new BaseClass(10);
         var test = function() {
-            baseClass.functionTyping3('hallo');
+            baseClass.functionTypingThree('hallo');
         }
         expect(test).to.throwError();
     });
     it('test typing correctness of return value 2', function() {
         var baseClass = new BaseClass(10);
         var test = function() {
-            baseClass.functionTyping4(10);
+            baseClass.functionTypingFour(10);
         }
         expect(test).to.not.throwError();
     });      
@@ -175,11 +175,11 @@ describe('Function overloading', function() {
             func2: function(int1, int2) {
                 return int1 + int2;
             }.paramType(['int','int']).returnType('int'),
-            func2: function(int1, int2, string1) {
+            func3: function(int1, int2, string1) {
                 return string1 + (int1 + int2);
             }.paramType(['int','int', 'string']).returnType('string'),
             func4: function(string1) {
-                return string1 + ' : one single argument';
+                return string1 + ' one single argument';
             }.paramType(['string']).returnType('string')
         });
     });
@@ -188,4 +188,19 @@ describe('Function overloading', function() {
         var result = baseClass.func(10);
         expect(result).to.be(10);
     });
+    it('tests overload with string param', function() {
+        var baseClass = new BaseClass();
+        var result = baseClass.func('Just');
+        expect(result).to.be('Just one single argument');
+    });
+    it('tests overload with double int param', function() {
+        var baseClass = new BaseClass();
+        var result = baseClass.func(10,40);
+        expect(result).to.be(50);
+    });    
+    it('tests overload with tripple param', function() {
+        var baseClass = new BaseClass();
+        var result = baseClass.func(10,40, 'Result: ');
+        expect(result).to.be('Result: 50');
+    });  
 });

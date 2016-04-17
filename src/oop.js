@@ -41,6 +41,7 @@ Op._ = {}
 Op._.helper = {}
 
 Op._.helper.matchParamsArgs = function(paramType, args) {
+	console.log(paramType.length);
 	if(paramType.length !== args.length) {
 		throw new Error("Number of parameter types and number of parameters missmatch!");
 	}
@@ -85,16 +86,18 @@ Op._.helper.FunctionOverload.prototype.prepareOverloadedFunctions = function() {
 			var result;
 			var lastErrorMsg = '';
 			for(var fn in executables) {
-				var paramType = executables[fn].prototype._paramType_;
-				if(len === paramType.length) {
+				//var paramType = executables[fn].prototype._paramType_;
+				//if(len === paramType.length) {
 					try {
 						result = executables[fn].apply(this,args);
 						executed = true;			
 					} catch(err) {
-						console.log(err);
 						lastErrorMsg = err;
 					}	
-				}
+				//}
+			}
+			if (!executed) {
+				throw new Error('No overloaded Function found!');
 			}
 			return result;
 
@@ -119,8 +122,14 @@ Op._.helper.FunctionOverload.prototype.addFunction = function(name, fn) {
 		if(!this.prepOverload.hasOwnProperty(endName)) {
 			this.prepOverload[endName] = {}
 		}
-		this.prepOverload[endName][name] = fn;
-		this.prepOverload[endName][name].prototype = fn.prototype;
+		//insert typing Wrapper
+		var typingWrapper = Op._.helper.generateTypingWrapper();
+
+		typingWrapper.prototype = fn.prototype; 
+		typingWrapper.prototype.toExecFunc = fn;
+
+		this.prepOverload[endName][name] = typingWrapper;
+		this.prepOverload[endName][name].prototype = typingWrapper.prototype;
 	}
 }
 
@@ -388,11 +397,7 @@ Op.Class = function() {
 	//They override possible functions with same name
 	var overloadedFunctions = functionOverload.retrieveOverloadedFunctions();
 	for(var fn in overloadedFunctions) {
-		console.log(overloadedFunctions.func);
-		//var typingWrapper = Op._.helper.generateTypingWrapper();
-		//typingWrapper = Op._.helper.renameFunction(prop, typingWrapper);
-		//typingWrapper.prototype = overloadedFunctions[fn].prototype; 
-		//typingWrapper.prototype.toExecFunc = overloadedFunctions[fn];
+		console.log(fn);
 		newClass.prototype[fn] = overloadedFunctions[fn];
 	}
 
