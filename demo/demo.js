@@ -580,6 +580,31 @@ demo.fw.ExtendsAbstract = Op.Class('ExtendsAbstract',  {
 var abstractClass = new demo.fw.ExtendsAbstract(20);
 //var abstractClass2 = new demo.fw.AbstractClass(20);
 
+demo.fw.GenericClass1 = Op.Class('GenericClass', {
+	'generic': {
+		'T': null
+	}
+},{
+	init: function() {
+
+	},
+	genericFunction: function(gen1, gen2) {
+
+	}.paramType(['T','T'])
+});
+
+demo.fw.GenericClass2 = Op.Class('GenericClass2', {
+	'generic': {
+		'V': null,
+		'T': {
+			'GenericClass': 'V'
+		}
+	}
+},{
+
+});
+
+
 
 
 //console.log(demo.fw.BaseClass.prototype.constructor.name);

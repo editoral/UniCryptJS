@@ -24,6 +24,16 @@ Function.prototype.returnType = function returnType() {
 	return this;
 }
 
+Function.prototype.genericType = function genericType() {
+	var gen = arguments[0];
+	if(typeof gen !== 'object') {
+		console.log(gen);
+		throw new Error("Generic Types needs to be an object with types inside");
+	}
+	this.prototype._genericType_ = gen;
+	return this;
+}
+
 Function.prototype.storeFunction = function storeFunction() {
 	var obj = arguments[0];
 	if(typeof obj !== 'object') {
@@ -40,20 +50,20 @@ Op._ = {}
 
 Op._.helper = {}
 
-Op._.helper.matchParamsArgs = function(paramType, args) {
+Op._.helper.matchParamsArgs = function(paramType, args, generic) {
 	console.log(paramType.length);
 	if(paramType.length !== args.length) {
 		throw new Error("Number of parameter types and number of parameters missmatch!");
 	}
 	for(var i = 0; i < paramType.length; i++) {
-		Op._.typing.testTypes(paramType[i], args[i]);
+		Op._.typing.testTypes(paramType[i], args[i], generic);
 	}	
 }
 
-Op._.helper.matchReturnType = function(returnType, result, name) {
+Op._.helper.matchReturnType = function(returnType, result, name, generic) {
 	var didPass = true;
 	try {
-		Op._.typing.testTypes(returnType, result);	
+		Op._.typing.testTypes(returnType, result, generic);	
 	} catch(err) {
 		didPass = false;
 	}
@@ -189,8 +199,9 @@ Op._.helper.generateTypingWrapper = function() {
 		var execFuncIntern = self.prototype.toExecFunc;
 		var intParamType = self.prototype._paramType_;
 		var intReturnType = self.prototype._returnType_;
+		var genericType = self.prototype._genericType_;
 		if (Array.isArray(intParamType)) {
-			Op._.helper.matchParamsArgs(intParamType, arguments);
+			Op._.helper.matchParamsArgs(intParamType, arguments,genericType);
 		}
 		//Execute the actual function
 		var result = execFuncIntern.apply(this, arguments);
@@ -240,10 +251,17 @@ Op._.helper.generateTypingWrapper = function() {
 		} else {
 			throw new Error("param " + val + " is not an object!");
 		}
+	},
+	generic: function(type, generic, val) {
+		if(generic.hasOwnProperty(type)) {
+			
+		} else {
+			throw new Error("param " + val + " is not known to be generic!");
+		}
 	}
 }
 
-Op._.typing.testTypes = function(type, val) {
+Op._.typing.testTypes = function(type, val, generic) {
 	var h = new Op._.typing.TestTypes();
 	switch(type) {
 		case 'int':
@@ -271,7 +289,11 @@ Op._.typing.testTypes = function(type, val) {
 		h.untypedObj(val);
 		break;
 		default:
-		h.obj(type,val);
+		if(type.match(/^[A-Z]$/)) {
+			h.generic(typw, generic, val)
+		} else {
+			h.obj(type,val);
+		}	
 	}
 }
 
@@ -290,10 +312,15 @@ Op.Class = function() {
 	//Function Overload
 	var functionOverload = new Op._.helper.FunctionOverload(obj);
 	// optional parameter: Class to inherit
-	var inheritanceObj = arguments[1];
+	var classSpecObj = arguments[1];
 	var baseClass;
-	if(inheritanceObj && inheritanceObj.hasOwnProperty('extends')) {
-		baseClass = inheritanceObj['extends'];
+	var generic;
+	if(classSpecObj && classSpecObj.hasOwnProperty('extends')) {
+		baseClass = classSpecObj['extends'];
+	}
+	//Generic information
+	if(classSpecObj && classSpecObj.hasOwnProperty('generic')) {
+		generic = classSpecObj['generic'];
 	}
 	// Option parameters
 	var options = arguments[3];
@@ -360,6 +387,8 @@ Op.Class = function() {
 	}
 	//Preserve properties from parent
 	newClass.prototype._objPreserve_ = obj;
+	//Preserve generics Information
+	newClass.prototype._generic_ = generics;
 
 	//append all defined functions to prototype of the new JavaScript function
 	//they will be wrapped in another function to ensure the right types of the parameters
