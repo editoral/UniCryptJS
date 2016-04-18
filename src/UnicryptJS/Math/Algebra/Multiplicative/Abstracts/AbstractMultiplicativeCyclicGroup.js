@@ -1,0 +1,5 @@
+Op.AbstractClass('AbstractMultiplicativeCyclicGroup', {
+
+},{
+	
+});

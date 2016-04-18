@@ -312,6 +312,10 @@ Op.Class = function() {
 
 	//define a new constructor
 	var newClass = function() {
+		//Tests if Abstract
+		if(this._isAbstract_) {
+			throw new Error('There are method signatures which are not implemented! It is therefore an abstract Class');
+		}
 		//Tests the typing
 		var paramType = obj.init.prototype._paramType_;
 		if(Array.isArray(paramType)) {
@@ -397,20 +401,11 @@ Op.Class = function() {
 	//They override possible functions with same name
 	var overloadedFunctions = functionOverload.retrieveOverloadedFunctions();
 	for(var fn in overloadedFunctions) {
-		console.log(fn);
+		//console.log(fn);
 		newClass.prototype[fn] = overloadedFunctions[fn];
 	}
 
-	if(isAbstract) {
-		newClassConst = function() {
-			throw new Error('There are method signatures which are not implemented! It is therefore an abstract Class');
-		}
-		newClassConst.prototype = Object.create(newClass.prototype);
-		newClassConst.prototype.constructor = newClassConst;
-		newClass = newClassConst;
-	}
-
-
+	newClass.prototype._isAbstract_ = isAbstract;
 	return newClass;
 }
 

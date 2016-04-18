@@ -204,3 +204,77 @@ describe('Function overloading', function() {
         expect(result).to.be('Result: 50');
     });  
 });
+
+describe('Abstract classes and inheritance', function() {
+    var AbstractClass;
+    var RealClass1;
+    var RealClass2;
+    var AbstractClass2;
+    before(function() {
+        AbstractClass = Op.AbstractClass('AbstractClass', null, {
+            init: function(constructorParam) {
+                this.constructorParam = constructorParam;
+                this.z = 40;
+            },
+            z: 20,
+            $abstractFunction: function(){},
+            $abstractVariable: 30,
+            constructorParam: null,
+            $abstractNewFunction: function(){},
+            normalFunction: function() {
+                return 'hi';
+            }
+        });
+
+        RealClass1 = Op.Class('RealClass1', {
+            'extends': AbstractClass
+        },{
+            init: function(constructorParam) {
+                this.l += constructorParam;
+                this.$$super(constructorParam);
+            },
+            l: 20,
+            abstractFunction: function(int1) {
+                return 10 + int1;
+            },
+            abstractNewFunction: function(int1) {
+                return 10 + this.abstractFunction(int1);
+            }
+        });
+        RealClass2 = Op.Class('RealClass2', {
+            'extends': AbstractClass
+        },{
+            init: function(constructorParam) {
+                this.l += constructorParam;
+                this.$$super(constructorParam);
+            },
+            l: 20
+        })
+        AbstractClass2 = Op.AbstractClass('AbstractClass2', null, {
+        });
+    });
+    it('tries to instantiate an abstract class', function() {
+        var test = function() {
+            var abstractClass = new AbstractClass(20);
+        }
+        expect(test).to.throwError();
+    });
+    it('tires to instantiate a class not implementing abstract Functions', function() {
+        var test = function() {
+            var realClass = new RealClass2(20);
+        }
+        expect(test).to.throwError();    
+    });
+    it('instantiate a class implementing all abstract methods', function() {
+        var test = function() {
+            var realClass1 = new RealClass1(20);
+        }
+        expect(test).to.not.throwError();
+    });
+    it('', function() {
+
+    });
+    it('', function() {
+
+    });
+});
