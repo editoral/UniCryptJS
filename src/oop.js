@@ -152,31 +152,6 @@ Op._.helper.FunctionOverload.prototype.retrieveRealName = function(name) {
 	return name.match(/[^\s]*[a-zA-Z][^0-9]/)[0];
 }
 
-// var meinObj = {
-// 	function1: function function1() {
-// 		return 'meep';
-// 	},
-// 	function2: function function2() {
-// 		return 'beep';
-// 	},
-// 	function3: function function3() {
-// 		return 'zeep';
-// 	},
-// }
-// var meinObj2 = {
-// 	fn1: function fn1(test) {
-// 		return 'meep';
-// 	}.paramType(['int']),
-// 	fn2: function fn2(test, val) {
-// 		return 'beep';
-// 	}.paramType(['string']),
-// 	fn3: function fn3() {
-// 		return 'zeep';
-// 	}.paramType(['int', 'string']),
-// }
-//var tester = new Op._.helper.FunctionOverload(meinObj);
-//var tester2 = new Op._.helper.FunctionOverload(meinObj2);
-//console.log(tester2.overloadedFunctions.fn(10));
 
 /**
  * JavaScript Rename Function
@@ -254,7 +229,8 @@ Op._.helper.generateTypingWrapper = function() {
 	},
 	generic: function(type, generic, val) {
 		if(generic.hasOwnProperty(type)) {
-			
+			var genericType = generic[type];
+
 		} else {
 			throw new Error("param " + val + " is not known to be generic!");
 		}
@@ -314,13 +290,19 @@ Op.Class = function() {
 	// optional parameter: Class to inherit
 	var classSpecObj = arguments[1];
 	var baseClass;
-	var generic;
+	var genericDeclaration;
+	var generic = {};
+	var isGeneric = false;
 	if(classSpecObj && classSpecObj.hasOwnProperty('extends')) {
 		baseClass = classSpecObj['extends'];
 	}
 	//Generic information
 	if(classSpecObj && classSpecObj.hasOwnProperty('generic')) {
-		generic = classSpecObj['generic'];
+		genericDeclaration = classSpecObj['generic'];
+		if(!(typeof genericDeclaration === 'array') {
+			throw new Error('Wrong generics declaration!');
+		}
+		isGeneric = true;
 	}
 	// Option parameters
 	var options = arguments[3];
@@ -343,10 +325,28 @@ Op.Class = function() {
 		if(this._isAbstract_) {
 			throw new Error('There are method signatures which are not implemented! It is therefore an abstract Class');
 		}
+		var args = Array.prototype.slice.call(arguments);
+		if(this._isGeneric_) {
+			var genericDef = args[0];
+			if(!(typeof genericDef === 'array')) {
+				throw new Error('Generic classes need to be typed as a first arguement!');
+			}
+			if(genericDef.length ==! genericDeclaration.length) {
+				throw new Error('Generic parameter missmatch!');
+			}
+			for(var i = 0; i < genericDeclaration.length; i++) {
+				var genType = genericDeclaration[i];
+				if(typeof genType === 'string') {
+					generic[genType] = genericDef[i];
+				}
+			}
+
+			args.shift();
+		}
 		//Tests the typing
 		var paramType = obj.init.prototype._paramType_;
 		if(Array.isArray(paramType)) {
-			Op._.helper.matchParamsArgs(paramType, arguments);
+			Op._.helper.matchParamsArgs(paramType, args);
 		}
 		if(!this._initializedProps_){
 			//assign all instance variables
@@ -360,7 +360,7 @@ Op.Class = function() {
 			this._initializedProps_ = true;
 		}
 		//execute the defined init function, as the oop constructor
-		obj.init.apply(this, arguments);
+		obj.init.apply(this, args);
 	}
 
 	//name the new Class
@@ -385,10 +385,6 @@ Op.Class = function() {
 			}
 		}
 	}
-	//Preserve properties from parent
-	newClass.prototype._objPreserve_ = obj;
-	//Preserve generics Information
-	newClass.prototype._generic_ = generics;
 
 	//append all defined functions to prototype of the new JavaScript function
 	//they will be wrapped in another function to ensure the right types of the parameters
@@ -397,15 +393,11 @@ Op.Class = function() {
 
 			// tests wheter it is an abstract param
 			if(!Op._.helper.isAbstractParam(prop)) {
-				//var paramType = obj[prop].prototype._paramType_;
-				//console.log(paramType);
 				//If the type of the Params are spezified a wrapper is defined
-
-					//var execFunc = obj[prop];
 				var typingWrapper = Op._.helper.generateTypingWrapper();
-				//typingWrapper = Op._.helper.renameFunction(prop, typingWrapper);
 				typingWrapper.prototype = obj[prop].prototype; 
 				typingWrapper.prototype.toExecFunc = obj[prop];
+				typingWrapper.prototype.genericType = generic;
 				newClass.prototype[prop] = typingWrapper;			
 			} else {
 				// It is an abstract function, so check if the method has been overwritten
@@ -430,11 +422,16 @@ Op.Class = function() {
 	//They override possible functions with same name
 	var overloadedFunctions = functionOverload.retrieveOverloadedFunctions();
 	for(var fn in overloadedFunctions) {
-		//console.log(fn);
 		newClass.prototype[fn] = overloadedFunctions[fn];
 	}
-
+	//Is Abstract?
 	newClass.prototype._isAbstract_ = isAbstract;
+	//Preserve properties from parent
+	newClass.prototype._objPreserve_ = obj;
+	//Preserve generics Information
+	newClass.prototype._generic_ = generics;
+	newClass.prototype._isGeneric_ = isGeneric;
+
 	return newClass;
 }
 
@@ -445,6 +442,5 @@ Op.AbstractClass = function() {
 		'abstract': true
 	}
 	args[3] = options;
-	//console.log(args[3]);
 	return Op.Class.apply(this, args)
 }
