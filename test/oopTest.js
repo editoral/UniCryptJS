@@ -251,6 +251,18 @@ describe('Abstract classes and inheritance', function() {
             l: 20
         })
         AbstractClass2 = Op.AbstractClass('AbstractClass2', null, {
+            init: function(constructorParam) {
+                this.l += constructorParam;
+            },
+            l: 20,        
+        });
+        SemiAbstract = Op.Class('SemiAbstract', null, {
+            init: function(constructorParam) {
+                this.l += constructorParam;
+            },
+            l: 20,
+            $abstractFunction: function(){},
+
         });
     });
     it('tries to instantiate an abstract class', function() {
@@ -271,10 +283,40 @@ describe('Abstract classes and inheritance', function() {
         }
         expect(test).to.not.throwError();
     });
-    it('', function() {
-
+    it('instantiating a abstract class without abstract methods fails', function() {
+        var test = function() {
+            var abstractClass2 = new AbstractClass2(20);
+        }
+        expect(test).to.throwError();
     });
-    it('', function() {
-
+    it('tests constructor of abstract parent class', function() {
+        var realClass1 = new RealClass1(20);
+        expect(realClass1.z).to.be(40);
+    });
+    it('tests constructor of abstract parent class 2', function() {
+        var realClass1 = new RealClass1(20);
+        expect(realClass1.constructorParam).to.be(20);
+    });
+    it('tests multiple abstract Functions', function() {
+        var realClass1 = new RealClass1(20);
+        var sum = realClass1.abstractFunction(10) + realClass1.abstractNewFunction(10);
+        expect(sum).to.be(50);
+    });
+    // it('tries to call the abstract Functions and fails', function() {
+    //     var realClass1 = new RealClass1(20);
+    //     var test = function() {
+    //         realClass1.$abstractFunction();
+    //     }
+    //     expect(test).to.throwError(); 
+    // });
+    it('varables have no inpact on abstractness of class', function() {
+        var realClass1 = new RealClass1(20);
+        expect(realClass1.$abstractVariable).to.be(30);
+    });
+    it('normal classes can be made abstract by adding abstract Methods', function() {
+        var test = function() {
+            var semiAbstract = new SemiAbstract(20);
+        }
+        expect(test).to.throwError();
     });
 });
