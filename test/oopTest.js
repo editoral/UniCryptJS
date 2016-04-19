@@ -6,6 +6,7 @@ describe('Class declaration and inheritance', function() {
 	var BaseClass;
 	var ClassWithoutConstructor;
 	var ChildClass;
+    var GrandChild;
 	before(function() {
 		// Named Base class
 		BaseClass = Op.Class('BaseClass', null,{
@@ -56,6 +57,14 @@ describe('Class declaration and inheritance', function() {
 				return this.preInitVariable + this.preInitVarChild;
 			}
 		});
+
+        GrandChild = Op.Class('GrandChild', {
+            'extends': ChildClass
+        },{
+            grandChildFunction: function() {
+                return 'hi from grandchild';
+            }
+        });
 
 		ClassWithoutConstructor = Op.Class('Constructorless', null,{
 
@@ -160,9 +169,15 @@ describe('Class declaration and inheritance', function() {
         var childClass = new ChildClass(20,50);
         expect(childClass.combineVarsFromBothConstructors()).to.be(70);
     });
-    it('', function() {
-
+    it('instantiate a grandchild and tests function', function() {
+        var grandChild = new GrandChild();
+        expect(grandChild.grandChildFunction()).to.be('hi from grandchild');
     });
+    it('instantiate a grandchild and tests parent function', function() {
+        var grandChild = new GrandChild();
+        expect(grandChild.functionTypingFour(20)).to.be(20);
+    });
+
 });
 
 describe('Function overloading', function() {
@@ -210,6 +225,7 @@ describe('Abstract classes and inheritance', function() {
     var RealClass1;
     var RealClass2;
     var AbstractClass2;
+    var GrandChild;
     before(function() {
         AbstractClass = Op.AbstractClass('AbstractClass', null, {
             init: function(constructorParam) {
@@ -253,6 +269,7 @@ describe('Abstract classes and inheritance', function() {
         AbstractClass2 = Op.AbstractClass('AbstractClass2', null, {
             init: function(constructorParam) {
                 this.l += constructorParam;
+                this.$$super(constructorParam);
             },
             l: 20,        
         });
@@ -263,6 +280,17 @@ describe('Abstract classes and inheritance', function() {
             l: 20,
             $abstractFunction: function(){},
 
+        });
+        GrandChild = Op.Class('GrandChild', {
+            'extends': RealClass1
+        }, {
+            init: function(constructorParam) {
+                this.b += constructorParam;
+            },
+            b: 20,
+            grandChildsFunction: function(){
+                return ('hallo from grandchild');
+            },
         });
     });
     it('tries to instantiate an abstract class', function() {
@@ -318,5 +346,9 @@ describe('Abstract classes and inheritance', function() {
             var semiAbstract = new SemiAbstract(20);
         }
         expect(test).to.throwError();
+    });
+    it('can instantiate a grandchild and call a grandparent function', function() {
+        var grandChild = new GrandChild(20);
+        expect(grandChild.normalFunction()).to.be('hi');
     });
 });

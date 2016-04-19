@@ -24,20 +24,19 @@ Function.prototype.returnType = function returnType() {
 	return this;
 }
 
-Function.prototype.genericType = function genericType() {
-	var gen = arguments[0];
-	if(typeof gen !== 'object') {
-		console.log(gen);
-		throw new Error("Generic Types needs to be an object with types inside");
-	}
-	this.prototype._genericType_ = gen;
-	return this;
-}
+// Function.prototype.genericType = function genericType() {
+// 	var gen = arguments[0];
+// 	if(typeof gen !== 'object') {
+// 		console.log(gen);
+// 		throw new Error("Generic Types needs to be an object with types inside");
+// 	}
+// 	this.prototype._genericType_ = gen;
+// 	return this;
+// }
 
 Function.prototype.storeFunction = function storeFunction() {
 	var obj = arguments[0];
 	if(typeof obj !== 'object') {
-		console.log(obj);
 		throw new Error("Parameter needs to be an object with functions inside");
 	}
 	this.prototype._storedFunctions_ = arguments[0];
@@ -51,7 +50,6 @@ Op._ = {}
 Op._.helper = {}
 
 Op._.helper.matchParamsArgs = function(paramType, args, generic) {
-	console.log(paramType.length);
 	if(paramType.length !== args.length) {
 		throw new Error("Number of parameter types and number of parameters missmatch!");
 	}
@@ -174,7 +172,7 @@ Op._.helper.generateTypingWrapper = function() {
 		var execFuncIntern = self.prototype.toExecFunc;
 		var intParamType = self.prototype._paramType_;
 		var intReturnType = self.prototype._returnType_;
-		var genericType = self.prototype._genericType_;
+		var genericType = this._generic_;
 		if (Array.isArray(intParamType)) {
 			Op._.helper.matchParamsArgs(intParamType, arguments,genericType);
 		}
@@ -228,9 +226,10 @@ Op._.helper.generateTypingWrapper = function() {
 		}
 	},
 	generic: function(type, generic, val) {
+		console.log(type + ' ' + generic + ' ' + val)
 		if(generic.hasOwnProperty(type)) {
 			var genericType = generic[type];
-
+			Op._.typing.testTypes(genericType, val, generic);
 		} else {
 			throw new Error("param " + val + " is not known to be generic!");
 		}
@@ -266,7 +265,7 @@ Op._.typing.testTypes = function(type, val, generic) {
 		break;
 		default:
 		if(type.match(/^[A-Z]$/)) {
-			h.generic(typw, generic, val)
+			h.generic(type, generic, val)
 		} else {
 			h.obj(type,val);
 		}	
@@ -299,7 +298,7 @@ Op.Class = function() {
 	//Generic information
 	if(classSpecObj && classSpecObj.hasOwnProperty('generic')) {
 		genericDeclaration = classSpecObj['generic'];
-		if(!(typeof genericDeclaration === 'array') {
+		if(!Array.isArray(genericDeclaration)) {
 			throw new Error('Wrong generics declaration!');
 		}
 		isGeneric = true;
@@ -327,20 +326,21 @@ Op.Class = function() {
 		}
 		var args = Array.prototype.slice.call(arguments);
 		if(this._isGeneric_) {
+			var genericDec = this._generic_;
+			this._generic_ = {};
 			var genericDef = args[0];
-			if(!(typeof genericDef === 'array')) {
+			if(!Array.isArray(genericDef)) {
 				throw new Error('Generic classes need to be typed as a first arguement!');
 			}
-			if(genericDef.length ==! genericDeclaration.length) {
+			if(genericDef.length ==! genericDec.length) {
 				throw new Error('Generic parameter missmatch!');
 			}
-			for(var i = 0; i < genericDeclaration.length; i++) {
-				var genType = genericDeclaration[i];
+			for(var i = 0; i < genericDec.length; i++) {
+				var genType = genericDec[i];
 				if(typeof genType === 'string') {
-					generic[genType] = genericDef[i];
+					this._generic_[genType] = genericDef[i];
 				}
 			}
-
 			args.shift();
 		}
 		//Tests the typing
@@ -397,7 +397,6 @@ Op.Class = function() {
 				var typingWrapper = Op._.helper.generateTypingWrapper();
 				typingWrapper.prototype = obj[prop].prototype; 
 				typingWrapper.prototype.toExecFunc = obj[prop];
-				typingWrapper.prototype.genericType = generic;
 				newClass.prototype[prop] = typingWrapper;			
 			} else {
 				// It is an abstract function, so check if the method has been overwritten
@@ -411,7 +410,7 @@ Op.Class = function() {
 		for(var prop in baseClass.prototype) {
 			if(Op._.helper.isAbstractParam(prop)) {
 				prop = prop.substring(1);
-				if(!(obj.hasOwnProperty(prop) && typeof obj[prop] === 'function')) {
+				if((!(obj.hasOwnProperty(prop) && typeof obj[prop] === 'function')) && (!(baseClass.prototype.hasOwnProperty(prop) && typeof baseClass.prototype[prop] === 'function'))) {
 					isAbstract = true
 				}				
 			}
@@ -429,7 +428,7 @@ Op.Class = function() {
 	//Preserve properties from parent
 	newClass.prototype._objPreserve_ = obj;
 	//Preserve generics Information
-	newClass.prototype._generic_ = generics;
+	newClass.prototype._generic_ = genericDeclaration;
 	newClass.prototype._isGeneric_ = isGeneric;
 
 	return newClass;

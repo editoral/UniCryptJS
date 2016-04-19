@@ -583,7 +583,8 @@ var abstractClass = new demo.fw.ExtendsAbstract(20);
 demo.fw.GenericClass1 = Op.Class('GenericClass', {
 	'generic': [
 		'T'
-	]
+	],
+	'extends': demo.fw.ChildClass
 },{
 	init: function() {
 
@@ -593,7 +594,8 @@ demo.fw.GenericClass1 = Op.Class('GenericClass', {
 	}.paramType(['T','T'])
 });
 
-var genericClass1 = new demo.fw.genericClass1();
+var genericClass1 = new demo.fw.GenericClass1(['int']);
+genericClass1.genericFunction(10,10);
 
 // demo.fw.GenericClass2 = Op.Class('GenericClass2', {
 // 	'generic': {
