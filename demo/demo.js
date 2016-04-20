@@ -614,7 +614,15 @@ demo.fw.StaticVariables = Op.Class('StaticVariables', null, {
 var staticVariables = new demo.fw.StaticVariables(20);
 demo.fw.StaticVariables.increment();
 demo.fw.StaticVariables.increment();
-console.log(demo.fw.StaticVariables.z);
+//console.log(demo.fw.StaticVariables.z);
+demo.fw.InterfaceTest = Op.Interface('TestInt', null, {
+	funcOne: function() {
+
+	}.paramType(['int']).returnType('string'),
+	funcTwo: function() {
+
+	}.paramType(['int', 'string']).returnType('int'),
+});
 
 // demo.fw.GenericClass2 = Op.Class('GenericClass2', {
 // 	'generic': {

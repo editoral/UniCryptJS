@@ -292,9 +292,15 @@ Op.Class = function() {
 	var genericDeclaration;
 	var generic = {};
 	var isGeneric = false;
+	var implements;
 	if(classSpecObj && classSpecObj.hasOwnProperty('extends')) {
 		baseClass = classSpecObj['extends'];
 	}
+	//Implementing Interfaces
+	if(classSpecObj && classSpecObj.hasOwnProperty('implements')) {
+		implements = classSpecObj['implements'];
+	}
+
 	//Generic information
 	if(classSpecObj && classSpecObj.hasOwnProperty('generic')) {
 		genericDeclaration = classSpecObj['generic'];
@@ -421,18 +427,6 @@ Op.Class = function() {
 			}
 		}
 	}
-	//checks if all abstract methods from parent are implemented
-	if (isChild) {
-		for(var prop in baseClass.prototype) {
-			if(Op._.helper.isAbstractParam(prop)) {
-				prop = prop.substring(1);
-				if((!(obj.hasOwnProperty(prop) && typeof obj[prop] === 'function')) && (!(baseClass.prototype.hasOwnProperty(prop) && typeof baseClass.prototype[prop] === 'function'))) {
-					isAbstract = true
-				}				
-			}
-		}		
-	}
-
 
 	//Append overloadedFunctions.
 	//They override possible functions with same name
@@ -440,6 +434,35 @@ Op.Class = function() {
 	for(var fn in overloadedFunctions) {
 		newClass.prototype[fn] = overloadedFunctions[fn];
 	}
+
+	//checks if all abstract methods from parent and from interfaces are implemented
+	//Abstract Methods from Praent
+	if (isChild) {
+		for(var prop in baseClass.prototype) {
+			if(Op._.helper.isAbstractParam(prop)) {
+				prop = prop.substring(1);
+				if((!(obj.hasOwnProperty(prop) && typeof obj[prop] === 'function')) && (!(baseClass.prototype.hasOwnProperty(prop) && typeof baseClass.prototype[prop] === 'function'))) {
+					isAbstract = true;
+				}				
+			}
+		}		
+	}
+	//Interfaces
+	if(implements) {
+		var TempInterface = Op.Interface('TempInterface', implements, {});
+		var tempInterface = new TempInterface();
+		var functionsList = tempInterface.getFunctions();
+		for(var prop in functionsList) {
+			if(!(newClass.prototype.hasOwnProperty(prop) && typeof newClass.prototype[prop] === 'function')) {
+				isAbstract = true;
+			} else {
+
+			}	
+
+		}
+	}
+
+
 	//Is Abstract?
 	newClass.prototype._isAbstract_ = isAbstract;
 	//Preserve properties from parent
@@ -447,6 +470,7 @@ Op.Class = function() {
 	//Preserve generics Information
 	newClass.prototype._generic_ = genericDeclaration;
 	newClass.prototype._isGeneric_ = isGeneric;
+	newClass.prototype._type_ = 'Class';
 
 	return newClass;
 }
@@ -465,12 +489,41 @@ Op.Interface = function() {
 	var interfaceName = arguments[0];
 	var interSpecObj = arguments[1];	
 	var obj = arguments[2];
-	
-	var args = Array.prototype.slice.call(arguments);
-	var options = {
-		'abstract': true,
-		'interface': true
+	var newObj = {};
+	var extends = null;
+	// extends other Interfaces interfaces
+	if(classSpecObj && classSpecObj.hasOwnProperty('extends')) {
+		extends = classSpecObj['extends'];
 	}
-	args[3] = options;
-	return Op.Class.apply(this, args)
+	if(extends) {
+		if(!Array.isArray(extends)) {
+			throw new Error('Interfaces to extend need to be defined in an array!');
+		}
+		for(var i = 0; i < extends.length; i++) {
+			var interface = new extends[i]();
+			var functions = interface.getFunctions();
+			for(var prop in functions) {
+				newObj[prop] = functions[prop];
+				newObj[prop].prototype = functions[prop].prototype;
+			}
+		}
+	}
+	for(var prop in obj) {
+		if(!typeof obj[prop] === 'function') {
+			throw new Error('Only functions are allowed inside an interface!');
+		}
+		newObj[prop] = obj[prop]; 
+	}
+	var newInt = function() {
+		this.abstractFunctions = newObj;
+	}
+	//name the new Interface
+	newInt = Op._.helper.renameFunction(interfaceName, newInt);
+	newInt.prototype.getFunctions = function() {
+		return this.abstractFunctions;
+	}
+	newInt.prototype._type_ = 'Interface';
+
+	
+	return newInt;
 }
