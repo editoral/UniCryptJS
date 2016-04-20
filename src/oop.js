@@ -332,7 +332,7 @@ Op.Class = function() {
 			if(!Array.isArray(genericDef)) {
 				throw new Error('Generic classes need to be typed as a first arguement!');
 			}
-			if(genericDef.length ==! genericDec.length) {
+			if(genericDef.length ==! this._generic_.length) {
 				throw new Error('Generic parameter missmatch!');
 			}
 			for(var i = 0; i < genericDec.length; i++) {

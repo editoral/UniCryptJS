@@ -556,7 +556,7 @@ demo.fw.ChildClass = Op.Class('ChildClass',  {
 demo.fw.AbstractClass = Op.AbstractClass('AbstractClass', null, {
 	init: function(constructorParam) {
 		this.constructorParam = constructorParam;
-		this.z = 40;
+		var x = this.getZ() //= 40;
 	},
 	z: 20,
 	constructorParam: null,
@@ -582,7 +582,7 @@ var abstractClass = new demo.fw.ExtendsAbstract(20);
 
 demo.fw.GenericClass1 = Op.Class('GenericClass', {
 	'generic': [
-		'T'
+		'T', 'V'
 	],
 	'extends': demo.fw.ChildClass
 },{
@@ -591,11 +591,11 @@ demo.fw.GenericClass1 = Op.Class('GenericClass', {
 	},
 	genericFunction: function(gen1, gen2) {
 
-	}.paramType(['T','T'])
+	}.paramType(['T','V'])
 });
 
-var genericClass1 = new demo.fw.GenericClass1(['int']);
-genericClass1.genericFunction(10,10);
+var genericClass1 = new demo.fw.GenericClass1(['demo.fw.ChildClass','string']);
+genericClass1.genericFunction('10','10');
 
 // demo.fw.GenericClass2 = Op.Class('GenericClass2', {
 // 	'generic': {
@@ -659,6 +659,10 @@ function() {} wurde um paramType erwietert
 Op.Class bekommt als parameter einen name und ein klassenobjekt
 this.$$super ist die Super konstruktor funktion.
 
+
+
+TypeScript Warum nicht TypeScript verwenden?
+Underline für Private Convention 
 
 */
 

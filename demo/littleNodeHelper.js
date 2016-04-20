@@ -1,0 +1,1 @@
+GLOBAL.navigator = "Test";

@@ -15,7 +15,7 @@ module.exports = function(grunt) {
 				dest: 'dist/build.js',
 			},
 			demoDist: {
-				src: ['src/oop.js', 'demo/*.js'],
+				src: ['demo/littleNodeHelper.js', 'vendor/*.js', 'src/oop.js', 'demo/demo.js'],
 				dest: 'dist/demoBuild.js'
 			}
 		},
