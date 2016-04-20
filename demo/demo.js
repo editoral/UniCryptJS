@@ -594,8 +594,27 @@ demo.fw.GenericClass1 = Op.Class('GenericClass', {
 	}.paramType(['T','V'])
 });
 
-var genericClass1 = new demo.fw.GenericClass1(['demo.fw.ChildClass','string']);
+var genericClass1 = new demo.fw.GenericClass1(['string','string']);
 genericClass1.genericFunction('10','10');
+
+
+demo.fw.StaticVariables = Op.Class('StaticVariables', null, {
+	init: function(int) {
+		this.x = int;
+	},
+	x: 0,
+	static: {
+		z: 0,
+		increment: function() {
+			demo.fw.StaticVariables.z += 1;
+		}
+	}
+});
+
+var staticVariables = new demo.fw.StaticVariables(20);
+demo.fw.StaticVariables.increment();
+demo.fw.StaticVariables.increment();
+console.log(demo.fw.StaticVariables.z);
 
 // demo.fw.GenericClass2 = Op.Class('GenericClass2', {
 // 	'generic': {

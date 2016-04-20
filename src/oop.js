@@ -318,6 +318,7 @@ Op.Class = function() {
 		obj.init = function init() {}
 	}
 
+
 	//define a new constructor
 	var newClass = function() {
 		//Tests if Abstract
@@ -351,7 +352,7 @@ Op.Class = function() {
 		if(!this._initializedProps_){
 			//assign all instance variables
 			for(var prop in obj) {
-				if(!(prop === 'init')) {
+				if(!(['init', 'static'].indexOf(prop) >= 0)) {
 					if(['number', 'boolean', 'string', 'object'].indexOf(typeof obj[prop]) >= 0) {
 						this[prop] = obj[prop];
 					}
@@ -376,7 +377,7 @@ Op.Class = function() {
 		}
 		var oldObj = baseClass.prototype._objPreserve_;
 		for(var prop in oldObj) {
-			if(!(prop === 'init')) {
+			if(!(['init', 'static'].indexOf(prop) >= 0)) {
 				if(['number', 'boolean', 'string', 'object'].indexOf(typeof oldObj[prop]) >= 0) {
 					if(!obj.hasOwnProperty(prop)) {
 						obj[prop] = oldObj[prop];
@@ -386,10 +387,25 @@ Op.Class = function() {
 		}
 	}
 
+	//Checks if there are static things to treat differently
+	if(obj.hasOwnProperty('static') && typeof obj.static === 'object') {
+		var statics = obj['static'];
+		for(var prop in statics) {
+			if(typeof statics[prop] === 'function') {
+				var typingWrapper = Op._.helper.generateTypingWrapper();
+				typingWrapper.prototype = statics[prop].prototype; 
+				typingWrapper.prototype.toExecFunc = statics[prop];
+				newClass[prop] = typingWrapper;
+			} else {
+				newClass[prop] = statics[prop];
+			}
+		}
+	}
+
 	//append all defined functions to prototype of the new JavaScript function
 	//they will be wrapped in another function to ensure the right types of the parameters
 	for(var prop in obj) {
-		if(!(prop === 'init') && typeof obj[prop] === 'function') {
+		if(!(['init', 'static'].indexOf(prop) >= 0) && typeof obj[prop] === 'function'){
 
 			// tests wheter it is an abstract param
 			if(!Op._.helper.isAbstractParam(prop)) {
@@ -417,6 +433,7 @@ Op.Class = function() {
 		}		
 	}
 
+
 	//Append overloadedFunctions.
 	//They override possible functions with same name
 	var overloadedFunctions = functionOverload.retrieveOverloadedFunctions();
@@ -439,6 +456,20 @@ Op.AbstractClass = function() {
 	var args = Array.prototype.slice.call(arguments);
 	var options = {
 		'abstract': true
+	}
+	args[3] = options;
+	return Op.Class.apply(this, args)
+}
+
+Op.Interface = function() {
+	var interfaceName = arguments[0];
+	var interSpecObj = arguments[1];	
+	var obj = arguments[2];
+	
+	var args = Array.prototype.slice.call(arguments);
+	var options = {
+		'abstract': true,
+		'interface': true
 	}
 	args[3] = options;
 	return Op.Class.apply(this, args)

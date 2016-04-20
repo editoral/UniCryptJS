@@ -1536,6 +1536,7 @@ Op.Class = function() {
 		obj.init = function init() {}
 	}
 
+
 	//define a new constructor
 	var newClass = function() {
 		//Tests if Abstract
@@ -1569,7 +1570,7 @@ Op.Class = function() {
 		if(!this._initializedProps_){
 			//assign all instance variables
 			for(var prop in obj) {
-				if(!(prop === 'init')) {
+				if(!(['init', 'static'].indexOf(prop) >= 0)) {
 					if(['number', 'boolean', 'string', 'object'].indexOf(typeof obj[prop]) >= 0) {
 						this[prop] = obj[prop];
 					}
@@ -1594,7 +1595,7 @@ Op.Class = function() {
 		}
 		var oldObj = baseClass.prototype._objPreserve_;
 		for(var prop in oldObj) {
-			if(!(prop === 'init')) {
+			if(!(['init', 'static'].indexOf(prop) >= 0)) {
 				if(['number', 'boolean', 'string', 'object'].indexOf(typeof oldObj[prop]) >= 0) {
 					if(!obj.hasOwnProperty(prop)) {
 						obj[prop] = oldObj[prop];
@@ -1604,10 +1605,25 @@ Op.Class = function() {
 		}
 	}
 
+	//Checks if there are static things to treat differently
+	if(obj.hasOwnProperty('static') && typeof obj.static === 'object') {
+		var statics = obj['static'];
+		for(var prop in statics) {
+			if(typeof statics[prop] === 'function') {
+				var typingWrapper = Op._.helper.generateTypingWrapper();
+				typingWrapper.prototype = statics[prop].prototype; 
+				typingWrapper.prototype.toExecFunc = statics[prop];
+				newClass[prop] = typingWrapper;
+			} else {
+				newClass[prop] = statics[prop];
+			}
+		}
+	}
+
 	//append all defined functions to prototype of the new JavaScript function
 	//they will be wrapped in another function to ensure the right types of the parameters
 	for(var prop in obj) {
-		if(!(prop === 'init') && typeof obj[prop] === 'function') {
+		if(!(['init', 'static'].indexOf(prop) >= 0) && typeof obj[prop] === 'function'){
 
 			// tests wheter it is an abstract param
 			if(!Op._.helper.isAbstractParam(prop)) {
@@ -1635,6 +1651,7 @@ Op.Class = function() {
 		}		
 	}
 
+
 	//Append overloadedFunctions.
 	//They override possible functions with same name
 	var overloadedFunctions = functionOverload.retrieveOverloadedFunctions();
@@ -1661,6 +1678,8 @@ Op.AbstractClass = function() {
 	args[3] = options;
 	return Op.Class.apply(this, args)
 }
+
+
 //"use strict";
 
 
@@ -2257,8 +2276,27 @@ demo.fw.GenericClass1 = Op.Class('GenericClass', {
 	}.paramType(['T','V'])
 });
 
-var genericClass1 = new demo.fw.GenericClass1(['demo.fw.ChildClass','string']);
+var genericClass1 = new demo.fw.GenericClass1(['string','string']);
 genericClass1.genericFunction('10','10');
+
+
+demo.fw.StaticVariables = Op.Class('StaticVariables', null, {
+	init: function(int) {
+		this.x = int;
+	},
+	x: 0,
+	static: {
+		z: 0,
+		increment: function() {
+			demo.fw.StaticVariables.z += 1;
+		}
+	}
+});
+
+var staticVariables = new demo.fw.StaticVariables(20);
+demo.fw.StaticVariables.increment();
+demo.fw.StaticVariables.increment();
+console.log(demo.fw.StaticVariables.z);
 
 // demo.fw.GenericClass2 = Op.Class('GenericClass2', {
 // 	'generic': {
