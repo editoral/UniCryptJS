@@ -624,6 +624,16 @@ demo.fw.InterfaceTest = Op.Interface('TestInt', null, {
 	}.paramType(['int', 'string']).returnType('int'),
 });
 
+
+
+demo.fw.InterfaceTestClass = Op.Class('InterfaceTestClass', {
+	'implements': [demo.fw.InterfaceTest]	
+},{
+	funcOne: function() {
+		return 'hallo';
+	}.paramType(['int']).returnType('string'),
+})
+
 // demo.fw.GenericClass2 = Op.Class('GenericClass2', {
 // 	'generic': {
 // 		'V': null,

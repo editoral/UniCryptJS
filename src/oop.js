@@ -292,13 +292,13 @@ Op.Class = function() {
 	var genericDeclaration;
 	var generic = {};
 	var isGeneric = false;
-	var implements;
+	var eimplements;
 	if(classSpecObj && classSpecObj.hasOwnProperty('extends')) {
 		baseClass = classSpecObj['extends'];
 	}
 	//Implementing Interfaces
 	if(classSpecObj && classSpecObj.hasOwnProperty('implements')) {
-		implements = classSpecObj['implements'];
+		eimplements = classSpecObj['implements'];
 	}
 
 	//Generic information
@@ -448,15 +448,18 @@ Op.Class = function() {
 		}		
 	}
 	//Interfaces
-	if(implements) {
-		var TempInterface = Op.Interface('TempInterface', implements, {});
+	if(eimplements) {
+		var TempInterface = Op.Interface('TempInterface', eimplements, {});
 		var tempInterface = new TempInterface();
 		var functionsList = tempInterface.getFunctions();
 		for(var prop in functionsList) {
 			if(!(newClass.prototype.hasOwnProperty(prop) && typeof newClass.prototype[prop] === 'function')) {
 				isAbstract = true;
 			} else {
-
+				var funcFromInterface = functionsList[prop];
+				var funcFromClass = newClass.prototype[prop];
+				console.log('Function1 :' + funcFromInterface.prototype._paramType_);
+				console.log('Function2 :' + funcFromClass.prototype._paramType_);
 			}	
 
 		}
@@ -490,17 +493,17 @@ Op.Interface = function() {
 	var interSpecObj = arguments[1];	
 	var obj = arguments[2];
 	var newObj = {};
-	var extends = null;
+	var xtends = null;
 	// extends other Interfaces interfaces
-	if(classSpecObj && classSpecObj.hasOwnProperty('extends')) {
-		extends = classSpecObj['extends'];
+	if(interSpecObj && interSpecObj.hasOwnProperty('extends')) {
+		xtends = interSpecObj['extends'];
 	}
-	if(extends) {
-		if(!Array.isArray(extends)) {
+	if(xtends) {
+		if(!Array.isArray(xtends)) {
 			throw new Error('Interfaces to extend need to be defined in an array!');
 		}
-		for(var i = 0; i < extends.length; i++) {
-			var interface = new extends[i]();
+		for(var i = 0; i < xtends.length; i++) {
+			var interface = new xtends[i]();
 			var functions = interface.getFunctions();
 			for(var prop in functions) {
 				newObj[prop] = functions[prop];
