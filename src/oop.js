@@ -226,7 +226,7 @@ Op._.helper.generateTypingWrapper = function() {
 		}
 	},
 	generic: function(type, generic, val) {
-		console.log(type + ' ' + generic + ' ' + val)
+		//console.log(type + ' ' + generic + ' ' + val)
 		if(generic.hasOwnProperty(type)) {
 			var genericType = generic[type];
 			Op._.typing.testTypes(genericType, val, generic);
@@ -449,17 +449,35 @@ Op.Class = function() {
 	}
 	//Interfaces
 	if(eimplements) {
-		var TempInterface = Op.Interface('TempInterface', eimplements, {});
+		var TempInterface = Op.Interface('TempInterface', {
+			'extends': eimplements
+		}, {});
 		var tempInterface = new TempInterface();
 		var functionsList = tempInterface.getFunctions();
+		//var inter = new eimplements[0]();
+		//console.log(inter.getFunctions());
 		for(var prop in functionsList) {
 			if(!(newClass.prototype.hasOwnProperty(prop) && typeof newClass.prototype[prop] === 'function')) {
 				isAbstract = true;
 			} else {
 				var funcFromInterface = functionsList[prop];
 				var funcFromClass = newClass.prototype[prop];
-				console.log('Function1 :' + funcFromInterface.prototype._paramType_);
-				console.log('Function2 :' + funcFromClass.prototype._paramType_);
+				var par1 =  funcFromInterface.prototype._paramType_;
+				var par2 =  funcFromClass.prototype._paramType_;
+				var ret1 =  funcFromInterface.prototype._returnType_;
+				var ret2 =  funcFromClass.prototype._returnType_;
+				if(ret1 !== ret2) {
+					isAbstract = true;
+				}
+				if(par1.length === par2.length) {
+					for(var i = 0; i < par1.length; i++) {
+						if(par1[i] !== par2[i]) {
+							isAbstract = true;
+						}
+					}
+				} else {
+					isAbstract = true;
+				}
 			}	
 
 		}
