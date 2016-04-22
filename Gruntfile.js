@@ -17,6 +17,10 @@ module.exports = function(grunt) {
 			demoDist: {
 				src: ['demo/littleNodeHelper.js', 'vendor/*.js', 'src/oop.js', 'demo/demo.js'],
 				dest: 'dist/demoBuild.js'
+			},
+			demoUniDist: {
+				src: ['src/oop.js', 'src/UnicryptJS/_Reqs/*', 'src/UnicryptJS/Unicrypt/**/*.js', 'demo/demoUniJS.js'],
+				dest: 'dist/UniDemoBuild.js'
 			}
 		},
 		mochaTest: {
@@ -56,6 +60,9 @@ module.exports = function(grunt) {
 	    execute : {
 	    	demo : {
 	    		src: ['dist/demoBuild.js']
+	    	},
+	    	uniDemo: {
+	    		src: ['dist/UniDemoBuild.js']
 	    	}
 	    }
 	});
@@ -63,5 +70,6 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('default', ['concat:dist', 'mochaTest:test']);
 	grunt.registerTask('demo', ['concat:demoDist', 'jsdoc:demo', 'mochaTest:testDemo']);
-	grunt.registerTask('runDemo', ['concat:demoDist', 'execute:demo'])
+	grunt.registerTask('runDemo', ['concat:demoDist', 'execute:demo']);
+	grunt.registerTask('runUni', ['concat:demoUniDist', 'execute:uniDemo']);
 };

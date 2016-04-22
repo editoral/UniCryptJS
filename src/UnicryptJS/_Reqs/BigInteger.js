@@ -5,5 +5,5 @@ GLOBAL.BigInteger = Op.Class('BigInteger',null, {
 	valueOf: function() {
 		
 	}
-	
+		
 });

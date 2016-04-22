@@ -651,7 +651,14 @@ var intTest = new demo.fw.InterfaceTestClass();
 
 // });
 
+demo.fw.PrivateConstructor = Op.Class('PrivateConstructor', null, {
+	_init: function(constructorParam) {
+		this.x = constructorParam;
+	}.paramType(['int']),
+	x: 10
+});
 
+var privateTester = new demo.fw.PrivateConstructor();
 
 
 //console.log(demo.fw.BaseClass.prototype.constructor.name);
