@@ -143,29 +143,29 @@ unicrypt.math.algebra.general.abstracts.AbstractSet = Op.AbstractClass('Abstract
 		}
 		return this.getRandomElements().limit(n);
 	}.paramType(['long']).returnType('Sequence'),
-	getRandomElements3: function(randomByteSequence) {
-		if (randomByteSequence == null) {
-			throw new Error('IllegalArgumentException');
-		}
-		return new Sequence([E]) {
+	// getRandomElements3: function(randomByteSequence) {
+	// 	if (randomByteSequence == null) {
+	// 		throw new Error('IllegalArgumentException');
+	// 	}
+	// 	return new Sequence([E]) {
 
-			@Override
-			public ExtendedIterator<E> iterator() {
-				return new ExtendedIterator<E>() {
+	// 		@Override
+	// 		public ExtendedIterator<E> iterator() {
+	// 			return new ExtendedIterator<E>() {
 
-					@Override
-					public boolean hasNext() {
-						return true;
-					}
+	// 				@Override
+	// 				public boolean hasNext() {
+	// 					return true;
+	// 				}
 
-					@Override
-					public E next() {
-						return abstractGetRandomElement(randomByteSequence);
-					}
-				};
-			}
-		};
-	}.paramType(['RandomByteSequence']).returnType('Sequence'),
+	// 				@Override
+	// 				public E next() {
+	// 					return abstractGetRandomElement(randomByteSequence);
+	// 				}
+	// 			};
+	// 		}
+	// 	};
+	// }.paramType(['RandomByteSequence']).returnType('Sequence'),
 	getRandomElements4: function(n) {
 		if (n < 0) {
 			throw new Error('IllegalArgumentException');

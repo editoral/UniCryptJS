@@ -352,3 +352,118 @@ describe('Abstract classes and inheritance', function() {
         expect(grandChild.normalFunction()).to.be('hi');
     });
 });
+
+// describe('Generic Typing', function() {
+//     var GenericClass1;
+//     var GenericClass2;
+//     before(function() {
+//         GenericClass1 = Op.Class('GenericClass', {
+//             'generic': [
+//                 'T', 'V'
+//             ]
+//         },{
+//             genericFunction: function(gen1, gen2) {
+//                 return gen2 + " " + gen1;
+//             }.paramType(['T','V'])
+//         });
+//         GenericClass2 = Op.Class('GenericClass', {
+//             'generic': [
+//                 'T', 'K'
+//             ],
+//             'extends': GenericClass1
+//         },{
+//             init(int, int2) {
+//                 this.x = int * int2;
+//             }.paramType(['int', 'int']),
+//             x: 0,
+//             genericFunc: function(gen1, gen2) {
+//                 return gen1 + gen2;
+//             }.paramType(['T','K'])
+//         });
+//     });
+//     it('fails if no generic type is delared', function() {
+//         var test = {
+//             var genericClass1 = new GenericClass1();
+//         }
+//         expect(test).to.throwError();
+//     });
+//     it('delcared types working', function() {
+//         var genericClass1 = new GenericClass1(['int','string']);
+//         expect(genericClass1.genericFunction('Apfel:', 5)).to.be('Apfel: 5');
+//     });
+//     it('fails if generic type missmatch', function() {
+//         var genericClass1 = new GenericClass1(['int','string']);
+//         var test = {
+//             genericClass1.genericFunction(10,10);
+//         }
+//         expect(test).to.throwError();
+//     }); 
+//     // it('', function() {
+//     //     var test = {
+//     //     }
+//     //     expect(test).to.throwError();        
+//     // });
+//     it('generic class extends another', function() {
+        
+//     });
+// });
+
+describe('Static Variables, Functions and private constructors', function() {
+    var StaticVariables;
+    var PrivateConstructor;
+    before(function() {
+        StaticVariables = Op.Class('StaticVariables', null, {
+            _init: function(int) {
+                this.x = int;
+            },
+            x: 0,
+            static: {
+                z: 2,
+                increment: function() {
+                    StaticVariables.z += 1;
+                    return StaticVariables.z;
+                },
+                getInstance: function() {
+                    return new StaticVariables(10);
+                }
+            },
+            publicFunction: function() {
+                StaticVariables.z += 100;
+                return StaticVariables.z;
+            },
+            otherWayToAccesStatic: function() {
+                this._self_.z = 5;
+                return this._self_.z;
+            }
+        });
+    }); 
+    it('uses a static Variable ', function(){
+        expect(StaticVariables.z).to.be(2);
+    });
+    it('uses a static Function', function() {
+        expect(StaticVariables.increment()).to.be(3);
+    });
+    it('fails when there is a private constructor and no getInstance method', function() {
+        var test = function() {
+            PrivateConstructor = Op.Class('PrivateConstructor', null, {
+                _init: function(int) {
+                    this.x = int;
+                },
+                x: 10
+            });   
+        }
+        expect(test).to.throwError();
+    });    
+    it('uses the getInstance Method to get an Instance', function() {
+        var staticVariables = new StaticVariables.getInstance();
+        expect(staticVariables.x).to.be(10);
+    });
+    it('uses a publicFunction which accesses a static variable', function() {
+        var staticVariables = new StaticVariables.getInstance();
+        expect(staticVariables.publicFunction()).to.be(103);
+    });
+    it('other and shorter form to access static Variables', function() {
+        var staticVariables = new StaticVariables.getInstance();
+        expect(staticVariables.otherWayToAccesStatic()).to.be(5);
+    });
+});

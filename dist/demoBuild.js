@@ -1538,8 +1538,14 @@ Op.Class = function() {
 	var isChild = typeof baseClass === 'function' ? true : false;
 
 	//Makes sure, that there is a constructor function avaliable
+	var privateConstructor = false;
 	if(!obj.hasOwnProperty('init') || typeof obj.init !== 'function') {
-		obj.init = function init() {}
+		if(!obj.hasOwnProperty('_init') || typeof obj._init !== 'function')  {
+			obj.init = function init() {}	
+		} else {
+			privateConstructor = true;
+			obj.init = obj._init;
+		}
 	}
 
 
@@ -1548,6 +1554,10 @@ Op.Class = function() {
 		//Tests if Abstract
 		if(this._isAbstract_) {
 			throw new Error('There are method signatures which are not implemented! It is therefore an abstract Class');
+		}
+		//Tests if constructor is private
+		if(this._privateConstLock_) {
+			throw new Error('Private Constructor. Please use getInstance()');
 		}
 		var args = Array.prototype.slice.call(arguments);
 		if(this._isGeneric_) {
@@ -1576,7 +1586,7 @@ Op.Class = function() {
 		if(!this._initializedProps_){
 			//assign all instance variables
 			for(var prop in obj) {
-				if(!(['init', 'static'].indexOf(prop) >= 0)) {
+				if(!(['init', 'static','_init'].indexOf(prop) >= 0)) {
 					if(['number', 'boolean', 'string', 'object'].indexOf(typeof obj[prop]) >= 0) {
 						this[prop] = obj[prop];
 					}
@@ -1601,7 +1611,7 @@ Op.Class = function() {
 		}
 		var oldObj = baseClass.prototype._objPreserve_;
 		for(var prop in oldObj) {
-			if(!(['init', 'static'].indexOf(prop) >= 0)) {
+			if(!(['init', 'static', '_init'].indexOf(prop) >= 0)) {
 				if(['number', 'boolean', 'string', 'object'].indexOf(typeof oldObj[prop]) >= 0) {
 					if(!obj.hasOwnProperty(prop)) {
 						obj[prop] = oldObj[prop];
@@ -1612,6 +1622,7 @@ Op.Class = function() {
 	}
 
 	//Checks if there are static things to treat differently
+	//Append them to Class
 	if(obj.hasOwnProperty('static') && typeof obj.static === 'object') {
 		var statics = obj['static'];
 		for(var prop in statics) {
@@ -1619,7 +1630,11 @@ Op.Class = function() {
 				var typingWrapper = Op._.helper.generateTypingWrapper();
 				typingWrapper.prototype = statics[prop].prototype; 
 				typingWrapper.prototype.toExecFunc = statics[prop];
-				newClass[prop] = typingWrapper;
+				if(prop !== 'getInstance'){
+					newClass[prop] = typingWrapper;	
+				} else {
+					newClass._getInstance_ = typingWrapper;
+				}
 			} else {
 				newClass[prop] = statics[prop];
 			}
@@ -1629,7 +1644,7 @@ Op.Class = function() {
 	//append all defined functions to prototype of the new JavaScript function
 	//they will be wrapped in another function to ensure the right types of the parameters
 	for(var prop in obj) {
-		if(!(['init', 'static'].indexOf(prop) >= 0) && typeof obj[prop] === 'function'){
+		if(!(['init', 'static','_init'].indexOf(prop) >= 0) && typeof obj[prop] === 'function'){
 
 			// tests wheter it is an abstract param
 			if(!Op._.helper.isAbstractParam(prop)) {
@@ -1701,7 +1716,24 @@ Op.Class = function() {
 		}
 	}
 
+	//Treat a getInstance Method differently
+	if(privateConstructor) {
+		if(!newClass.hasOwnProperty('_getInstance_') && typeof newClass.getInstance !== 'function') {
+			throw new Error('If constructor is private the class needs a static getInstance method!');
+		} else { 
+			newClass.getInstance = function getInstance() {
+				newClass.prototype._privateConstLock_ = false;
+				var instance = newClass._getInstance_.apply(this, arguments);
+				newClass.prototype._privateConstLock_ = true;
+				return instance;
+			}
+		}
+	}
 
+	//Simplify static access
+	newClass.prototype._self_ = newClass;
+	//lock for private Constructors
+	newClass.prototype._privateConstLock_ = privateConstructor;
 	//Is Abstract?
 	newClass.prototype._isAbstract_ = isAbstract;
 	//Preserve properties from parent
@@ -2373,16 +2405,24 @@ demo.fw.StaticVariables = Op.Class('StaticVariables', null, {
 	x: 0,
 	static: {
 		z: 0,
+		y: 0,
 		increment: function() {
 			demo.fw.StaticVariables.z += 1;
 		}
-	}
+	},
+	setY: function(y) {
+		console.log('here: ' + this._self_);
+		this._self_.y = y;
+	}	
 });
 
 var staticVariables = new demo.fw.StaticVariables(20);
 demo.fw.StaticVariables.increment();
 demo.fw.StaticVariables.increment();
 //console.log(demo.fw.StaticVariables.z);
+staticVariables.setY(10);
+//console.log(demo.fw.StaticVariables.y);
+
 demo.fw.InterfaceTest = Op.Interface('TestInt', null, {
 	funcOne: function() {
 
@@ -2419,7 +2459,21 @@ var intTest = new demo.fw.InterfaceTestClass();
 
 // });
 
+demo.fw.PrivateConstructor = Op.Class('PrivateConstructor', null, {
+	_init: function(constructorParam) {
+		this.x = constructorParam;
+	}.paramType(['int']),
+	static: {
+		getInstance: function() {
+			console.log('hello');
+			return new demo.fw.PrivateConstructor(20);
+		}
+	},
+	x: 10
+});
 
+var privateTester = new demo.fw.PrivateConstructor.getInstance();
+console.log('hi: ' + privateTester.x);
 
 
 //console.log(demo.fw.BaseClass.prototype.constructor.name);

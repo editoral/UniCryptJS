@@ -605,16 +605,24 @@ demo.fw.StaticVariables = Op.Class('StaticVariables', null, {
 	x: 0,
 	static: {
 		z: 0,
+		y: 0,
 		increment: function() {
 			demo.fw.StaticVariables.z += 1;
 		}
-	}
+	},
+	setY: function(y) {
+		console.log('here: ' + this._self_);
+		this._self_.y = y;
+	}	
 });
 
 var staticVariables = new demo.fw.StaticVariables(20);
 demo.fw.StaticVariables.increment();
 demo.fw.StaticVariables.increment();
 //console.log(demo.fw.StaticVariables.z);
+staticVariables.setY(10);
+//console.log(demo.fw.StaticVariables.y);
+
 demo.fw.InterfaceTest = Op.Interface('TestInt', null, {
 	funcOne: function() {
 
@@ -655,10 +663,17 @@ demo.fw.PrivateConstructor = Op.Class('PrivateConstructor', null, {
 	_init: function(constructorParam) {
 		this.x = constructorParam;
 	}.paramType(['int']),
+	static: {
+		getInstance: function() {
+			console.log('hello');
+			return new demo.fw.PrivateConstructor(20);
+		}
+	},
 	x: 10
 });
 
-var privateTester = new demo.fw.PrivateConstructor();
+var privateTester = new demo.fw.PrivateConstructor.getInstance();
+console.log('hi: ' + privateTester.x);
 
 
 //console.log(demo.fw.BaseClass.prototype.constructor.name);

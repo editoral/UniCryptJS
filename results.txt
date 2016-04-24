@@ -1,3 +1,6 @@
+here: function StaticVariables() { return call(this, arguments) }
+hello
+hi: 20
 
 [0m[0m
 [0m  Class declaration and inheritance[0m
@@ -37,54 +40,14 @@
 [2K[0G  [32m  √[0m[90m normal classes can be made abstract by adding abstract Methods[0m
 [2K[0G  [32m  √[0m[90m can instantiate a grandchild and call a grandparent function[0m
 
-[0m  A first example[0m
-[2K[0G  [32m  √[0m[90m will write names but can't[0m
-[2K[0G  [32m  √[0m[90m will now have instance variables[0m
-[2K[0G  [32m  √[0m[90m calls a private function[0m
-[2K[0G  [32m  √[0m[90m it calls a privileged function[0m
-
-[0m  wie ich die closures und Instatntiirung teste[0m
-[2K[0G  [32m  √[0m[90m benutzt meine Klasse nicht als Klasse[0m
-[2K[0G  [32m  √[0m[90m will nun das Schlüsselwort new brauchen[0m
-[2K[0G  [32m  √[0m[90m probiert eine private Variable abzugreifen[0m
-[2K[0G  [32m  √[0m[90m kann drei Fahrzeuge geben[0m
-[2K[0G  [32m  √[0m[90m kann keine 4 Fahrzeuge geben[0m
-[2K[0G  [32m  √[0m[90m benutzt eine privileged Methode um den ölstand zu sehen[0m
-
-[0m  wie ich die Vererbung teste[0m
-[2K[0G  [32m  √[0m[90m testet ob der Konstruktor der Basisklasse Fahrzeug bei der Erstellung eines Autos aufgerufen wird[0m
-[2K[0G  [32m  √[0m[90m auto ist ein Fahrzeug[0m
-[2K[0G  [32m  √[0m[90m hat die Mehtode mein Treibstoff überschrieben[0m
-[2K[0G  [32m  √[0m[90m auto kann die Mehtode von Fahrzeug brauchen[0m
-[2K[0G  [32m  √[0m[90m kann die eigenen Funktionen verwenden[0m
-[2K[0G  [32m  √[0m[90m akzeptiert nur einen Integer als Preis[0m
-[2K[0G  [32m  √[0m[90m wird selbst bei Aufruf als Funktion zu einer Instanz[0m
-
-[0m  Das gebaute Interface[0m
-[2K[0G  [32m  √[0m[90m klappt mit der Instatntiirung wenn alle Methoden implementiert wurden[0m
-[2K[0G  [32m  √[0m[90m klappt mit der Instatntiirung nicht mehr wenn eine Methode vergessen wurde[0m
-
-[0m  Typisierung mit Hammer[0m
-[2K[0G  [32m  √[0m[90m testet typisierung mit integer[0m
-[2K[0G  [32m  √[0m[90m testet typisierung nach objekttypen[0m
-
-[0m  tests with Op FW classes generation and with typing[0m
-[2K[0G  [32m  √[0m[90m instantiiate a base class and get public attribute[0m
-[2K[0G  [32m  √[0m[90m instantiiate a base class and tests the constructor assignement[0m
-[2K[0G  [32m  √[0m[90m instantiiate a base class and tests a function[0m
-[2K[0G  [32m  √[0m[90m tests typing correctnes with integers in the constructor[0m
-[2K[0G  [32m  √[0m[90m tests typing correctnes with integers in a function param[0m
-[2K[0G  [32m  √[0m[90m tests typing correctnes with objects in a function param throwing Error[0m
-[2K[0G  [32m  √[0m[90m tests typing correctnes with objects in a function param working[0m
-
-[0m  tests with Op FW inheritance[0m
-[2K[0G  [32m  √[0m[90m assigns a variable trough super constructor[0m
-[2K[0G  [32m  √[0m[90m checks for the super class attribute[0m
-[2K[0G  [32m  √[0m[90m checks for the super class function[0m
-
-[0m  [0m
-[2K[0G  [32m  √[0m[90m [0m
+[0m  Static Variables, Functions and private constructors[0m
+[2K[0G  [32m  √[0m[90m uses a static Variable [0m
+[2K[0G  [32m  √[0m[90m uses a static Function[0m
+[2K[0G  [32m  √[0m[90m fails when there is a private constructor and no getInstance method[0m
+[2K[0G  [32m  √[0m[90m uses the getInstance Method to get an Instance[0m
+[2K[0G  [32m  √[0m[90m uses a publicFunction which accesses a static variable[0m
+[2K[0G  [32m  √[0m[90m other and shorter form to access static Variables[0m
 
 
-[92m [0m[32m 63 passing[0m[90m (197ms)[0m
+[92m [0m[32m 37 passing[0m[90m (125ms)[0m
 
