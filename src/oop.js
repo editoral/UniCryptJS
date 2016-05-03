@@ -213,6 +213,11 @@ Op._.helper.generateTypingWrapper = function() {
 			throw new Error("param " + val + " is not a boolean!");
 		}	
 	},
+	array: function(val) {
+		if (!Array.isArray(val)) {
+			throw new Error("param " + val + " is not an array!");
+		}		
+	},
 	strTest: function(val) {
 		if (!(typeof val === "string")) {
 			throw new Error("param " + val + " is not a string!");
@@ -251,6 +256,9 @@ Op._.typing.testTypes = function(type, val, generic) {
 		break;
 		case 'boolean':
 		h.boolean(val);
+		break;
+		case 'array':
+		h.array(val);
 		break;
 		case 'byte':
 		break;

@@ -1,12 +1,15 @@
-Op.Class('GStarMod', {
-	'extends': unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeCyclicGroup
+unicrypt.math.algebra.multiplicative.classes.GStarMod =  Op.Class('GStarMod', {
+	'extends': {
+		'class': unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeCyclicGroup,
+		'generic': ['GStarModElement', 'BigInteger']
+	}
 },{
 	_modulus: null,
 	_moduloFactorization: null,
 	_orderFactorization: null,
 	_superGroup: null,
 	_init: function(moduloFactorization, orderFactorization) {
-		this.$$super(BigInteger);
+		this.$$super(u.BigInteger);
 		this._modulus = moduloFactorization.getValue();
 		this._moduloFactorization = moduloFactorization;
 		this._orderFactorization = orderFactorization;
@@ -27,10 +30,10 @@ Op.Class('GStarMod', {
 		return this._superGroup;
 	}.returnType('ZStarMod'),
 	contains: function(integerValue) {
-		return this.contains(BigInteger.valueOf(integerValue));
+		return this.contains(u.BigInteger.valueOf(integerValue));
 	}.paramType(['long']).returnType('boolean'),
 	getElement: function(integerValue) {
-		return this.getElement(BigInteger.valueOf(integerValue));
+		return this.getElement(u.BigInteger.valueOf(integerValue));
 	}.paramType(['long']).returnType('GStarModElement'),
 	getCoFactor: function() {
 		return this.getZStarMod().getOrder().divide(this.getOrder());
@@ -45,7 +48,7 @@ Op.Class('GStarMod', {
 		return value.signum() > 0
 			   && value.compareTo(this._modulus) < 0
 			   && MathUtil.areRelativelyPrime(value, this._modulus)
-			   && value.modPow(this.getOrder(), this._modulus).equals(BigInteger.ONE);
+			   && value.modPow(this.getOrder(), this._modulus).equals(u.BigInteger.ONE);
 	}.paramType(['BigInteger']).returnType('boolean'),
 	_abstractGetElement: function(value) {
 		return new GStarModElement(this, value);
@@ -61,7 +64,7 @@ Op.Class('GStarMod', {
 		return this.getOrderFactorization().getValue();
 	}.returnType('BigInteger'),
 	_abstractGetIdentityElement: function() {
-		return this._abstractGetElement(BigInteger.ONE);
+		return this._abstractGetElement(u.BigInteger.ONE);
 	}.returnType('GStarModElement'),
 	_abstractApply: function(element1,element2) {
 		return this._abstractGetElement(element1.getValue().multiply(element2.getValue()).mod(this._modulus));
@@ -70,11 +73,11 @@ Op.Class('GStarMod', {
 		return this._abstractGetElement(element.getValue().modInverse(this._modulus));
 	}.paramType(['GStarModElement']).returnType('GStarModElement'),
 	_abstractGetDefaultGenerator: function() {
-		var alpha = BigInteger.ZERO;
+		var alpha = u.BigInteger.ZERO;
 		var element;
 		do {
 			do {
-				alpha = alpha.add(BigInteger.ONE);
+				alpha = alpha.add(u.BigInteger.ONE);
 			} while (!MathUtil.areRelativelyPrime(alpha, this.getModulus()));
 			element = this.abstractGetElement(alpha.modPow(this.getCoFactor(), this._modulus));
 		} while (!this.isGenerator(element)); // this test could be skipped for a prime order
@@ -101,7 +104,7 @@ Op.Class('GStarMod', {
 	static: {
 		getInstance: function(moduloFactorization, orderFactorization) {
 			var group = new GStarMod(moduloFactorization, orderFactorization);
-			if (!group.getOrder().mod(orderFactorization.getValue()).equals(BigInteger.ZERO)) {
+			if (!group.getOrder().mod(orderFactorization.getValue()).equals(u.BigInteger.ZERO)) {
 				throw new Error('IllegalArgumentException');
 			}
 			return group;

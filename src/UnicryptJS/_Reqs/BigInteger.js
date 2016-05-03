@@ -1,4 +1,5 @@
-GLOBAL.BigInteger = Op.Class('BigInteger',null, {
+GLOBAL.u = {},
+u.BigInteger = Op.Class('BigInteger',null, {
 	init: function init(argument) {
 		
 	},

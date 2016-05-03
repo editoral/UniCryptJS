@@ -1,3 +1,10 @@
+//Very useless and distached method
+GLOBAL.printConsoleObj = function printConsoleObj(obj) {
+	for(var prop in obj) {
+		console.log(prop + ' : ' + obj[prop]);
+	}
+}
+
 
 //Op Framework to add class based inheritance as known from Java
 
@@ -226,11 +233,11 @@ Op._.helper.generateTypingWrapper = function() {
 		}
 	},
 	generic: function(type, generic, val) {
-		//console.log(type + ' ' + generic + ' ' + val)
 		if(generic.hasOwnProperty(type)) {
 			var genericType = generic[type];
 			Op._.typing.testTypes(genericType, val, generic);
 		} else {
+			//console.log(type + ' ' + generic + ' ' + val);
 			throw new Error("param " + val + " is not known to be generic!");
 		}
 	}
@@ -293,13 +300,7 @@ Op.Class = function() {
 	var generic = {};
 	var isGeneric = false;
 	var eimplements;
-	if(classSpecObj && classSpecObj.hasOwnProperty('extends')) {
-		baseClass = classSpecObj['extends'];
-	}
-	//Implementing Interfaces
-	if(classSpecObj && classSpecObj.hasOwnProperty('implements')) {
-		eimplements = classSpecObj['implements'];
-	}
+	var extendObjGeneric = null;
 
 	//Generic information
 	if(classSpecObj && classSpecObj.hasOwnProperty('generic')) {
@@ -309,6 +310,28 @@ Op.Class = function() {
 		}
 		isGeneric = true;
 	}
+	//Inheritance	
+	if(classSpecObj && classSpecObj.hasOwnProperty('extends')) {
+		var extendsOptionSpec = classSpecObj['extends'];
+		if(typeof extendsOptionSpec === 'function') {
+			baseClass = extendsOptionSpec;	
+		} else if (typeof extendsOptionSpec === 'object') {
+			if(!extendsOptionSpec.hasOwnProperty('class') && !extendsOptionSpec.hasOwnProperty('generic')) {
+				throw new Error('If extending a generic class, the extends obtion has to be an object with property "class" and "generic"');
+			}
+			baseClass = extendsOptionSpec['class'];
+			extendObjGeneric = extendsOptionSpec['generic'];
+		} else {
+			throw new Error('Unknown extends format!');
+		}
+		
+	}
+	//Implementing Interfaces
+	if(classSpecObj && classSpecObj.hasOwnProperty('implements')) {
+		eimplements = classSpecObj['implements'];
+	}
+
+
 	// Option parameters
 	var options = arguments[3];
 	var isAbstract = false;
@@ -320,8 +343,14 @@ Op.Class = function() {
 	var isChild = typeof baseClass === 'function' ? true : false;
 
 	//Makes sure, that there is a constructor function avaliable
+	var privateConstructor = false;
 	if(!obj.hasOwnProperty('init') || typeof obj.init !== 'function') {
-		obj.init = function init() {}
+		if(!obj.hasOwnProperty('_init') || typeof obj._init !== 'function')  {
+			obj.init = function init() {}	
+		} else {
+			privateConstructor = true;
+			obj.init = obj._init;
+		}
 	}
 
 
@@ -331,7 +360,12 @@ Op.Class = function() {
 		if(this._isAbstract_) {
 			throw new Error('There are method signatures which are not implemented! It is therefore an abstract Class');
 		}
+		//Tests if constructor is private
+		if(this._privateConstLock_) {
+			throw new Error('Private Constructor. Please use getInstance()');
+		}
 		var args = Array.prototype.slice.call(arguments);
+		//Generic Handling
 		if(this._isGeneric_) {
 			var genericDec = this._generic_;
 			this._generic_ = {};
@@ -348,6 +382,27 @@ Op.Class = function() {
 					this._generic_[genType] = genericDef[i];
 				}
 			}
+			//var tempArrayGeneric = [];
+			var extendObjGenericTemp = this._extendObjGeneric_;
+			if(Array.isArray(extendObjGenericTemp)) {
+				//var baseClassGeneric = this._baseClass_.prototype._generic_;
+				var baseClassGeneric = this._baseClass_.prototype._generic_;
+				if(baseClassGeneric.length !== extendObjGenericTemp.length) {
+					throw new Error('Extends object does not specify the generic params of parent class!');
+				} 
+				for(var i = 0; i < extendObjGenericTemp.length; i++) {
+					var comparableObj = extendObjGenericTemp[i];
+					if(comparableObj.match(/^[A-Z]$/)) {
+						if(!this._generic_.hasOwnProperty(comparableObj)) {
+							throw new Error('Unknown generic Parameter in extends property!');
+						}
+						//tempArrayGeneric.push(this._generic_[comparableObj])
+					} else {
+						this._generic_[baseClassGeneric[i]] = comparableObj;
+						//tempArrayGeneric.push(comparableObj);
+					}
+				}
+			}
 			args.shift();
 		}
 		//Tests the typing
@@ -358,7 +413,7 @@ Op.Class = function() {
 		if(!this._initializedProps_){
 			//assign all instance variables
 			for(var prop in obj) {
-				if(!(['init', 'static'].indexOf(prop) >= 0)) {
+				if(!(['init', 'static','_init'].indexOf(prop) >= 0)) {
 					if(['number', 'boolean', 'string', 'object'].indexOf(typeof obj[prop]) >= 0) {
 						this[prop] = obj[prop];
 					}
@@ -379,11 +434,15 @@ Op.Class = function() {
 		newClass.prototype.constructor = newClass;
 		// call the constructor of the baseClass
 		newClass.prototype.$$super = function() {
-			baseClass.apply(this, arguments);
+			if(this._isGeneric_) {
+				
+			} else {
+				baseClass.apply(this, arguments);
+			}
 		}
 		var oldObj = baseClass.prototype._objPreserve_;
 		for(var prop in oldObj) {
-			if(!(['init', 'static'].indexOf(prop) >= 0)) {
+			if(!(['init', 'static', '_init'].indexOf(prop) >= 0)) {
 				if(['number', 'boolean', 'string', 'object'].indexOf(typeof oldObj[prop]) >= 0) {
 					if(!obj.hasOwnProperty(prop)) {
 						obj[prop] = oldObj[prop];
@@ -394,6 +453,7 @@ Op.Class = function() {
 	}
 
 	//Checks if there are static things to treat differently
+	//Append them to Class
 	if(obj.hasOwnProperty('static') && typeof obj.static === 'object') {
 		var statics = obj['static'];
 		for(var prop in statics) {
@@ -401,7 +461,11 @@ Op.Class = function() {
 				var typingWrapper = Op._.helper.generateTypingWrapper();
 				typingWrapper.prototype = statics[prop].prototype; 
 				typingWrapper.prototype.toExecFunc = statics[prop];
-				newClass[prop] = typingWrapper;
+				if(prop !== 'getInstance'){
+					newClass[prop] = typingWrapper;	
+				} else {
+					newClass._getInstance_ = typingWrapper;
+				}
 			} else {
 				newClass[prop] = statics[prop];
 			}
@@ -411,7 +475,7 @@ Op.Class = function() {
 	//append all defined functions to prototype of the new JavaScript function
 	//they will be wrapped in another function to ensure the right types of the parameters
 	for(var prop in obj) {
-		if(!(['init', 'static'].indexOf(prop) >= 0) && typeof obj[prop] === 'function'){
+		if(!(['init', 'static','_init'].indexOf(prop) >= 0) && typeof obj[prop] === 'function'){
 
 			// tests wheter it is an abstract param
 			if(!Op._.helper.isAbstractParam(prop)) {
@@ -483,13 +547,34 @@ Op.Class = function() {
 		}
 	}
 
+	//Treat a getInstance Method differently
+	if(privateConstructor) {
+		if(!newClass.hasOwnProperty('_getInstance_') && typeof newClass.getInstance !== 'function') {
+			throw new Error('If constructor is private the class needs a static getInstance method!');
+		} else { 
+			newClass.getInstance = function getInstance() {
+				newClass.prototype._privateConstLock_ = false;
+				var instance = newClass._getInstance_.apply(this, arguments);
+				newClass.prototype._privateConstLock_ = true;
+				return instance;
+			}
+		}
+	}
 
+	//Simplify static access
+	newClass.prototype.static = newClass;
+	//lock for private Constructors
+	newClass.prototype._privateConstLock_ = privateConstructor;
 	//Is Abstract?
 	newClass.prototype._isAbstract_ = isAbstract;
 	//Preserve properties from parent
 	newClass.prototype._objPreserve_ = obj;
 	//Preserve generics Information
 	newClass.prototype._generic_ = genericDeclaration;
+	//Preserve extends obj generics
+	newClass.prototype._extendObjGeneric_ = extendObjGeneric;
+	//Perserve BaseClass
+	newClass.prototype._baseClass_ = baseClass;
 	newClass.prototype._isGeneric_ = isGeneric;
 	newClass.prototype._type_ = 'Class';
 
@@ -548,7 +633,8 @@ Op.Interface = function() {
 	
 	return newInt;
 }
-GLOBAL.BigInteger = Op.Class('BigInteger',null, {
+GLOBAL.u = {},
+u.BigInteger = Op.Class('BigInteger',null, {
 	init: function init(argument) {
 		
 	},
@@ -565,6 +651,63 @@ unicrypt.math.algebra.general.interfaces = {};
 unicrypt.math.algebra.general.abstracts = {};
 unicrypt.math.algebra.multiplicative = {};
 unicrypt.math.algebra.multiplicative.abstracts = {};
+unicrypt.math.algebra.general.abstracts.AbstractCyclicGroup = Op.AbstractClass('AbstractCyclicGroup', {
+	'generic': {
+		'E', 'V'
+	},
+	'extends': {
+		'class': unicrypt.math.algebra.general.abstracts.AbstractGroup,
+		'generic': [
+			'E','V'
+		]
+	}
+},{
+	_defaultGenerator: null,
+	_generatorLists: {}
+	_init: function() {
+			
+	},
+
+});
+unicrypt.math.algebra.general.abstracts.AbstractGroup = Op.AbstractClass('AbstractGroup', {
+	'generic': {
+		'E', 'V'
+	},
+	'extends': {
+		'class': unicrypt.math.algebra.general.abstracts.AbstractMonoid,
+		'generic': [
+			'E','V'
+		]
+	}
+},{
+	
+});
+unicrypt.math.algebra.general.abstracts.AbstractMonoid = Op.AbstractClass('AbstractMonoid', {
+	'generic': {
+		'E', 'V'
+	},
+	'extends': {
+		'class': unicrypt.math.algebra.general.abstracts.AbstractSemiGroup,
+		'generic': [
+			'E','V'
+		]
+	}
+},{
+	
+});
+unicrypt.math.algebra.general.abstracts.AbstractSemiGroup = Op.AbstractClass('AbstractSemiGroup', {
+	'generic': {
+		'E', 'V'
+	},
+	'extends': {
+		'class': unicrypt.math.algebra.general.abstracts.AbstractSet,
+		'generic': [
+			'E','V'
+		]
+	}
+},{
+	
+});
 unicrypt.math.algebra.general.abstracts.AbstractSet = Op.AbstractClass('AbstractSet', {
 	'extends': unicrypt.UniCrypt,
 	//'implements': [unicrypt.math.algebra.general.interfaces.Set],
@@ -619,8 +762,145 @@ unicrypt.math.algebra.general.abstracts.AbstractSet = Op.AbstractClass('Abstract
 		 return this instanceof ProductSet;
 	}.returnType('boolean'),
 	isFinite: function() {
-		
+		return !this.getOrder().equals(Set.INFINITE);
 	}.returnType('boolean'),
+	hasKnownOrder: function() {
+		return !this.getOrder().equals(Set.UNKNOWN);
+	}.returnType('boolean'),
+	getOrder: function() {
+		if (this.order == null) {
+			this.order = this.abstractGetOrder();
+		}
+		return this.order;
+	}.returnType('BigInteger'),
+	getOrderLowerBound: function() {
+		if (this._lowerBound == null) {
+			if (this.hasKnownOrder()) {
+				this._lowerBound = this.getOrder();
+			} else {
+				this._lowerBound = this.defaultGetOrderLowerBound();
+			}
+		}
+		return this._lowerBound;
+	}.returnType('BigInteger'),
+	getOrderUpperBound: function() {
+		if (this._upperBound == null) {
+			if (this.hasKnownOrder()) {
+				this._upperBound = this.getOrder();
+			} else {
+				this._upperBound = this.defaultGetOrderUpperBound();
+			}
+		}
+		return this._upperBound;
+	}.returnType('BigInteger'),
+	getMinimalOrder: function() {
+		if (this._minimum == null) {
+			this._minimum = this.defaultGetMinimalOrder();
+		}
+		return this._minimum;
+	}.returnType('BigInteger'),
+	isSingleton: function() {
+		return this.getOrder().equals(BigInteger.ONE);
+	}.returnType(''),
+	getZModOrder: function() {
+		if (!(this.isFinite() && this.hasKnownOrder())) {
+			throw new Error('UnsupportedOperationException');
+		}
+		return ZMod.getInstance(this.getOrder());
+	}.returnType('ZMod'),
+	getZStarModOrder: function() {
+		if (!(this.isFinite() && this.hasKnownOrder())) {
+			throw new Error('UnsupportedOperationException');
+		}
+		return ZStarMod.getInstance(this.getOrder());
+	}.returnType('ZStarMod'),
+	getElement: function(value) {
+		if (!this.contains(value)) {
+			throw new Error('IllegalArgumentException');
+		}
+		return this.abstractGetElement(value);
+	}.paramType(['V']).returnType('E'),
+	contains1: function(value) {
+		if (value == null) {
+			throw new Error('IllegalArgumentException');
+		}
+		return this.abstractContains(value);
+	}.paramType(['V']).returnType('boolean'),
+	contains2: function(element) {
+		if (element == null) {
+			throw new Error('IllegalArgumentException');
+		}
+		if (!this.valueClass.isInstance(element.getValue())) {
+			return false;
+		}
+		return this.defaultContains(element);
+	}.paramType(['Element']).returnType('boolean'),
+	getRandomElement1: function() {
+		return this.abstractGetRandomElement(HybridRandomByteSequence.getInstance());
+	}.returnType('E'),
+	getRandomElement2: function(randomByteSequence) {
+		if (randomByteSequence == null) {
+			throw new Error('IllegalArgumentException');
+		}
+		return this.abstractGetRandomElement(randomByteSequence);
+	}.paramType(['RandomByteSequence']).returnType('E'),
+	getRandomElements1: function() {
+		return this.getRandomElements(HybridRandomByteSequence.getInstance());
+	}.returnType('Sequence'),
+	getRandomElements2: function(n) {
+		if (n < 0) {
+			throw new Error('IllegalArgumentException');
+		}
+		return this.getRandomElements().limit(n);
+	}.paramType(['long']).returnType('Sequence'),
+	// getRandomElements3: function(randomByteSequence) {
+	// 	if (randomByteSequence == null) {
+	// 		throw new Error('IllegalArgumentException');
+	// 	}
+	// 	return new Sequence([E]) {
+
+	// 		@Override
+	// 		public ExtendedIterator<E> iterator() {
+	// 			return new ExtendedIterator<E>() {
+
+	// 				@Override
+	// 				public boolean hasNext() {
+	// 					return true;
+	// 				}
+
+	// 				@Override
+	// 				public E next() {
+	// 					return abstractGetRandomElement(randomByteSequence);
+	// 				}
+	// 			};
+	// 		}
+	// 	};
+	// }.paramType(['RandomByteSequence']).returnType('Sequence'),
+	getRandomElements4: function(n) {
+		if (n < 0) {
+			throw new Error('IllegalArgumentException');
+		}
+		return this.getRandomElements().limit(n);
+	}.paramType(['long']).returnType('Sequence'),
+	getRandomElements5: function(n) {
+		if (n < 0) {
+			throw new Error('IllegalArgumentException');
+		}
+		return this.getRandomElements().limit(n);
+	}.paramType(['long']).returnType('Sequence'),
+
+	func: function() {
+
+	}.paramType(['']).returnType(''),
+	func: function() {
+
+	}.paramType(['']).returnType(''),
+	func: function() {
+
+	}.paramType(['']).returnType(''),
+	func: function() {
+
+	}.paramType(['']).returnType(''),
 });
 // unicrypt.math.algebra.general.interfaces.Set = Op.Interface('Set',null, {
 // 	isSemiGroup: function() {
@@ -691,19 +971,70 @@ unicrypt.math.algebra.general.abstracts.AbstractSet = Op.AbstractClass('Abstract
 
 // });
 unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeCyclicGroup = Op.AbstractClass('AbstractMultiplicativeCyclicGroup', {
-	'extends': unicrypt.math.algebra.general.abstracts.AbstractSet
+	'generic': {
+		'E', 'V'
+	},
+	'extends': {
+		'class': unicrypt.math.algebra.general.abstracts.AbstractCyclicGroup,
+		'generic': [
+			'E','V'
+		]
+	}
 },{
-	
+	_init: function(valueClass) {
+		this.$$super(valueClass);
+	},
+	multiply1: function(element1, element2) {
+		return this.apply(element1, element2);
+	}.paramType(['Element', 'Element']).returnType('E'),
+	// multiply2: function() {
+
+	// }.paramType(['']).returnType(''),
+	// multiply3: function() {
+
+	// }.paramType(['']).returnType(''),
+	power1: function(element, amount) {
+		return this.selfApply(element, amount);
+	}.paramType(['Element','BigInteger']).returnType('E'),
+	power2: function(element, amount) {
+		return this.selfApply(element, amount);
+	}.paramType(['Element', 'long']).returnType('E'),
+	// power3: function() {
+
+	// }.paramType(['']).returnType(''),
+	square: function(element) {
+		return this.selfApply(element);
+	}.paramType(['Element']).returnType('E'),
+	productOfPowers: function(elements, amounts) {
+		return this.multiSelfApply(elements, amounts);
+	}.returnType('E'),
+	divide: function(element1, element2) {
+		return this.applyInverse(element1, element2);
+	}.paramType(['Element', 'Element']).returnType('E'),
+	oneOver: function(element) {
+		return this.invert(element);
+	}.paramType(['Element']).returnType('E'),
+	getOneElement: function() {
+		return this.getIdentityElement();
+	}.returnType('E'),
+	isOneElement: function(element) {
+		return this.isIdentityElement(element);
+	}.paramType(['Element']).returnType('boolean')
+
 });
-Op.Class('GStarMod', {
-	'extends': unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeCyclicGroup
+
+unicrypt.math.algebra.multiplicative.classes.GStarMod =  Op.Class('GStarMod', {
+	'extends': {
+		'class': unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeCyclicGroup,
+		'generic': ['GStarModElement', 'BigInteger']
+	}
 },{
 	_modulus: null,
 	_moduloFactorization: null,
 	_orderFactorization: null,
 	_superGroup: null,
-	init: function(moduloFactorization, orderFactorization) {
-		this.$$super(BigInteger);
+	_init: function(moduloFactorization, orderFactorization) {
+		this.$$super(u.BigInteger);
 		this._modulus = moduloFactorization.getValue();
 		this._moduloFactorization = moduloFactorization;
 		this._orderFactorization = orderFactorization;
@@ -724,10 +1055,10 @@ Op.Class('GStarMod', {
 		return this._superGroup;
 	}.returnType('ZStarMod'),
 	contains: function(integerValue) {
-		return this.contains(BigInteger.valueOf(integerValue));
+		return this.contains(u.BigInteger.valueOf(integerValue));
 	}.paramType(['long']).returnType('boolean'),
 	getElement: function(integerValue) {
-		return this.getElement(BigInteger.valueOf(integerValue));
+		return this.getElement(u.BigInteger.valueOf(integerValue));
 	}.paramType(['long']).returnType('GStarModElement'),
 	getCoFactor: function() {
 		return this.getZStarMod().getOrder().divide(this.getOrder());
@@ -742,7 +1073,7 @@ Op.Class('GStarMod', {
 		return value.signum() > 0
 			   && value.compareTo(this._modulus) < 0
 			   && MathUtil.areRelativelyPrime(value, this._modulus)
-			   && value.modPow(this.getOrder(), this._modulus).equals(BigInteger.ONE);
+			   && value.modPow(this.getOrder(), this._modulus).equals(u.BigInteger.ONE);
 	}.paramType(['BigInteger']).returnType('boolean'),
 	_abstractGetElement: function(value) {
 		return new GStarModElement(this, value);
@@ -758,7 +1089,7 @@ Op.Class('GStarMod', {
 		return this.getOrderFactorization().getValue();
 	}.returnType('BigInteger'),
 	_abstractGetIdentityElement: function() {
-		return this._abstractGetElement(BigInteger.ONE);
+		return this._abstractGetElement(u.BigInteger.ONE);
 	}.returnType('GStarModElement'),
 	_abstractApply: function(element1,element2) {
 		return this._abstractGetElement(element1.getValue().multiply(element2.getValue()).mod(this._modulus));
@@ -767,11 +1098,11 @@ Op.Class('GStarMod', {
 		return this._abstractGetElement(element.getValue().modInverse(this._modulus));
 	}.paramType(['GStarModElement']).returnType('GStarModElement'),
 	_abstractGetDefaultGenerator: function() {
-		var alpha = BigInteger.ZERO;
+		var alpha = u.BigInteger.ZERO;
 		var element;
 		do {
 			do {
-				alpha = alpha.add(BigInteger.ONE);
+				alpha = alpha.add(u.BigInteger.ONE);
 			} while (!MathUtil.areRelativelyPrime(alpha, this.getModulus()));
 			element = this.abstractGetElement(alpha.modPow(this.getCoFactor(), this._modulus));
 		} while (!this.isGenerator(element)); // this test could be skipped for a prime order
@@ -798,12 +1129,31 @@ Op.Class('GStarMod', {
 	static: {
 		getInstance: function(moduloFactorization, orderFactorization) {
 			var group = new GStarMod(moduloFactorization, orderFactorization);
-			if (!group.getOrder().mod(orderFactorization.getValue()).equals(BigInteger.ZERO)) {
+			if (!group.getOrder().mod(orderFactorization.getValue()).equals(u.BigInteger.ZERO)) {
 				throw new Error('IllegalArgumentException');
 			}
 			return group;
 		}.paramType(['SpecialFactorization','Factorization']).returnType('GStarMod')
 	}
+});
+ unicrypt.math.algebra.multiplicative.classes.GStarModElement = Op.Class('GStarModElement', {
+	'generic': [
+		'E'
+	],
+	'extends': {
+		'class' : ,
+		'generic': [
+			'T', 'string'
+		]
+	}
+},{
+	init: function() {
+		this.$$super();
+		
+	}.paramType(['int']),
+	func: function() {
+
+	}.paramType(['E']).returnType(''),
 });
 unicrypt.UniCrypt = Op.AbstractClass('UniCrypt', null, {
 	toString: function() {
