@@ -597,6 +597,53 @@ demo.fw.GenericClass1 = Op.Class('GenericClass', {
 var genericClass1 = new demo.fw.GenericClass1(['string','string']);
 genericClass1.genericFunction('10','10');
 
+// demo.fw.GenericClass2 = Op.Class('GenericClass2' , {
+// 	'generic': [
+// 		'B', 'A'
+// 	],
+// 	'extends': {
+// 		'class': demo.fw.GenericClass1,
+// 		'generic': ['']
+// 	}
+// },{
+
+// });
+
+
+        GenericClass1 = Op.Class('GenericClass1', {
+            'generic': [
+                'T', 'V'
+            ]
+        },{
+            genericFunction: function(gen1, gen2) {
+                return gen2 + " " + gen1;
+            }.paramType(['T','V'])
+        });
+        GenericClass2 = Op.Class('GenericClass2', {
+            'generic': [
+                'T', 'K'
+            ],
+            'extends': {
+                'class' : GenericClass1,
+                'generic': [
+                    'T', 'string'
+                ]
+            }
+        },{
+            init: function(int, int2) {
+            	this.$$super();
+                this.x = int * int2;
+            }.paramType(['int', 'int']),
+            x: 0,
+            genericFunc: function(gen1, gen2) {
+                return gen1 + gen2;
+            }.paramType(['T','K'])
+        });
+		var genericClass2 = new GenericClass2(['int','int'], 13, 13);
+        var test = function() {
+            return genericClass2.genericFunction(5, 'Apfel:');
+        }
+        console.log(test());
 
 demo.fw.StaticVariables = Op.Class('StaticVariables', null, {
 	init: function(int) {

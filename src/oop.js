@@ -1,3 +1,10 @@
+//Very useless and distached method
+GLOBAL.printConsoleObj = function printConsoleObj(obj) {
+	for(var prop in obj) {
+		console.log(prop + ' : ' + obj[prop]);
+	}
+}
+
 
 //Op Framework to add class based inheritance as known from Java
 
@@ -226,11 +233,11 @@ Op._.helper.generateTypingWrapper = function() {
 		}
 	},
 	generic: function(type, generic, val) {
-		//console.log(type + ' ' + generic + ' ' + val)
 		if(generic.hasOwnProperty(type)) {
 			var genericType = generic[type];
 			Op._.typing.testTypes(genericType, val, generic);
 		} else {
+			//console.log(type + ' ' + generic + ' ' + val);
 			throw new Error("param " + val + " is not known to be generic!");
 		}
 	}
@@ -293,7 +300,7 @@ Op.Class = function() {
 	var generic = {};
 	var isGeneric = false;
 	var eimplements;
-	var extendObjGeneric = [];
+	var extendObjGeneric = null;
 
 	//Generic information
 	if(classSpecObj && classSpecObj.hasOwnProperty('generic')) {
@@ -313,8 +320,7 @@ Op.Class = function() {
 				throw new Error('If extending a generic class, the extends obtion has to be an object with property "class" and "generic"');
 			}
 			baseClass = extendsOptionSpec['class'];
-			var extendGeneric = extendsOptionSpec['generic'];
-			
+			extendObjGeneric = extendsOptionSpec['generic'];
 		} else {
 			throw new Error('Unknown extends format!');
 		}
@@ -359,6 +365,7 @@ Op.Class = function() {
 			throw new Error('Private Constructor. Please use getInstance()');
 		}
 		var args = Array.prototype.slice.call(arguments);
+		//Generic Handling
 		if(this._isGeneric_) {
 			var genericDec = this._generic_;
 			this._generic_ = {};
@@ -375,21 +382,26 @@ Op.Class = function() {
 					this._generic_[genType] = genericDef[i];
 				}
 			}
-			var tempArrayGeneric = [];
+			//var tempArrayGeneric = [];
 			var extendObjGenericTemp = this._extendObjGeneric_;
-			if(extendObjGenericTemp) {
+			if(Array.isArray(extendObjGenericTemp)) {
+				//var baseClassGeneric = this._baseClass_.prototype._generic_;
+				var baseClassGeneric = this._baseClass_.prototype._generic_;
+				if(baseClassGeneric.length !== extendObjGenericTemp.length) {
+					throw new Error('Extends object does not specify the generic params of parent class!');
+				} 
 				for(var i = 0; i < extendObjGenericTemp.length; i++) {
 					var comparableObj = extendObjGenericTemp[i];
 					if(comparableObj.match(/^[A-Z]$/)) {
 						if(!this._generic_.hasOwnProperty(comparableObj)) {
-							throw new Error('Unknown generic Parameter in extends property');
+							throw new Error('Unknown generic Parameter in extends property!');
 						}
-						tempArrayGeneric.push(this._generic_[comparableObj])
+						//tempArrayGeneric.push(this._generic_[comparableObj])
 					} else {
-						tempArrayGeneric.push(comparableObj);
+						this._generic_[baseClassGeneric[i]] = comparableObj;
+						//tempArrayGeneric.push(comparableObj);
 					}
 				}
-				this._extendObjGeneric_ = tempArrayGeneric;
 			}
 			args.shift();
 		}
@@ -422,7 +434,11 @@ Op.Class = function() {
 		newClass.prototype.constructor = newClass;
 		// call the constructor of the baseClass
 		newClass.prototype.$$super = function() {
-			baseClass.apply(this, this._extendObjGeneric_, arguments);
+			if(this._isGeneric_) {
+				
+			} else {
+				baseClass.apply(this, arguments);
+			}
 		}
 		var oldObj = baseClass.prototype._objPreserve_;
 		for(var prop in oldObj) {
@@ -557,6 +573,8 @@ Op.Class = function() {
 	newClass.prototype._generic_ = genericDeclaration;
 	//Preserve extends obj generics
 	newClass.prototype._extendObjGeneric_ = extendObjGeneric;
+	//Perserve BaseClass
+	newClass.prototype._baseClass_ = baseClass;
 	newClass.prototype._isGeneric_ = isGeneric;
 	newClass.prototype._type_ = 'Class';
 

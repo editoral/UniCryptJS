@@ -357,16 +357,16 @@ describe('Generic Typing', function() {
     var GenericClass1;
     var GenericClass2;
     before(function() {
-        GenericClass1 = Op.Class('GenericClass', {
+        GenericClass1 = Op.Class('GenericClass1', {
             'generic': [
                 'T', 'V'
             ]
         },{
             genericFunction: function(gen1, gen2) {
-                return gen2 + " " + gen1;
-            }.paramType(['T','V'])
+                return gen1 + " " + gen2;
+            }.paramType(['V','T'])
         });
-        GenericClass2 = Op.Class('GenericClass', {
+        GenericClass2 = Op.Class('GenericClass2', {
             'generic': [
                 'T', 'K'
             ],
@@ -377,7 +377,7 @@ describe('Generic Typing', function() {
                 ]
             }
         },{
-            init(int, int2) {
+            init: function(int, int2) {
                 this.x = int * int2;
             }.paramType(['int', 'int']),
             x: 0,
@@ -387,7 +387,7 @@ describe('Generic Typing', function() {
         });
     });
     it('fails if no generic type is delared', function() {
-        var test = {
+        var test = function(){
             var genericClass1 = new GenericClass1();
         }
         expect(test).to.throwError();
@@ -398,7 +398,7 @@ describe('Generic Typing', function() {
     });
     it('fails if generic type missmatch', function() {
         var genericClass1 = new GenericClass1(['int','string']);
-        var test = {
+        var test = function(){
             genericClass1.genericFunction(10,10);
         }
         expect(test).to.throwError();
@@ -408,8 +408,12 @@ describe('Generic Typing', function() {
     //     }
     //     expect(test).to.throwError();        
     // });
-    it('generic class extends another', function() {
-        
+    it('generic class extends another generic class', function() {
+        var genericClass2 = new GenericClass2(['int','int'], 13, 13);
+        var test = function() {
+            return genericClass2.genericFunction('Apfel:', 5);
+        }
+        expect(test()).to.be('Apfel: 5');
     });
 });
 
