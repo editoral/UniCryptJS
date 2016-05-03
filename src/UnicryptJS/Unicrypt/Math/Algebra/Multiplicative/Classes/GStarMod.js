@@ -5,7 +5,7 @@ Op.Class('GStarMod', {
 	_moduloFactorization: null,
 	_orderFactorization: null,
 	_superGroup: null,
-	init: function(moduloFactorization, orderFactorization) {
+	_init: function(moduloFactorization, orderFactorization) {
 		this.$$super(BigInteger);
 		this._modulus = moduloFactorization.getValue();
 		this._moduloFactorization = moduloFactorization;

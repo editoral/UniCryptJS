@@ -611,8 +611,8 @@ demo.fw.StaticVariables = Op.Class('StaticVariables', null, {
 		}
 	},
 	setY: function(y) {
-		console.log('here: ' + this._self_);
-		this._self_.y = y;
+		console.log('here: ' + this.static);
+		this.static.y = y;
 	}	
 });
 

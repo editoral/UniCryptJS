@@ -1731,7 +1731,7 @@ Op.Class = function() {
 	}
 
 	//Simplify static access
-	newClass.prototype._self_ = newClass;
+	newClass.prototype.static = newClass;
 	//lock for private Constructors
 	newClass.prototype._privateConstLock_ = privateConstructor;
 	//Is Abstract?
@@ -2411,8 +2411,8 @@ demo.fw.StaticVariables = Op.Class('StaticVariables', null, {
 		}
 	},
 	setY: function(y) {
-		console.log('here: ' + this._self_);
-		this._self_.y = y;
+		console.log('here: ' + this.static);
+		this.static.y = y;
 	}	
 });
 

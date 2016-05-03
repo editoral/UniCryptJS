@@ -353,60 +353,65 @@ describe('Abstract classes and inheritance', function() {
     });
 });
 
-// describe('Generic Typing', function() {
-//     var GenericClass1;
-//     var GenericClass2;
-//     before(function() {
-//         GenericClass1 = Op.Class('GenericClass', {
-//             'generic': [
-//                 'T', 'V'
-//             ]
-//         },{
-//             genericFunction: function(gen1, gen2) {
-//                 return gen2 + " " + gen1;
-//             }.paramType(['T','V'])
-//         });
-//         GenericClass2 = Op.Class('GenericClass', {
-//             'generic': [
-//                 'T', 'K'
-//             ],
-//             'extends': GenericClass1
-//         },{
-//             init(int, int2) {
-//                 this.x = int * int2;
-//             }.paramType(['int', 'int']),
-//             x: 0,
-//             genericFunc: function(gen1, gen2) {
-//                 return gen1 + gen2;
-//             }.paramType(['T','K'])
-//         });
-//     });
-//     it('fails if no generic type is delared', function() {
-//         var test = {
-//             var genericClass1 = new GenericClass1();
-//         }
-//         expect(test).to.throwError();
-//     });
-//     it('delcared types working', function() {
-//         var genericClass1 = new GenericClass1(['int','string']);
-//         expect(genericClass1.genericFunction('Apfel:', 5)).to.be('Apfel: 5');
-//     });
-//     it('fails if generic type missmatch', function() {
-//         var genericClass1 = new GenericClass1(['int','string']);
-//         var test = {
-//             genericClass1.genericFunction(10,10);
-//         }
-//         expect(test).to.throwError();
-//     }); 
-//     // it('', function() {
-//     //     var test = {
-//     //     }
-//     //     expect(test).to.throwError();        
-//     // });
-//     it('generic class extends another', function() {
+describe('Generic Typing', function() {
+    var GenericClass1;
+    var GenericClass2;
+    before(function() {
+        GenericClass1 = Op.Class('GenericClass', {
+            'generic': [
+                'T', 'V'
+            ]
+        },{
+            genericFunction: function(gen1, gen2) {
+                return gen2 + " " + gen1;
+            }.paramType(['T','V'])
+        });
+        GenericClass2 = Op.Class('GenericClass', {
+            'generic': [
+                'T', 'K'
+            ],
+            'extends': {
+                'class' : GenericClass1,
+                'generic': [
+                    'T', 'string'
+                ]
+            }
+        },{
+            init(int, int2) {
+                this.x = int * int2;
+            }.paramType(['int', 'int']),
+            x: 0,
+            genericFunc: function(gen1, gen2) {
+                return gen1 + gen2;
+            }.paramType(['T','K'])
+        });
+    });
+    it('fails if no generic type is delared', function() {
+        var test = {
+            var genericClass1 = new GenericClass1();
+        }
+        expect(test).to.throwError();
+    });
+    it('delcared types working', function() {
+        var genericClass1 = new GenericClass1(['int','string']);
+        expect(genericClass1.genericFunction('Apfel:', 5)).to.be('Apfel: 5');
+    });
+    it('fails if generic type missmatch', function() {
+        var genericClass1 = new GenericClass1(['int','string']);
+        var test = {
+            genericClass1.genericFunction(10,10);
+        }
+        expect(test).to.throwError();
+    }); 
+    // it('', function() {
+    //     var test = {
+    //     }
+    //     expect(test).to.throwError();        
+    // });
+    it('generic class extends another', function() {
         
-//     });
-// });
+    });
+});
 
 describe('Static Variables, Functions and private constructors', function() {
     var StaticVariables;
@@ -432,8 +437,8 @@ describe('Static Variables, Functions and private constructors', function() {
                 return StaticVariables.z;
             },
             otherWayToAccesStatic: function() {
-                this._self_.z = 5;
-                return this._self_.z;
+                this.static.z = 5;
+                return this.static.z;
             }
         });
     }); 

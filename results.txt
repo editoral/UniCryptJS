@@ -49,5 +49,5 @@ hi: 20
 [2K[0G  [32m  √[0m[90m other and shorter form to access static Variables[0m
 
 
-[92m [0m[32m 37 passing[0m[90m (125ms)[0m
+[92m [0m[32m 37 passing[0m[90m (137ms)[0m
 
