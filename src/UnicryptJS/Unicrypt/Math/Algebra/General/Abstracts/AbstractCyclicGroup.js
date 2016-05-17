@@ -1,7 +1,7 @@
 unicrypt.math.algebra.general.abstracts.AbstractCyclicGroup = Op.AbstractClass('AbstractCyclicGroup', {
-	'generic': {
+	'generic': [
 		'E', 'V'
-	},
+	],
 	'extends': {
 		'class': unicrypt.math.algebra.general.abstracts.AbstractGroup,
 		'generic': [
@@ -14,16 +14,16 @@ unicrypt.math.algebra.general.abstracts.AbstractCyclicGroup = Op.AbstractClass('
 	_init: function(valueClass) {
 		this.$$super(valueClass)	
 	},
-	func: function() {
+	multiply1: function() {
 
 	},
-	func: function() {
+	multiply2: function() {
 
 	},
-	func: function() {
+	multiply3: function() {
 
 	},
-	func: function() {
+	multiply3: function() {
 
 	},
 	func: function() {

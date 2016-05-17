@@ -9,11 +9,7 @@
 		]
 	}
 },{
-	init: function() {
-		this.$$super();
-		
-	}.paramType(['int']),
-	func: function() {
-
-	}.paramType(['E']).returnType(''),
+	init: function(gStarMod, value) {
+		this.$$super(gStarMod, value);
+	}.paramType(['GStarMod', 'BigInteger']),
 });

@@ -186,7 +186,7 @@ Op._.helper.generateTypingWrapper = function() {
 		//Execute the actual function
 		var result = execFuncIntern.apply(this, arguments);
 		if(intReturnType) {
-			Op._.helper.matchReturnType(intReturnType, result, self.name);	
+			Op._.helper.matchReturnType(intReturnType, result, self.name, genericType);	
 		}
 		return result;
 	}
@@ -330,7 +330,7 @@ Op.Class = function() {
 			baseClass = extendsOptionSpec['class'];
 			extendObjGeneric = extendsOptionSpec['generic'];
 		} else {
-			throw new Error('Unknown extends format!');
+			//throw new Error('Unknown extends format ' + typeof extendObjGeneric + ' in ' + className + '!');
 		}
 		
 	}
@@ -558,7 +558,7 @@ Op.Class = function() {
 	//Treat a getInstance Method differently
 	if(privateConstructor) {
 		if(!newClass.hasOwnProperty('_getInstance_') && typeof newClass.getInstance !== 'function') {
-			throw new Error('If constructor is private the class needs a static getInstance method!');
+			//throw new Error('If constructor is private the class needs a static getInstance method in ' + className + '!');
 		} else { 
 			newClass.getInstance = function getInstance() {
 				newClass.prototype._privateConstLock_ = false;

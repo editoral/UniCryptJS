@@ -13,8 +13,8 @@ unicrypt.math.algebra.general.abstracts.AbstractSet = Op.AbstractClass('Abstract
 	_bigIntegerConverter: null,
 	_stringConverter: null,
 	_byteArrayConverter: null,
-	INFINITE: BigInteger.valueOf(-1),
-	UNKNOWN: BigInteger.valueOf(-2),
+	INFINITE: u.BigInteger.valueOf(-1),
+	UNKNOWN: u.BigInteger.valueOf(-2),
 	init: function(valueClass) {
 		this._valueClass = valueClass;
 	},

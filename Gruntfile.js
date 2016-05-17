@@ -19,7 +19,7 @@ module.exports = function(grunt) {
 				dest: 'dist/demoBuild.js'
 			},
 			demoUniDist: {
-				src: ['src/oop.js', 'src/UnicryptJS/_Reqs/*', 'src/UnicryptJS/Unicrypt/**/*.js', 'demo/demoUniJS.js'],
+				src: ['demo/littleNodeHelper.js', 'src/oop.js', 'vendor/*.js', 'src/UnicryptJS/_Reqs/*.js', 'src/UnicryptJS/Unicrypt/**/*.js', 'demo/demoUniJS.js'],
 				dest: 'dist/UniDemoBuild.js'
 			}
 		},
