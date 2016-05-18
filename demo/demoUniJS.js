@@ -11,4 +11,10 @@
 var bigInt = new u.BigInteger(60);
 var bigInt2 = new u.BigInteger(30);
 var bigInt = bigInt.subtract(bigInt2);
-console.log('BigInteger: ' + bigInt.intValue());
+//console.log('BigInteger: ' + bigInt.intValue());
+
+var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(11);
+console.log('Modulus: ' + gGstarMod.getModulus().intValue());
+console.log('ModuloFactorization: ' +  gGstarMod.getModuloFactorization().intValue());
+console.log('orderFactorization: ' +  gGstarMod.getOrderFactorization().intValue());
+//var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(11);

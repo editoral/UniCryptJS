@@ -14,34 +14,16 @@ unicrypt.math.algebra.general.abstracts.AbstractCyclicGroup = Op.AbstractClass('
 	_init: function(valueClass) {
 		this.$$super(valueClass)	
 	},
-	multiply1: function() {
-
-	},
-	multiply2: function() {
-
-	},
-	multiply3: function() {
-
-	},
-	multiply3: function() {
-
-	},
-	func: function() {
-
-	},
-	func: function() {
-
-	},
-	func: function() {
-
-	},
-	func: function() {
-
-	},
-	func: function() {
-
-	},
-	func: function() {
-
-	},
+	getDefaultGenerator: function() {
+		if (this.defaultGenerator == null) {
+			this.defaultGenerator = this._abstractGetDefaultGenerator();
+		}
+		return this.defaultGenerator;
+	}.returnType('E'),
+	isGenerator: function() {
+		if (!this.contains(element)) {
+			throw new Error('IllegalArgumentException');
+		}
+		return this.abstractIsGenerator(element);
+	}.paramType(['Element']).returnType('boolean'),
 });

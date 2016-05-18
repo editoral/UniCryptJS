@@ -309,6 +309,7 @@ Op.Class = function() {
 	var isGeneric = false;
 	var eimplements;
 	var extendObjGeneric = null;
+	var inheritanceChain = new Array;
 
 	//Generic information
 	if(classSpecObj && classSpecObj.hasOwnProperty('generic')) {
@@ -323,11 +324,16 @@ Op.Class = function() {
 		var extendsOptionSpec = classSpecObj['extends'];
 		if(typeof extendsOptionSpec === 'function') {
 			baseClass = extendsOptionSpec;	
+			var newArr = [baseClass];
+			inheritanceChain = baseClass.prototype._inheritanceChain_.concat(newArr);
 		} else if (typeof extendsOptionSpec === 'object') {
 			if(!extendsOptionSpec.hasOwnProperty('class') && !extendsOptionSpec.hasOwnProperty('generic')) {
 				throw new Error('If extending a generic class, the extends obtion has to be an object with property "class" and "generic"');
 			}
 			baseClass = extendsOptionSpec['class'];
+			var newArr = [baseClass];
+			inheritanceChain = baseClass.prototype._inheritanceChain_.concat(newArr);
+			//baseClass.prototype = extendsOptionSpec['class'].prototype;
 			extendObjGeneric = extendsOptionSpec['generic'];
 		} else {
 			//throw new Error('Unknown extends format ' + typeof extendObjGeneric + ' in ' + className + '!');
@@ -374,7 +380,7 @@ Op.Class = function() {
 		}
 		var args = Array.prototype.slice.call(arguments);
 		//Generic Handling
-		if(this._isGeneric_) {
+		if(this._superIteration_ === 0  && this._isGeneric_) {
 			var genericDec = this._generic_;
 			this._generic_ = {};
 			var genericDef = args[0];
@@ -412,7 +418,7 @@ Op.Class = function() {
 				}
 			}
 			args.shift();
-		}
+		} 
 		//Tests the typing
 		var paramType = obj.init.prototype._paramType_;
 		if(Array.isArray(paramType)) {
@@ -442,11 +448,9 @@ Op.Class = function() {
 		newClass.prototype.constructor = newClass;
 		// call the constructor of the baseClass
 		newClass.prototype.$$super = function() {
-			if(this._isGeneric_) {
-				
-			} else {
-				baseClass.apply(this, arguments);
-			}
+			//baseClass.apply(this, arguments);
+			this._superIteration_ -= 1;
+			this._inheritanceChain_[this._superIteration_].apply(this, arguments);
 		}
 		var oldObj = baseClass.prototype._objPreserve_;
 		for(var prop in oldObj) {
@@ -569,6 +573,10 @@ Op.Class = function() {
 		}
 	}
 
+	//Super called counter
+	newClass.prototype._superIteration_ = inheritanceChain.length;
+	// Inheritance Chain for Super constructor
+	newClass.prototype._inheritanceChain_ = inheritanceChain;
 	//Simplify static access
 	newClass.prototype.static = newClass;
 	//lock for private Constructors

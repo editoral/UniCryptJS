@@ -11,28 +11,34 @@ u.BigInteger = Op.Class('BigInteger',null, {
 		return this.bigInt.isProbablePrime(num);
 	}.paramType(['int']),
 	subtract: function(value) {
-		//this.bigInt = this.bigInt.subtract();
-		return this.bigInt.subtract(value.bigInt);
+		newBigInt = new u.BigInteger(1);
+		newBigInt.bigInt = this.bigInt.subtract(value.bigInt);
+		return newBigInt;
 	}.paramType(['BigInteger']),
 	divide: function(value) {
-		//this.bigInt = this.bigInt.divide();
-		return this.bigInt.divide(value.bigInt);
+		newBigInt = new u.BigInteger(1);
+		newBigInt.bigInt = this.bigInt.divide(value.bigInt);
+		return newBigInt;
 	}.paramType(['BigInteger']),
 	intValue: function() {
 		return this.bigInt.intValue();
 	}.returnType('int'),
 	compareTo: function(value) {
 		return this.bigInt.compareTo(value.bigInt);
-	}.paramType('BigInteger'),
+	}.paramType(['BigInteger']),
 	gcd: function(value) {
-		return this.bigInt.gcd(value.bigInt);
-	}.paramType('BigInteger'),
+		newBigInt = new u.BigInteger(1);
+		newBigInt.bigInt = this.bigInt.gcd(value.bigInt);
+		return newBigInt;
+	}.paramType(['BigInteger']),
 	equals: function(value) {
 		return this.bigInt.equals(value.bigInt);
-	}.paramType('BigInteger'),
-	modInverse: function() {
-
-	},
+	}.paramType(['BigInteger']),
+	modInverse: function(mod) {
+		newBigInt = new u.BigInteger(1);
+		newBigInt.bigInt = this.bigInt.modInverse(mod);
+		return newBigInt;
+	}.paramType(['BigInteger']),
 	static: {
 		valueOf: function(long) {
 			return new u.BigInteger(long)

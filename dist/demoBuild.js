@@ -1404,7 +1404,7 @@ Op._.helper.generateTypingWrapper = function() {
 		//Execute the actual function
 		var result = execFuncIntern.apply(this, arguments);
 		if(intReturnType) {
-			Op._.helper.matchReturnType(intReturnType, result, self.name);	
+			Op._.helper.matchReturnType(intReturnType, result, self.name, genericType);	
 		}
 		return result;
 	}
@@ -1527,6 +1527,7 @@ Op.Class = function() {
 	var isGeneric = false;
 	var eimplements;
 	var extendObjGeneric = null;
+	var inheritanceChain = new Array;
 
 	//Generic information
 	if(classSpecObj && classSpecObj.hasOwnProperty('generic')) {
@@ -1541,14 +1542,19 @@ Op.Class = function() {
 		var extendsOptionSpec = classSpecObj['extends'];
 		if(typeof extendsOptionSpec === 'function') {
 			baseClass = extendsOptionSpec;	
+			var newArr = [baseClass];
+			inheritanceChain = baseClass.prototype._inheritanceChain_.concat(newArr);
 		} else if (typeof extendsOptionSpec === 'object') {
 			if(!extendsOptionSpec.hasOwnProperty('class') && !extendsOptionSpec.hasOwnProperty('generic')) {
 				throw new Error('If extending a generic class, the extends obtion has to be an object with property "class" and "generic"');
 			}
 			baseClass = extendsOptionSpec['class'];
+			var newArr = [baseClass];
+			inheritanceChain = baseClass.prototype._inheritanceChain_.concat(newArr);
+			//baseClass.prototype = extendsOptionSpec['class'].prototype;
 			extendObjGeneric = extendsOptionSpec['generic'];
 		} else {
-			throw new Error('Unknown extends format!');
+			throw new Error('Unknown extends format ' + typeof extendObjGeneric + ' in ' + className + '!');
 		}
 		
 	}
@@ -1592,10 +1598,11 @@ Op.Class = function() {
 		}
 		var args = Array.prototype.slice.call(arguments);
 		//Generic Handling
-		if(this._isGeneric_) {
+		if(this._superIteration_ === 0  && this._isGeneric_) {
 			var genericDec = this._generic_;
 			this._generic_ = {};
 			var genericDef = args[0];
+			console.log('bu: ' + arguments[0] + 'BaseClass: ' + this.constructor.name);
 			if(!Array.isArray(genericDef)) {
 				throw new Error('Generic classes need to be typed as a first arguement!');
 			}
@@ -1630,7 +1637,7 @@ Op.Class = function() {
 				}
 			}
 			args.shift();
-		}
+		} 
 		//Tests the typing
 		var paramType = obj.init.prototype._paramType_;
 		if(Array.isArray(paramType)) {
@@ -1660,11 +1667,10 @@ Op.Class = function() {
 		newClass.prototype.constructor = newClass;
 		// call the constructor of the baseClass
 		newClass.prototype.$$super = function() {
-			if(this._isGeneric_) {
-				
-			} else {
-				baseClass.apply(this, arguments);
-			}
+			//baseClass.apply(this, arguments);
+			this._superIteration_ += 1;
+			this._inheritanceChain_[this._superIteration_ - 1].apply(this, arguments);
+			console.log(this._inheritanceChain_);
 		}
 		var oldObj = baseClass.prototype._objPreserve_;
 		for(var prop in oldObj) {
@@ -1776,7 +1782,7 @@ Op.Class = function() {
 	//Treat a getInstance Method differently
 	if(privateConstructor) {
 		if(!newClass.hasOwnProperty('_getInstance_') && typeof newClass.getInstance !== 'function') {
-			throw new Error('If constructor is private the class needs a static getInstance method!');
+			//throw new Error('If constructor is private the class needs a static getInstance method in ' + className + '!');
 		} else { 
 			newClass.getInstance = function getInstance() {
 				newClass.prototype._privateConstLock_ = false;
@@ -1787,6 +1793,10 @@ Op.Class = function() {
 		}
 	}
 
+	//Super called counter
+	newClass.prototype._superIteration_ = 0;
+	// Inheritance Chain for Super constructor
+	newClass.prototype._inheritanceChain_ = inheritanceChain;
 	//Simplify static access
 	newClass.prototype.static = newClass;
 	//lock for private Constructors
@@ -2504,7 +2514,8 @@ genericClass1.genericFunction('10','10');
         var test = function() {
             return genericClass2.genericFunction(5, 'Apfel:');
         }
-        console.log(test());
+        console.log('Test: ' + test());
+        console.log(genericClass2._generic_)
 
 demo.fw.StaticVariables = Op.Class('StaticVariables', null, {
 	init: function(int) {
@@ -2641,21 +2652,47 @@ Underline für Private Convention
 
 
 
-var BaseClass = Op.Class('BaseClass', null,{
-            func1: function(int1) {
-                return int1;
-            }.paramType(['int']).returnType('int'),
-            func2: function(int1, int2) {
-                return int1 + int2;
-            }.paramType(['int','int']).returnType('int'),
-            func2: function(int1, int2, string1) {
-                return string1 + (int1 + int2);
-            }.paramType(['int','int', 'string']).returnType('string'),
-            func4: function(string1) {
-                return string1 + ' : one single argument';
-            }.paramType(['string']).returnType('string')
-        });
+// var BaseClass = Op.Class('BaseClass', null,{
+//             func1: function(int1) {
+//                 return int1;
+//             }.paramType(['int']).returnType('int'),
+//             func2: function(int1, int2) {
+//                 return int1 + int2;
+//             }.paramType(['int','int']).returnType('int'),
+//             func2: function(int1, int2, string1) {
+//                 return string1 + (int1 + int2);
+//             }.paramType(['int','int', 'string']).returnType('string'),
+//             func4: function(string1) {
+//                 return string1 + ' : one single argument';
+//             }.paramType(['string']).returnType('string')
+//         });
 
-var baseClass = new BaseClass();
+// var baseClass = new BaseClass();
 //var result = baseClass.func(10);
 //console.log(result);
+
+var Class1 = Op.Class('Class1', null, {
+	init: function(val) {
+		console.log(val);
+	}
+});
+
+
+var Class2 = Op.Class('Class2', {
+	'extends': Class1
+}, {
+	init: function(val) {
+		this.$$super(val);
+	}
+});
+
+var Class3 = Op.Class('Class3', {
+	'extends': Class2
+}, {
+	init: function(val) {
+		this.$$super(val);
+	}
+});
+
+
+var class3 = new Class3('hll');

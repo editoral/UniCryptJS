@@ -643,7 +643,8 @@ genericClass1.genericFunction('10','10');
         var test = function() {
             return genericClass2.genericFunction(5, 'Apfel:');
         }
-        console.log(test());
+        console.log('Test: ' + test());
+        console.log(genericClass2._generic_)
 
 demo.fw.StaticVariables = Op.Class('StaticVariables', null, {
 	init: function(int) {
@@ -780,21 +781,47 @@ Underline für Private Convention
 
 
 
-var BaseClass = Op.Class('BaseClass', null,{
-            func1: function(int1) {
-                return int1;
-            }.paramType(['int']).returnType('int'),
-            func2: function(int1, int2) {
-                return int1 + int2;
-            }.paramType(['int','int']).returnType('int'),
-            func2: function(int1, int2, string1) {
-                return string1 + (int1 + int2);
-            }.paramType(['int','int', 'string']).returnType('string'),
-            func4: function(string1) {
-                return string1 + ' : one single argument';
-            }.paramType(['string']).returnType('string')
-        });
+// var BaseClass = Op.Class('BaseClass', null,{
+//             func1: function(int1) {
+//                 return int1;
+//             }.paramType(['int']).returnType('int'),
+//             func2: function(int1, int2) {
+//                 return int1 + int2;
+//             }.paramType(['int','int']).returnType('int'),
+//             func2: function(int1, int2, string1) {
+//                 return string1 + (int1 + int2);
+//             }.paramType(['int','int', 'string']).returnType('string'),
+//             func4: function(string1) {
+//                 return string1 + ' : one single argument';
+//             }.paramType(['string']).returnType('string')
+//         });
 
-var baseClass = new BaseClass();
+// var baseClass = new BaseClass();
 //var result = baseClass.func(10);
 //console.log(result);
+
+var Class1 = Op.Class('Class1', null, {
+	init: function(val) {
+		console.log(val);
+	},
+});
+
+
+var Class2 = Op.Class('Class2', {
+	'extends': Class1
+}, {
+	init: function(val) {
+		this.$$super(val);
+	}
+});
+
+var Class3 = Op.Class('Class3', {
+	'extends': Class2
+}, {
+	init: function(val) {
+		this.$$super(val);
+	}
+});
+
+
+var class3 = new Class3('hll');

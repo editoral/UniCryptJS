@@ -1,11 +1,11 @@
-unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeElement = Op.AbstractClass('AbstractMultiplicativeElement', {
+unicrypt.math.algebra.multiplicative.abstracts.AbstractElement = Op.AbstractClass('AbstractElement', {
 	'generic': [
 		'S', 'E', 'V'
 	],
 	'extends': unicrypt.UniCrypt
 },{
 	set: null,
-	value: null
+	value: null,
 	_init: function(set, value) {
 		this.set = set;
 		this.value = value;

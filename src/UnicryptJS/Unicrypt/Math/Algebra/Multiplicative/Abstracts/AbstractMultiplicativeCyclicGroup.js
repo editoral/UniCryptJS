@@ -21,7 +21,7 @@ unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeCyclicGroup
 	// multiply3: function() {
 
 	// }.paramType(['']).returnType(''),
-	power1: function(element, amount) {
+	power: function(element, amount) {
 		return this.selfApply(element, amount);
 	}.paramType(['Element','BigInteger']).returnType('E'),
 	// power2: function(element, amount) {

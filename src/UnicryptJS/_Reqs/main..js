@@ -11,3 +11,4 @@ unicrypt.math.algebra.multiplicative.classes = {};
 unicrypt.helper = {};
 unicrypt.helper.factorization = {};
 unicrypt.helper.map = {};
+unicrypt.helper.math = {};

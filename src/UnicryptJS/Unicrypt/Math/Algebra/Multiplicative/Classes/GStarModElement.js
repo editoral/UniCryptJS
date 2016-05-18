@@ -1,11 +1,8 @@
  unicrypt.math.algebra.multiplicative.classes.GStarModElement = Op.Class('GStarModElement', {
-	'generic': [
-		'E'
-	],
 	'extends': {
-		'class' : ,
+		'class' : unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeElement,
 		'generic': [
-			'T', 'string'
+			'GStarMod', 'GStarModElement', 'BigInteger'
 		]
 	}
 },{

@@ -13,16 +13,16 @@ unicrypt.math.algebra.multiplicative.classes.GStarMod =  Op.Class('GStarMod', {
 		this._modulus = moduloFactorization;
 		this._moduloFactorization = moduloFactorization;
 		this._orderFactorization = orderFactorization;
-	}.paramType(['SpecialFactorization', 'Factorization']),
+	}.paramType(['BigInteger', 'BigInteger']),
 	getModulus: function() {
 		return this._modulus;
 	}.returnType('BigInteger'),
 	getModuloFactorization: function() {
 		return this._moduloFactorization;
-	}.returnType('SpecialFactorization'),
+	}.returnType('BigInteger'),
 	getOrderFactorization: function() {
 		return this._orderFactorization;		
-	}.returnType('Factorization'),
+	}.returnType('BigInteger'),
 	// getZStarMod: function() {
 	// 	if (this._superGroup == null) {
 	// 		this._superGroup = ZStarMod.getInstance(this.getModuloFactorization());

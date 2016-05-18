@@ -22,11 +22,12 @@ unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime = Op.Class('GStar
 			if(!(mod.signum() > 0 && mod.isProbablePrime(40))) {
 				throw new Error('IllegalArgumentException');
 			}
-			var q = (modulus - 1) / 2
+			var q = mod.subtract(u.BigInteger.ONE()).divide(u.BigInteger.valueOf(2));
+			//console.log(u.BigInteger.valueOf(2).bigInt.intValue());
 			if(!(q.signum() > 0 && q.isProbablePrime(40))) {
 				throw new Error('IllegalArgumentException');
 			}			
-			var instance = new unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime(modulus);
+			var instance = new unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime(mod);
 			return instance;
 		}.paramType(['long']),
 		//instances: null

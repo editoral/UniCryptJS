@@ -9,5 +9,8 @@ unicrypt.math.algebra.general.abstracts.AbstractGroup = Op.AbstractClass('Abstra
 		]
 	}
 },{
+	_init: function(valueClass) {
+		this.$$super(valueClass);
+	},
 	
 });

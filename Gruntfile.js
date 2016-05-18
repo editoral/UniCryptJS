@@ -19,7 +19,14 @@ module.exports = function(grunt) {
 				dest: 'dist/demoBuild.js'
 			},
 			demoUniDist: {
-				src: ['demo/littleNodeHelper.js', 'src/oop.js', 'vendor/*.js', 'src/UnicryptJS/_Reqs/*.js', 'src/UnicryptJS/Unicrypt/**/*.js', 'demo/demoUniJS.js'],
+				src: ['demo/littleNodeHelper.js', 'src/oop.js', 'vendor/*.js', 'src/UnicryptJS/_Reqs/*.js', 
+				//'src/UnicryptJS/Unicrypt/**/*.js'
+				'src/UnicryptJS/Unicrypt/Helper/Math/MathUtil.js', 'src/UnicryptJS/Unicrypt/unicrypt.js', 'src/UnicryptJS/Unicrypt/Math/Algebra/General/Abstracts/AbstractSet.js',
+				'src/UnicryptJS/Unicrypt/Math/Algebra/General/Abstracts/AbstractSemiGroup.js','src/UnicryptJS/Unicrypt/Math/Algebra/General/Abstracts/AbstractMonoid.js',
+				'src/UnicryptJS/Unicrypt/Math/Algebra/General/Abstracts/AbstractGroup.js', 'src/UnicryptJS/Unicrypt/Math/Algebra/General/Abstracts/AbstractCyclicGroup.js',
+				'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Abstracts/AbstractMultiplicativeCyclicGroup.js', 'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Classes/GStarMod.js',
+				'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Classes/GStarModPrime.js', 'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Classes/GStarModSafePrime.js',
+				'demo/demoUniJS.js'],
 				dest: 'dist/UniDemoBuild.js'
 			}
 		},
