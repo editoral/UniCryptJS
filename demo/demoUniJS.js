@@ -17,6 +17,11 @@ var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.g
 console.log('Modulus: ' + gGstarMod.getModulus().intValue());
 console.log('ModuloFactorization: ' +  gGstarMod.getModuloFactorization().intValue());
 console.log('orderFactorization: ' +  gGstarMod.getOrderFactorization().intValue());
-//var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(11);
+
+console.log(gGstarMod.__proto__.constructor.name);
+console.log(gGstarMod.__proto__.__proto__.constructor.name);
+console.log(gGstarMod.__proto__.__proto__.__proto__.constructor.name);
+
+var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(11);
 var el = new u.BigInteger(3);
 var gStarEl = gGstarMod.getElement(el);

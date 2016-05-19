@@ -232,11 +232,23 @@ Op._.helper.generateTypingWrapper = function() {
 	obj: function(type, val) {
 		if (typeof val === "object") {
 			if(!(val.constructor.name === type)) {
-				throw new Error("param " + val + " is not from type " + type + "!");
+				// if(!this.objInheritance(type,val)) {
+					throw new Error("param " + val + " is not from type " + type + "!");
+				// }
 			}
 		} else {
 			throw new Error("param " + val + " is not an object!");
 		}
+	},
+	objInheritance: function(type, val) {
+		// if(!val.hasOwnProperty(__porto__)) {
+		// 	return false;
+		// }
+		// var proto = val.__porto__;
+		// while () {
+			
+		// }
+
 	},
 	generic: function(type, generic, val) {
 		if(generic.hasOwnProperty(type)) {
@@ -2569,6 +2581,11 @@ var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.g
 console.log('Modulus: ' + gGstarMod.getModulus().intValue());
 console.log('ModuloFactorization: ' +  gGstarMod.getModuloFactorization().intValue());
 console.log('orderFactorization: ' +  gGstarMod.getOrderFactorization().intValue());
-//var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(11);
+
+console.log(gGstarMod.__proto__.constructor.name);
+console.log(gGstarMod.__proto__.__proto__.constructor.name);
+console.log(gGstarMod.__proto__.__proto__.__proto__.constructor.name);
+
+var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(11);
 var el = new u.BigInteger(3);
 var gStarEl = gGstarMod.getElement(el);
