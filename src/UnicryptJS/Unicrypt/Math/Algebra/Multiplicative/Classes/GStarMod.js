@@ -45,13 +45,14 @@ unicrypt.math.algebra.multiplicative.classes.GStarMod =  Op.Class('GStarMod', {
 	// 	return this.getModulus().toString() + "," + this.getOrder().toString();
 	// }.returnType('string'),
 	_abstractContains: function(value) {
+		//console.log('gi: ' + value.constructor.name);
 		return value.signum() > 0
 			   && value.compareTo(this._modulus) < 0
 			   && unicrypt.helper.math.MathUtil.areRelativelyPrime(value, this._modulus)
-			   && value.modPow(this.getOrder(), this._modulus).equals(u.BigInteger.ONE);
+			   && value.modPow(this.getOrder(), this._modulus).equals(u.BigInteger.ONE());
 	}.paramType(['BigInteger']).returnType('boolean'),
 	_abstractGetElement: function(value) {
-		return new GStarModElement(this, value);
+		return new unicrypt.math.algebra.multiplicative.classes.GStarModElement(this, value);
 	}.paramType(['BigInteger']).returnType('GStarModElement'),
 	// _abstractGetBigIntegerConverter: function() {
 	// 	return BigIntegerToBigInteger.getInstance(0);

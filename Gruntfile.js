@@ -26,6 +26,8 @@ module.exports = function(grunt) {
 				'src/UnicryptJS/Unicrypt/Math/Algebra/General/Abstracts/AbstractGroup.js', 'src/UnicryptJS/Unicrypt/Math/Algebra/General/Abstracts/AbstractCyclicGroup.js',
 				'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Abstracts/AbstractMultiplicativeCyclicGroup.js', 'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Classes/GStarMod.js',
 				'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Classes/GStarModPrime.js', 'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Classes/GStarModSafePrime.js',
+				'src/UnicryptJS/Unicrypt/Math/Algebra/General/Abstracts/AbstractElement.js', 'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Abstracts/AbstractMultiplicativeElement.js',
+				'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Classes/GStarModElement.js',
 				'demo/demoUniJS.js'],
 				dest: 'dist/UniDemoBuild.js'
 			}

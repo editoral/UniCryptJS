@@ -1,4 +1,4 @@
-unicrypt.math.algebra.multiplicative.abstracts.AbstractElement = Op.AbstractClass('AbstractElement', {
+unicrypt.math.algebra.general.abstracts.AbstractElement = Op.AbstractClass('AbstractElement', {
 	'generic': [
 		'S', 'E', 'V'
 	],

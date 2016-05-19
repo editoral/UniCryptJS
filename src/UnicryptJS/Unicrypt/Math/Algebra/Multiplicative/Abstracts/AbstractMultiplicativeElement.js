@@ -12,41 +12,20 @@ unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeElement = O
 	_init: function(semiGroup, value) {
 		this.$$super(semiGroup, value);
 	},
-	// multiply1: function(element1, element2) {
-	// 	return this.apply(element1, element2);
-	// }.paramType(['Element', 'Element']).returnType('E'),
-	// // multiply2: function() {
-
-	// // }.paramType(['']).returnType(''),
-	// // multiply3: function() {
-
-	// // }.paramType(['']).returnType(''),
-	// power1: function(element, amount) {
-	// 	return this.selfApply(element, amount);
-	// }.paramType(['Element','BigInteger']).returnType('E'),
-	// power2: function(element, amount) {
-	// 	return this.selfApply(element, amount);
-	// }.paramType(['Element', 'long']).returnType('E'),
-	// // power3: function() {
-
-	// // }.paramType(['']).returnType(''),
-	// square: function(element) {
-	// 	return this.selfApply(element);
-	// }.paramType(['Element']).returnType('E'),
-	// productOfPowers: function(elements, amounts) {
-	// 	return this.multiSelfApply(elements, amounts);
-	// }.returnType('E'),
-	// divide: function(element1, element2) {
-	// 	return this.applyInverse(element1, element2);
-	// }.paramType(['Element', 'Element']).returnType('E'),
-	// oneOver: function(element) {
-	// 	return this.invert(element);
-	// }.paramType(['Element']).returnType('E'),
-	// getOneElement: function() {
-	// 	return this.getIdentityElement();
-	// }.returnType('E'),
-	// isOneElement: function(element) {
-	// 	return this.isIdentityElement(element);
-	// }.paramType(['Element']).returnType('boolean')
-
+	multiply: function(element) {
+		return this.getSet().multiply(this, element);
+	}.paramType(['Element']).returnType('E'),
+	power: function(amount) {
+		return this.getSet().power(this, amount);
+	}.paramType(['BigInteger']).returnType('E'),
+	square: function() {
+		return this.getSet().square(this);
+	}.returnType('E'),
+	divide: function(element) {
+		if (this.getSet().isGroup()) {
+			var group = this.getSet();
+			return group.divide(this, element);
+		}
+		throw new Error('UnsupportedOperationException');
+	}.paramType(['Element']).returnType('E'),
 });

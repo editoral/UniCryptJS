@@ -1883,12 +1883,12 @@ u.BigInteger = Op.Class('BigInteger',null, {
 		newBigInt = new u.BigInteger(1);
 		newBigInt.bigInt = this.bigInt.subtract(value.bigInt);
 		return newBigInt;
-	}.paramType(['BigInteger']),
+	}.paramType(['BigInteger']).returnType('BigInteger'),
 	divide: function(value) {
 		newBigInt = new u.BigInteger(1);
 		newBigInt.bigInt = this.bigInt.divide(value.bigInt);
 		return newBigInt;
-	}.paramType(['BigInteger']),
+	}.paramType(['BigInteger']).returnType('BigInteger'),
 	intValue: function() {
 		return this.bigInt.intValue();
 	}.returnType('int'),
@@ -1899,7 +1899,7 @@ u.BigInteger = Op.Class('BigInteger',null, {
 		newBigInt = new u.BigInteger(1);
 		newBigInt.bigInt = this.bigInt.gcd(value.bigInt);
 		return newBigInt;
-	}.paramType(['BigInteger']),
+	}.paramType(['BigInteger']).returnType('BigInteger'),
 	equals: function(value) {
 		return this.bigInt.equals(value.bigInt);
 	}.paramType(['BigInteger']),
@@ -1907,7 +1907,18 @@ u.BigInteger = Op.Class('BigInteger',null, {
 		newBigInt = new u.BigInteger(1);
 		newBigInt.bigInt = this.bigInt.modInverse(mod);
 		return newBigInt;
-	}.paramType(['BigInteger']),
+	}.paramType(['BigInteger']).returnType('BigInteger'),
+	bitLength: function() {
+		return this.bigInt.bitLength();
+	}.returnType('int'),
+	testBit: function(bit) {
+		return this.bigInt.testBit(bit)
+	}.paramType(['int']).returnType('boolean'),
+	modPow: function(exponent, m) {
+		newBigInt = new u.BigInteger(1);
+		newBigInt.bigInt = this.bigInt.modPow(exponent, m);
+		return newBigInt;
+	}.paramType(['BigInteger', 'BigInteger']),
 	static: {
 		valueOf: function(long) {
 			return new u.BigInteger(long)
@@ -1938,7 +1949,7 @@ unicrypt.helper.math.MathUtil = Op.Class('MathUtil', {
 },{
 	static: {
 		areRelativelyPrime: function(value1, value2) {
-			return value1.gcd(value2).equals(ONE)
+			return value1.gcd(value2).equals(u.BigInteger.ONE())
 		}.paramType(['BigInteger', 'BigInteger'])
 	}
 });
@@ -1946,10 +1957,10 @@ unicrypt.UniCrypt = Op.AbstractClass('UniCrypt', null, {
 	toString: function() {
 		var str1 = this._defaultToStringType();
 		var str2 = this._defaultToStringContent();
-		if(str1.length() == 0) {
+		if(str1.length == 0) {
 			return str2;
 		}
-		if(str2.length() == 0) {
+		if(str2.length == 0) {
 			return str1;
 		}
 		return str1 + "[" + str2 + "]";
@@ -1981,179 +1992,145 @@ unicrypt.math.algebra.general.abstracts.AbstractSet = Op.AbstractClass('Abstract
 	init: function(valueClass) {
 		this._valueClass = valueClass;
 	},
-	isSemiGroup: function() {
-		 return this instanceof SemiGroup;
-	}.returnType('boolean'),
-	isMonoid: function() {
-		 return this instanceof Monoid;
-	}.returnType('boolean'),
-	isGroup: function() {
-		 return this instanceof Group;
-	}.returnType('boolean'),
-	isSemiRing: function() {
-		 return this instanceof SemiRing;
-	}.returnType('boolean'),
-	isRing: function() {
-		 return this instanceof Ring;
-	}.returnType('boolean'),
-	isField: function() {
-		 return this instanceof Field;
-	}.returnType('boolean'),
-	isCyclic: function() {
-		 return this instanceof CyclicGroup;
-	}.returnType('boolean'),
-	isAdditive: function() {
-		 return this instanceof AdditiveSemiGroup;
-	}.returnType('boolean'),
-	isMultiplicative: function() {
-		 return this instanceof MultiplicativeSemiGroup;
-	}.returnType('boolean'),
-	isConcatenative: function() {
-		 return this instanceof ConcatenativeSemiGroup;
-	}.returnType('boolean'),
-	isProduct: function() {
-		 return this instanceof ProductSet;
-	}.returnType('boolean'),
-	isFinite: function() {
-		return !this.getOrder().equals(Set.INFINITE);
-	}.returnType('boolean'),
-	hasKnownOrder: function() {
-		return !this.getOrder().equals(Set.UNKNOWN);
-	}.returnType('boolean'),
+	// isSemiGroup: function() {
+	// 	 return this instanceof SemiGroup;
+	// }.returnType('boolean'),
+	// isMonoid: function() {
+	// 	 return this instanceof Monoid;
+	// }.returnType('boolean'),
+	// isGroup: function() {
+	// 	 return this instanceof Group;
+	// }.returnType('boolean'),
+	// isSemiRing: function() {
+	// 	 return this instanceof SemiRing;
+	// }.returnType('boolean'),
+	// isRing: function() {
+	// 	 return this instanceof Ring;
+	// }.returnType('boolean'),
+	// isField: function() {
+	// 	 return this instanceof Field;
+	// }.returnType('boolean'),
+	// isCyclic: function() {
+	// 	 return this instanceof CyclicGroup;
+	// }.returnType('boolean'),
+	// isAdditive: function() {
+	// 	 return this instanceof AdditiveSemiGroup;
+	// }.returnType('boolean'),
+	// isMultiplicative: function() {
+	// 	 return this instanceof MultiplicativeSemiGroup;
+	// }.returnType('boolean'),
+	// isConcatenative: function() {
+	// 	 return this instanceof ConcatenativeSemiGroup;
+	// }.returnType('boolean'),
+	// isProduct: function() {
+	// 	 return this instanceof ProductSet;
+	// }.returnType('boolean'),
+	// isFinite: function() {
+	// 	return !this.getOrder().equals(Set.INFINITE);
+	// }.returnType('boolean'),
+	// hasKnownOrder: function() {
+	// 	return !this.getOrder().equals(Set.UNKNOWN);
+	// }.returnType('boolean'),
 	getOrder: function() {
 		if (this.order == null) {
-			this.order = this.abstractGetOrder();
+			this.order = this._abstractGetOrder();
 		}
 		return this.order;
 	}.returnType('BigInteger'),
-	getOrderLowerBound: function() {
-		if (this._lowerBound == null) {
-			if (this.hasKnownOrder()) {
-				this._lowerBound = this.getOrder();
-			} else {
-				this._lowerBound = this.defaultGetOrderLowerBound();
-			}
-		}
-		return this._lowerBound;
-	}.returnType('BigInteger'),
-	getOrderUpperBound: function() {
-		if (this._upperBound == null) {
-			if (this.hasKnownOrder()) {
-				this._upperBound = this.getOrder();
-			} else {
-				this._upperBound = this.defaultGetOrderUpperBound();
-			}
-		}
-		return this._upperBound;
-	}.returnType('BigInteger'),
-	getMinimalOrder: function() {
-		if (this._minimum == null) {
-			this._minimum = this.defaultGetMinimalOrder();
-		}
-		return this._minimum;
-	}.returnType('BigInteger'),
-	isSingleton: function() {
-		return this.getOrder().equals(BigInteger.ONE);
-	}.returnType(''),
-	getZModOrder: function() {
-		if (!(this.isFinite() && this.hasKnownOrder())) {
-			throw new Error('UnsupportedOperationException');
-		}
-		return ZMod.getInstance(this.getOrder());
-	}.returnType('ZMod'),
-	getZStarModOrder: function() {
-		if (!(this.isFinite() && this.hasKnownOrder())) {
-			throw new Error('UnsupportedOperationException');
-		}
-		return ZStarMod.getInstance(this.getOrder());
-	}.returnType('ZStarMod'),
+	// getOrderLowerBound: function() {
+	// 	if (this._lowerBound == null) {
+	// 		if (this.hasKnownOrder()) {
+	// 			this._lowerBound = this.getOrder();
+	// 		} else {
+	// 			this._lowerBound = this.defaultGetOrderLowerBound();
+	// 		}
+	// 	}
+	// 	return this._lowerBound;
+	// }.returnType('BigInteger'),
+	// getOrderUpperBound: function() {
+	// 	if (this._upperBound == null) {
+	// 		if (this.hasKnownOrder()) {
+	// 			this._upperBound = this.getOrder();
+	// 		} else {
+	// 			this._upperBound = this.defaultGetOrderUpperBound();
+	// 		}
+	// 	}
+	// 	return this._upperBound;
+	// }.returnType('BigInteger'),
+	// getMinimalOrder: function() {
+	// 	if (this._minimum == null) {
+	// 		this._minimum = this.defaultGetMinimalOrder();
+	// 	}
+	// 	return this._minimum;
+	// }.returnType('BigInteger'),
+	// isSingleton: function() {
+	// 	return this.getOrder().equals(BigInteger.ONE);
+	// }.returnType(''),
+	// getZModOrder: function() {
+	// 	if (!(this.isFinite() && this.hasKnownOrder())) {
+	// 		throw new Error('UnsupportedOperationException');
+	// 	}
+	// 	return ZMod.getInstance(this.getOrder());
+	// }.returnType('ZMod'),
+	// getZStarModOrder: function() {
+	// 	if (!(this.isFinite() && this.hasKnownOrder())) {
+	// 		throw new Error('UnsupportedOperationException');
+	// 	}
+	// 	return ZStarMod.getInstance(this.getOrder());
+	// }.returnType('ZStarMod'),
 	getElement: function(value) {
 		if (!this.contains(value)) {
 			throw new Error('IllegalArgumentException');
 		}
-		return this.abstractGetElement(value);
-	}.paramType(['V']).returnType('E'),
-	contains1: function(value) {
+		return this._abstractGetElement(value);
+	},//.paramType(['V']).returnType('E'),
+	contains: function(value) {
 		if (value == null) {
 			throw new Error('IllegalArgumentException');
 		}
-		return this.abstractContains(value);
-	}.paramType(['V']).returnType('boolean'),
-	contains2: function(element) {
-		if (element == null) {
-			throw new Error('IllegalArgumentException');
-		}
-		if (!this.valueClass.isInstance(element.getValue())) {
-			return false;
-		}
-		return this.defaultContains(element);
-	}.paramType(['Element']).returnType('boolean'),
-	getRandomElement1: function() {
-		return this.abstractGetRandomElement(HybridRandomByteSequence.getInstance());
-	}.returnType('E'),
-	getRandomElement2: function(randomByteSequence) {
-		if (randomByteSequence == null) {
-			throw new Error('IllegalArgumentException');
-		}
-		return this.abstractGetRandomElement(randomByteSequence);
-	}.paramType(['RandomByteSequence']).returnType('E'),
-	getRandomElements1: function() {
-		return this.getRandomElements(HybridRandomByteSequence.getInstance());
-	}.returnType('Sequence'),
-	getRandomElements2: function(n) {
-		if (n < 0) {
-			throw new Error('IllegalArgumentException');
-		}
-		return this.getRandomElements().limit(n);
-	}.paramType(['long']).returnType('Sequence'),
-	// getRandomElements3: function(randomByteSequence) {
+		return this._abstractContains(value);
+	},//.paramType(['V']).returnType('boolean'),
+	// contains2: function(element) {
+	// 	if (element == null) {
+	// 		throw new Error('IllegalArgumentException');
+	// 	}
+	// 	if (!this.valueClass.isInstance(element.getValue())) {
+	// 		return false;
+	// 	}
+	// 	return this.defaultContains(element);
+	// }.paramType(['Element']).returnType('boolean'),
+	// getRandomElement1: function() {
+	// 	return this.abstractGetRandomElement(HybridRandomByteSequence.getInstance());
+	// }.returnType('E'),
+	// getRandomElement2: function(randomByteSequence) {
 	// 	if (randomByteSequence == null) {
 	// 		throw new Error('IllegalArgumentException');
 	// 	}
-	// 	return new Sequence([E]) {
+	// 	return this.abstractGetRandomElement(randomByteSequence);
+	// }.paramType(['RandomByteSequence']).returnType('E'),
+	// getRandomElements1: function() {
+	// 	return this.getRandomElements(HybridRandomByteSequence.getInstance());
+	// }.returnType('Sequence'),
+	// getRandomElements2: function(n) {
+	// 	if (n < 0) {
+	// 		throw new Error('IllegalArgumentException');
+	// 	}
+	// 	return this.getRandomElements().limit(n);
+	// }.paramType(['long']).returnType('Sequence'),
+	// getRandomElements4: function(n) {
+	// 	if (n < 0) {
+	// 		throw new Error('IllegalArgumentException');
+	// 	}
+	// 	return this.getRandomElements().limit(n);
+	// }.paramType(['long']).returnType('Sequence'),
+	// getRandomElements5: function(n) {
+	// 	if (n < 0) {
+	// 		throw new Error('IllegalArgumentException');
+	// 	}
+	// 	return this.getRandomElements().limit(n);
+	// }.paramType(['long']).returnType('Sequence'),
 
-	// 		@Override
-	// 		public ExtendedIterator<E> iterator() {
-	// 			return new ExtendedIterator<E>() {
 
-	// 				@Override
-	// 				public boolean hasNext() {
-	// 					return true;
-	// 				}
-
-	// 				@Override
-	// 				public E next() {
-	// 					return abstractGetRandomElement(randomByteSequence);
-	// 				}
-	// 			};
-	// 		}
-	// 	};
-	// }.paramType(['RandomByteSequence']).returnType('Sequence'),
-	getRandomElements4: function(n) {
-		if (n < 0) {
-			throw new Error('IllegalArgumentException');
-		}
-		return this.getRandomElements().limit(n);
-	}.paramType(['long']).returnType('Sequence'),
-	getRandomElements5: function(n) {
-		if (n < 0) {
-			throw new Error('IllegalArgumentException');
-		}
-		return this.getRandomElements().limit(n);
-	}.paramType(['long']).returnType('Sequence'),
-
-	func: function() {
-
-	}.paramType(['']).returnType(''),
-	func: function() {
-
-	}.paramType(['']).returnType(''),
-	func: function() {
-
-	}.paramType(['']).returnType(''),
-	func: function() {
-
-	}.paramType(['']).returnType(''),
 });
 unicrypt.math.algebra.general.abstracts.AbstractSemiGroup = Op.AbstractClass('AbstractSemiGroup', {
 	'generic': [
@@ -2166,7 +2143,35 @@ unicrypt.math.algebra.general.abstracts.AbstractSemiGroup = Op.AbstractClass('Ab
 		]
 	}
 },{
-	
+	_init: function() {
+
+	},
+	apply: function(element1, element2) {
+		if (!this.contains(element1) || !this.contains(element2)) {
+			throw new Error('IllegalArgumentException');
+		}
+		return this.abstractApply(element1, element2);
+	}.paramType(['Element', 'Element']),
+	selfApply1: function(element, amount) {
+		if (!this.contains(element) || amount == null) {
+			throw new Error('IllegalArgumentException');
+		}
+		return this.defaultSelfApply(element, amount);		
+	}.paramType(['Element','BigInteger']).returnType('E'),
+	selfApply2: function(element) {
+		return this.apply(element, element);
+	}.paramType(['Element']).returnType('E'),
+	defaultSelfApplyAlgorithm: function(element, posAmount) {
+		var result = element;
+		for (var i = posAmount.bitLength() - 2; i >= 0; i--) {
+			result = this.abstractApply(result, result);
+			if (posAmount.testBit(i)) {
+				result = this.abstractApply(result, element);
+			}
+		}
+		return result;		
+	}.paramType(['E', 'BigInteger']).returnType('E')
+
 });
 unicrypt.math.algebra.general.abstracts.AbstractMonoid = Op.AbstractClass('AbstractMonoid', {
 	'generic': [
@@ -2192,7 +2197,39 @@ unicrypt.math.algebra.general.abstracts.AbstractGroup = Op.AbstractClass('Abstra
 		]
 	}
 },{
-	
+	_init: function(valueClass) {
+		this.$$super(valueClass);
+	},
+	invert: function(element) {
+		if (!this.contains(element)) {
+			throw new Error('IllegalArgumentException');
+		}
+		return this.abstractInvert(element);		
+	}.paramType(['Element']).returnType('E'),
+	applyInverse: function(elemnt1, element2) {
+		return this.apply(element1, this.invert(element2));
+	}.paramType(['Element', 'Element']).returnType('E'),
+	defaultSelfApply: function(element, amount) {
+		var negAmount = (amount.signum() < 0);
+		amount = amount.abs();
+		if (this.isFinite() && this.hasKnownOrder()) {
+			amount = amount.mod(this.getOrder());
+		}
+		if (amount.signum() == 0) {
+			return this.getIdentityElement();
+		}
+		var result = this.defaultSelfApplyAlgorithm(element, amount);
+		if (negAmount) {
+			return this.invert(result);
+		}
+		return result;
+	}.paramType(['Element', 'BigInteger']),
+	func: function() {
+
+	},
+	func: function() {
+
+	},
 });
 unicrypt.math.algebra.general.abstracts.AbstractCyclicGroup = Op.AbstractClass('AbstractCyclicGroup', {
 	'generic': [
@@ -2210,36 +2247,18 @@ unicrypt.math.algebra.general.abstracts.AbstractCyclicGroup = Op.AbstractClass('
 	_init: function(valueClass) {
 		this.$$super(valueClass)	
 	},
-	multiply1: function() {
-
-	},
-	multiply2: function() {
-
-	},
-	multiply3: function() {
-
-	},
-	multiply3: function() {
-
-	},
-	func: function() {
-
-	},
-	func: function() {
-
-	},
-	func: function() {
-
-	},
-	func: function() {
-
-	},
-	func: function() {
-
-	},
-	func: function() {
-
-	},
+	getDefaultGenerator: function() {
+		if (this.defaultGenerator == null) {
+			this.defaultGenerator = this._abstractGetDefaultGenerator();
+		}
+		return this.defaultGenerator;
+	}.returnType('E'),
+	isGenerator: function() {
+		if (!this.contains(element)) {
+			throw new Error('IllegalArgumentException');
+		}
+		return this.abstractIsGenerator(element);
+	}.paramType(['Element']).returnType('boolean'),
 });
 unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeCyclicGroup = Op.AbstractClass('AbstractMultiplicativeCyclicGroup', {
 	'generic': [
@@ -2340,13 +2359,14 @@ unicrypt.math.algebra.multiplicative.classes.GStarMod =  Op.Class('GStarMod', {
 	// 	return this.getModulus().toString() + "," + this.getOrder().toString();
 	// }.returnType('string'),
 	_abstractContains: function(value) {
+		//console.log('gi: ' + value.constructor.name);
 		return value.signum() > 0
 			   && value.compareTo(this._modulus) < 0
 			   && unicrypt.helper.math.MathUtil.areRelativelyPrime(value, this._modulus)
-			   && value.modPow(this.getOrder(), this._modulus).equals(u.BigInteger.ONE);
+			   && value.modPow(this.getOrder(), this._modulus).equals(u.BigInteger.ONE());
 	}.paramType(['BigInteger']).returnType('boolean'),
 	_abstractGetElement: function(value) {
-		return new GStarModElement(this, value);
+		return new unicrypt.math.algebra.multiplicative.classes.GStarModElement(this, value);
 	}.paramType(['BigInteger']).returnType('GStarModElement'),
 	// _abstractGetBigIntegerConverter: function() {
 	// 	return BigIntegerToBigInteger.getInstance(0);
@@ -2468,6 +2488,68 @@ unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime = Op.Class('GStar
 		//instances: null
 	}
 });
+unicrypt.math.algebra.general.abstracts.AbstractElement = Op.AbstractClass('AbstractElement', {
+	'generic': [
+		'S', 'E', 'V'
+	],
+	'extends': unicrypt.UniCrypt
+},{
+	set: null,
+	value: null,
+	_init: function(set, value) {
+		this.set = set;
+		this.value = value;
+	},
+	getSet: function() {
+		return this.set;
+	},
+	getValue: function() {
+		return this.value;
+	}
+});
+unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeElement = Op.AbstractClass('AbstractMultiplicativeElement', {
+	'generic': [
+		'S', 'E', 'V'
+	],
+	'extends': {
+		'class': unicrypt.math.algebra.general.abstracts.AbstractElement,
+		'generic': [
+			'S', 'E','V'
+		]
+	}
+},{
+	_init: function(semiGroup, value) {
+		this.$$super(semiGroup, value);
+	},
+	multiply: function(element) {
+		return this.getSet().multiply(this, element);
+	}.paramType(['Element']).returnType('E'),
+	power: function(amount) {
+		return this.getSet().power(this, amount);
+	}.paramType(['BigInteger']).returnType('E'),
+	square: function() {
+		return this.getSet().square(this);
+	}.returnType('E'),
+	divide: function(element) {
+		if (this.getSet().isGroup()) {
+			var group = this.getSet();
+			return group.divide(this, element);
+		}
+		throw new Error('UnsupportedOperationException');
+	}.paramType(['Element']).returnType('E'),
+});
+ unicrypt.math.algebra.multiplicative.classes.GStarModElement = Op.Class('GStarModElement', {
+	'extends': {
+		'class' : unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeElement,
+		'generic': [
+			'GStarMod', 'GStarModElement', 'BigInteger'
+		]
+	}
+},{
+	init: function(gStarMod, value) {
+		this.$$super(gStarMod, value);
+	}.paramType(['GStarMod', 'BigInteger']),
+});
 //var uniD = {},
 //var uniD.alg.GStarMod = unicrypt.math.algebra.multiplicative.classes.GStarMod.getInstance();
 
@@ -2488,3 +2570,5 @@ console.log('Modulus: ' + gGstarMod.getModulus().intValue());
 console.log('ModuloFactorization: ' +  gGstarMod.getModuloFactorization().intValue());
 console.log('orderFactorization: ' +  gGstarMod.getOrderFactorization().intValue());
 //var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(11);
+var el = new u.BigInteger(3);
+var gStarEl = gGstarMod.getElement(el);
