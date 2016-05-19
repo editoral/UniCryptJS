@@ -20,6 +20,11 @@ u.BigInteger = Op.Class('BigInteger',null, {
 		newBigInt.bigInt = this.bigInt.divide(value.bigInt);
 		return newBigInt;
 	}.paramType(['BigInteger']).returnType('BigInteger'),
+	multiply: function(value) {
+		newBigInt = new u.BigInteger(1);
+		newBigInt.bigInt = this.bigInt.multiply(value.bigInt);
+		return newBigInt;
+	}.paramType(['BigInteger']).returnType('BigInteger'),	
 	intValue: function() {
 		return this.bigInt.intValue();
 	}.returnType('int'),
@@ -34,9 +39,14 @@ u.BigInteger = Op.Class('BigInteger',null, {
 	equals: function(value) {
 		return this.bigInt.equals(value.bigInt);
 	}.paramType(['BigInteger']),
+	mod: function(mod) {
+		newBigInt = new u.BigInteger(1);
+		newBigInt.bigInt = this.bigInt.mod(mod.bigInt);
+		return newBigInt;
+	}.paramType(['BigInteger']).returnType('BigInteger'),	
 	modInverse: function(mod) {
 		newBigInt = new u.BigInteger(1);
-		newBigInt.bigInt = this.bigInt.modInverse(mod);
+		newBigInt.bigInt = this.bigInt.modInverse(mod.bigInt);
 		return newBigInt;
 	}.paramType(['BigInteger']).returnType('BigInteger'),
 	bitLength: function() {

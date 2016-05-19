@@ -45,7 +45,6 @@ unicrypt.math.algebra.multiplicative.classes.GStarMod =  Op.Class('GStarMod', {
 	// 	return this.getModulus().toString() + "," + this.getOrder().toString();
 	// }.returnType('string'),
 	_abstractContains: function(value) {
-		//console.log('gi: ' + value.constructor.name);
 		return value.signum() > 0
 			   && value.compareTo(this._modulus) < 0
 			   && unicrypt.helper.math.MathUtil.areRelativelyPrime(value, this._modulus)
@@ -68,6 +67,7 @@ unicrypt.math.algebra.multiplicative.classes.GStarMod =  Op.Class('GStarMod', {
 		return this._abstractGetElement(u.BigInteger.ONE);
 	}.returnType('GStarModElement'),
 	_abstractApply: function(element1,element2) {
+		console.log(element1.getValue());
 		return this._abstractGetElement(element1.getValue().multiply(element2.getValue()).mod(this._modulus));
 	}.paramType(['GStarModElement','GStarModElement']).returnType('GStarModElement'),
 	_abstractInvert: function(element) {

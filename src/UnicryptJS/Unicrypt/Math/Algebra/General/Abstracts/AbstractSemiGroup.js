@@ -13,10 +13,10 @@ unicrypt.math.algebra.general.abstracts.AbstractSemiGroup = Op.AbstractClass('Ab
 
 	},
 	apply: function(element1, element2) {
-		if (!this.contains(element1) || !this.contains(element2)) {
+		if (!this.contains(element1.getValue()) || !this.contains(element2.getValue())) {
 			throw new Error('IllegalArgumentException');
 		}
-		return this.abstractApply(element1, element2);
+		return this._abstractApply(element1, element2);
 	}.paramType(['Element', 'Element']),
 	selfApply1: function(element, amount) {
 		if (!this.contains(element) || amount == null) {

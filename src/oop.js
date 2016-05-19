@@ -73,7 +73,7 @@ Op._.helper.matchReturnType = function(returnType, result, name, generic) {
 		didPass = false;
 	}
 	if(!didPass) {
-		throw new Error('The return value from function ' + name + ' was not from type ' + returnType);
+		//throw new Error('The return value from function ' + name + ' was not from type ' + returnType);
 	}
 }
 
@@ -232,7 +232,7 @@ Op._.helper.generateTypingWrapper = function() {
 		if (typeof val === "object") {
 			if(!(val.constructor.name === type)) {
 				// if(!this.objInheritance(type,val)) {
-					throw new Error("param " + val + " is not from type " + type + "!");
+					//throw new Error("param " + val + " is not from type " + type + "!");
 				// }
 			}
 		} else {
@@ -245,7 +245,7 @@ Op._.helper.generateTypingWrapper = function() {
 		// }
 		// var proto = val.__porto__;
 		// while () {
-			
+
 		// }
 
 	},

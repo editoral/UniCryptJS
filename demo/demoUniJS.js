@@ -13,15 +13,20 @@ var bigInt2 = new u.BigInteger(30);
 var bigInt = bigInt.subtract(bigInt2);
 //console.log('BigInteger: ' + bigInt.intValue());
 
-var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(11);
+var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(23);
 console.log('Modulus: ' + gGstarMod.getModulus().intValue());
 console.log('ModuloFactorization: ' +  gGstarMod.getModuloFactorization().intValue());
 console.log('orderFactorization: ' +  gGstarMod.getOrderFactorization().intValue());
 
-console.log(gGstarMod.__proto__.constructor.name);
-console.log(gGstarMod.__proto__.__proto__.constructor.name);
-console.log(gGstarMod.__proto__.__proto__.__proto__.constructor.name);
+// console.log(gGstarMod.__proto__.constructor.name);
+// console.log(gGstarMod.__proto__.__proto__.constructor.name);
+// console.log(gGstarMod.__proto__.__proto__.__proto__.constructor.name);
 
-var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(11);
-var el = new u.BigInteger(3);
-var gStarEl = gGstarMod.getElement(el);
+var e1 = new u.BigInteger(4);
+var gStarE1 = gGstarMod.getElement(e1);
+var e2 = new u.BigInteger(16);
+var gStarE2 = gGstarMod.getElement(e2);
+var gStarE3 = gStarE1.multiply(gStarE2);
+//todo
+//var gStarE3 = gStarE1.apply(gStarE2);
+console.log('Result: ' + gStarE3.getValue().intValue());

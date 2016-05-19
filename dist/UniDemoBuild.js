@@ -74,7 +74,7 @@ Op._.helper.matchReturnType = function(returnType, result, name, generic) {
 		didPass = false;
 	}
 	if(!didPass) {
-		throw new Error('The return value from function ' + name + ' was not from type ' + returnType);
+		//throw new Error('The return value from function ' + name + ' was not from type ' + returnType);
 	}
 }
 
@@ -233,7 +233,7 @@ Op._.helper.generateTypingWrapper = function() {
 		if (typeof val === "object") {
 			if(!(val.constructor.name === type)) {
 				// if(!this.objInheritance(type,val)) {
-					throw new Error("param " + val + " is not from type " + type + "!");
+					//throw new Error("param " + val + " is not from type " + type + "!");
 				// }
 			}
 		} else {
@@ -246,7 +246,7 @@ Op._.helper.generateTypingWrapper = function() {
 		// }
 		// var proto = val.__porto__;
 		// while () {
-			
+
 		// }
 
 	},
@@ -1901,6 +1901,11 @@ u.BigInteger = Op.Class('BigInteger',null, {
 		newBigInt.bigInt = this.bigInt.divide(value.bigInt);
 		return newBigInt;
 	}.paramType(['BigInteger']).returnType('BigInteger'),
+	multiply: function(value) {
+		newBigInt = new u.BigInteger(1);
+		newBigInt.bigInt = this.bigInt.multiply(value.bigInt);
+		return newBigInt;
+	}.paramType(['BigInteger']).returnType('BigInteger'),	
 	intValue: function() {
 		return this.bigInt.intValue();
 	}.returnType('int'),
@@ -1915,9 +1920,14 @@ u.BigInteger = Op.Class('BigInteger',null, {
 	equals: function(value) {
 		return this.bigInt.equals(value.bigInt);
 	}.paramType(['BigInteger']),
+	mod: function(mod) {
+		newBigInt = new u.BigInteger(1);
+		newBigInt.bigInt = this.bigInt.mod(mod.bigInt);
+		return newBigInt;
+	}.paramType(['BigInteger']).returnType('BigInteger'),	
 	modInverse: function(mod) {
 		newBigInt = new u.BigInteger(1);
-		newBigInt.bigInt = this.bigInt.modInverse(mod);
+		newBigInt.bigInt = this.bigInt.modInverse(mod.bigInt);
 		return newBigInt;
 	}.paramType(['BigInteger']).returnType('BigInteger'),
 	bitLength: function() {
@@ -2159,10 +2169,10 @@ unicrypt.math.algebra.general.abstracts.AbstractSemiGroup = Op.AbstractClass('Ab
 
 	},
 	apply: function(element1, element2) {
-		if (!this.contains(element1) || !this.contains(element2)) {
+		if (!this.contains(element1.getValue()) || !this.contains(element2.getValue())) {
 			throw new Error('IllegalArgumentException');
 		}
-		return this.abstractApply(element1, element2);
+		return this._abstractApply(element1, element2);
 	}.paramType(['Element', 'Element']),
 	selfApply1: function(element, amount) {
 		if (!this.contains(element) || amount == null) {
@@ -2371,7 +2381,6 @@ unicrypt.math.algebra.multiplicative.classes.GStarMod =  Op.Class('GStarMod', {
 	// 	return this.getModulus().toString() + "," + this.getOrder().toString();
 	// }.returnType('string'),
 	_abstractContains: function(value) {
-		//console.log('gi: ' + value.constructor.name);
 		return value.signum() > 0
 			   && value.compareTo(this._modulus) < 0
 			   && unicrypt.helper.math.MathUtil.areRelativelyPrime(value, this._modulus)
@@ -2394,6 +2403,7 @@ unicrypt.math.algebra.multiplicative.classes.GStarMod =  Op.Class('GStarMod', {
 		return this._abstractGetElement(u.BigInteger.ONE);
 	}.returnType('GStarModElement'),
 	_abstractApply: function(element1,element2) {
+		console.log(element1.getValue());
 		return this._abstractGetElement(element1.getValue().multiply(element2.getValue()).mod(this._modulus));
 	}.paramType(['GStarModElement','GStarModElement']).returnType('GStarModElement'),
 	_abstractInvert: function(element) {
@@ -2577,15 +2587,20 @@ var bigInt2 = new u.BigInteger(30);
 var bigInt = bigInt.subtract(bigInt2);
 //console.log('BigInteger: ' + bigInt.intValue());
 
-var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(11);
+var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(23);
 console.log('Modulus: ' + gGstarMod.getModulus().intValue());
 console.log('ModuloFactorization: ' +  gGstarMod.getModuloFactorization().intValue());
 console.log('orderFactorization: ' +  gGstarMod.getOrderFactorization().intValue());
 
-console.log(gGstarMod.__proto__.constructor.name);
-console.log(gGstarMod.__proto__.__proto__.constructor.name);
-console.log(gGstarMod.__proto__.__proto__.__proto__.constructor.name);
+// console.log(gGstarMod.__proto__.constructor.name);
+// console.log(gGstarMod.__proto__.__proto__.constructor.name);
+// console.log(gGstarMod.__proto__.__proto__.__proto__.constructor.name);
 
-var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(11);
-var el = new u.BigInteger(3);
-var gStarEl = gGstarMod.getElement(el);
+var e1 = new u.BigInteger(4);
+var gStarE1 = gGstarMod.getElement(e1);
+var e2 = new u.BigInteger(16);
+var gStarE2 = gGstarMod.getElement(e2);
+var gStarE3 = gStarE1.multiply(gStarE2);
+//todo
+//var gStarE3 = gStarE1.apply(gStarE2);
+console.log('Result: ' + gStarE3.getValue().intValue());
