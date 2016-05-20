@@ -616,7 +616,7 @@ genericClass1.genericFunction('10','10');
             ]
         },{
             genericFunction: function(gen1, gen2) {
-                return gen2 + " " + gen1;
+                 return gen2 + " " + gen1;
             }.paramType(['T','V'])
         });
         GenericClass2 = Op.Class('GenericClass2', {
@@ -800,28 +800,48 @@ Underline für Private Convention
 //var result = baseClass.func(10);
 //console.log(result);
 
-var Class1 = Op.Class('Class1', null, {
-	init: function(val) {
-		console.log(val);
-	},
-});
+// var Class1 = Op.Class('Class1', null, {
+// 	init: function(val) {
+// 		console.log(val);
+// 	},
+// });
 
 
-var Class2 = Op.Class('Class2', {
-	'extends': Class1
-}, {
-	init: function(val) {
-		this.$$super(val);
-	}
-});
+// var Class2 = Op.Class('Class2', {
+// 	'extends': Class1
+// }, {
+// 	init: function(val) {
+// 		this.$$super(val);
+// 	}
+// });
 
-var Class3 = Op.Class('Class3', {
-	'extends': Class2
-}, {
-	init: function(val) {
-		this.$$super(val);
-	}
-});
+// var Class3 = Op.Class('Class3', {
+// 	'extends': Class2
+// }, {
+// 	init: function(val) {
+// 		this.$$super(val);
+// 	}
+// });
 
 
-var class3 = new Class3('hll');
+// var class3 = new Class3('hll');
+
+// var Class4 = Op.Class('Class4', {
+
+// },{
+// 	func: function(class1) {
+
+// 	}.paramType(['Class1'])
+// });
+
+// var Class5 = Op.Class('Class5', null, {
+// 	init: function(val) {
+// 		console.log(val);
+// 	},
+// });
+
+
+// var class4 = new Class4();
+// var class5 = new Class5();
+// class4.func(class3);
+// class4.func(class5);

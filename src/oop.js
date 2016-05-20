@@ -73,7 +73,7 @@ Op._.helper.matchReturnType = function(returnType, result, name, generic) {
 		didPass = false;
 	}
 	if(!didPass) {
-		//throw new Error('The return value from function ' + name + ' was not from type ' + returnType);
+		throw new Error('The return value from function ' + name + ' was not from type ' + returnType);
 	}
 }
 
@@ -231,23 +231,23 @@ Op._.helper.generateTypingWrapper = function() {
 	obj: function(type, val) {
 		if (typeof val === "object") {
 			if(!(val.constructor.name === type)) {
-				// if(!this.objInheritance(type,val)) {
-					//throw new Error("param " + val + " is not from type " + type + "!");
-				// }
+				if(!this.objInheritance(type,val)) {
+					throw new Error("param " + val + " is not from type " + type + "!");
+				}
 			}
 		} else {
 			throw new Error("param " + val + " is not an object!");
 		}
 	},
 	objInheritance: function(type, val) {
-		// if(!val.hasOwnProperty(__porto__)) {
-		// 	return false;
-		// }
-		// var proto = val.__porto__;
-		// while () {
-
-		// }
-
+		var proto = val.__proto__;
+		while (proto !== null) {
+			if(proto.constructor.name === type) {
+				return true;
+			}
+			proto = proto.__proto__;
+		}
+		return false
 	},
 	generic: function(type, generic, val) {
 		if(generic.hasOwnProperty(type)) {
@@ -392,7 +392,7 @@ Op.Class = function() {
 		}
 		var args = Array.prototype.slice.call(arguments);
 		//Generic Handling
-		if(this._superIteration_ === 0  && this._isGeneric_) {
+		if(!this._isCalledFromSuper_  && this._isGeneric_) {
 			var genericDec = this._generic_;
 			this._generic_ = {};
 			var genericDef = args[0];
@@ -462,6 +462,7 @@ Op.Class = function() {
 		newClass.prototype.$$super = function() {
 			//baseClass.apply(this, arguments);
 			this._superIteration_ -= 1;
+			this._isCalledFromSuper_ = true;
 			this._inheritanceChain_[this._superIteration_].apply(this, arguments);
 		}
 		var oldObj = baseClass.prototype._objPreserve_;
@@ -587,6 +588,8 @@ Op.Class = function() {
 
 	//Super called counter
 	newClass.prototype._superIteration_ = inheritanceChain.length;
+	//Called from Super
+	newClass.prototype._isCalledFromSuper_ = false;
 	// Inheritance Chain for Super constructor
 	newClass.prototype._inheritanceChain_ = inheritanceChain;
 	//Simplify static access

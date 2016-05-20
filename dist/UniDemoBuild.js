@@ -74,7 +74,7 @@ Op._.helper.matchReturnType = function(returnType, result, name, generic) {
 		didPass = false;
 	}
 	if(!didPass) {
-		//throw new Error('The return value from function ' + name + ' was not from type ' + returnType);
+		throw new Error('The return value from function ' + name + ' was not from type ' + returnType);
 	}
 }
 
@@ -232,23 +232,23 @@ Op._.helper.generateTypingWrapper = function() {
 	obj: function(type, val) {
 		if (typeof val === "object") {
 			if(!(val.constructor.name === type)) {
-				// if(!this.objInheritance(type,val)) {
-					//throw new Error("param " + val + " is not from type " + type + "!");
-				// }
+				if(!this.objInheritance(type,val)) {
+					throw new Error("param " + val + " is not from type " + type + "!");
+				}
 			}
 		} else {
 			throw new Error("param " + val + " is not an object!");
 		}
 	},
 	objInheritance: function(type, val) {
-		// if(!val.hasOwnProperty(__porto__)) {
-		// 	return false;
-		// }
-		// var proto = val.__porto__;
-		// while () {
-
-		// }
-
+		var proto = val.__proto__;
+		while (proto !== null) {
+			if(proto.constructor.name === type) {
+				return true;
+			}
+			proto = proto.__proto__;
+		}
+		return false
 	},
 	generic: function(type, generic, val) {
 		if(generic.hasOwnProperty(type)) {
@@ -393,21 +393,24 @@ Op.Class = function() {
 		}
 		var args = Array.prototype.slice.call(arguments);
 		//Generic Handling
-		if(this._superIteration_ === 0  && this._isGeneric_) {
-			var genericDec = this._generic_;
-			this._generic_ = {};
-			var genericDef = args[0];
-			if(!Array.isArray(genericDef)) {
-				throw new Error('Generic classes need to be typed as a first arguement!');
-			}
-			if(genericDef.length ==! this._generic_.length) {
-				throw new Error('Generic parameter missmatch!');
-			}
-			for(var i = 0; i < genericDec.length; i++) {
-				var genType = genericDec[i];
-				if(typeof genType === 'string') {
-					this._generic_[genType] = genericDef[i];
+		if(this._isGeneric_) {
+			if(!this._isCalledFromSuper_ ) {
+				var genericDec = this._generic_;
+				this._generic_ = {};
+				var genericDef = args[0];
+				if(!Array.isArray(genericDef)) {
+					throw new Error('Generic classes need to be typed as a first arguement!');
 				}
+				if(genericDef.length ==! this._generic_.length) {
+					throw new Error('Generic parameter missmatch!');
+				}
+				for(var i = 0; i < genericDec.length; i++) {
+					var genType = genericDec[i];
+					if(typeof genType === 'string') {
+						this._generic_[genType] = genericDef[i];
+					}
+				}				
+				args.shift();
 			}
 			//var tempArrayGeneric = [];
 			var extendObjGenericTemp = this._extendObjGeneric_;
@@ -430,7 +433,6 @@ Op.Class = function() {
 					}
 				}
 			}
-			args.shift();
 		} 
 		//Tests the typing
 		var paramType = obj.init.prototype._paramType_;
@@ -463,6 +465,7 @@ Op.Class = function() {
 		newClass.prototype.$$super = function() {
 			//baseClass.apply(this, arguments);
 			this._superIteration_ -= 1;
+			this._isCalledFromSuper_ = true;
 			this._inheritanceChain_[this._superIteration_].apply(this, arguments);
 		}
 		var oldObj = baseClass.prototype._objPreserve_;
@@ -588,6 +591,8 @@ Op.Class = function() {
 
 	//Super called counter
 	newClass.prototype._superIteration_ = inheritanceChain.length;
+	//Called from Super
+	newClass.prototype._isCalledFromSuper_ = false;
 	// Inheritance Chain for Super constructor
 	newClass.prototype._inheritanceChain_ = inheritanceChain;
 	//Simplify static access
@@ -2403,7 +2408,6 @@ unicrypt.math.algebra.multiplicative.classes.GStarMod =  Op.Class('GStarMod', {
 		return this._abstractGetElement(u.BigInteger.ONE);
 	}.returnType('GStarModElement'),
 	_abstractApply: function(element1,element2) {
-		console.log(element1.getValue());
 		return this._abstractGetElement(element1.getValue().multiply(element2.getValue()).mod(this._modulus));
 	}.paramType(['GStarModElement','GStarModElement']).returnType('GStarModElement'),
 	_abstractInvert: function(element) {
@@ -2510,7 +2514,7 @@ unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime = Op.Class('GStar
 		//instances: null
 	}
 });
-unicrypt.math.algebra.general.abstracts.AbstractElement = Op.AbstractClass('AbstractElement', {
+unicrypt.math.algebra.general.abstracts.AbstractElement = Op.AbstractClass('Element', {
 	'generic': [
 		'S', 'E', 'V'
 	],
@@ -2563,9 +2567,7 @@ unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeElement = O
  unicrypt.math.algebra.multiplicative.classes.GStarModElement = Op.Class('GStarModElement', {
 	'extends': {
 		'class' : unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeElement,
-		'generic': [
-			'GStarMod', 'GStarModElement', 'BigInteger'
-		]
+		'generic': ['GStarMod', 'GStarModElement', 'BigInteger']
 	}
 },{
 	init: function(gStarMod, value) {

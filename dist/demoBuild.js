@@ -1449,11 +1449,23 @@ Op._.helper.generateTypingWrapper = function() {
 	obj: function(type, val) {
 		if (typeof val === "object") {
 			if(!(val.constructor.name === type)) {
-				throw new Error("param " + val + " is not from type " + type + "!");
+				if(!this.objInheritance(type,val)) {
+					throw new Error("param " + val + " is not from type " + type + "!");
+				}
 			}
 		} else {
 			throw new Error("param " + val + " is not an object!");
 		}
+	},
+	objInheritance: function(type, val) {
+		var proto = val.__proto__;
+		while (proto !== null) {
+			if(proto.constructor.name === type) {
+				return true;
+			}
+			proto = proto.__proto__;
+		}
+		return false
 	},
 	generic: function(type, generic, val) {
 		if(generic.hasOwnProperty(type)) {
@@ -1554,7 +1566,7 @@ Op.Class = function() {
 			//baseClass.prototype = extendsOptionSpec['class'].prototype;
 			extendObjGeneric = extendsOptionSpec['generic'];
 		} else {
-			throw new Error('Unknown extends format ' + typeof extendObjGeneric + ' in ' + className + '!');
+			//throw new Error('Unknown extends format ' + typeof extendObjGeneric + ' in ' + className + '!');
 		}
 		
 	}
@@ -1598,11 +1610,10 @@ Op.Class = function() {
 		}
 		var args = Array.prototype.slice.call(arguments);
 		//Generic Handling
-		if(this._superIteration_ === 0  && this._isGeneric_) {
+		if(!this._isCalledFromSuper_  && this._isGeneric_) {
 			var genericDec = this._generic_;
 			this._generic_ = {};
 			var genericDef = args[0];
-			console.log('bu: ' + arguments[0] + 'BaseClass: ' + this.constructor.name);
 			if(!Array.isArray(genericDef)) {
 				throw new Error('Generic classes need to be typed as a first arguement!');
 			}
@@ -1668,9 +1679,9 @@ Op.Class = function() {
 		// call the constructor of the baseClass
 		newClass.prototype.$$super = function() {
 			//baseClass.apply(this, arguments);
-			this._superIteration_ += 1;
-			this._inheritanceChain_[this._superIteration_ - 1].apply(this, arguments);
-			console.log(this._inheritanceChain_);
+			this._superIteration_ -= 1;
+			this._isCalledFromSuper_ = true;
+			this._inheritanceChain_[this._superIteration_].apply(this, arguments);
 		}
 		var oldObj = baseClass.prototype._objPreserve_;
 		for(var prop in oldObj) {
@@ -1794,7 +1805,9 @@ Op.Class = function() {
 	}
 
 	//Super called counter
-	newClass.prototype._superIteration_ = 0;
+	newClass.prototype._superIteration_ = inheritanceChain.length;
+	//Called from Super
+	newClass.prototype._isCalledFromSuper_ = false;
 	// Inheritance Chain for Super constructor
 	newClass.prototype._inheritanceChain_ = inheritanceChain;
 	//Simplify static access
@@ -2487,6 +2500,8 @@ genericClass1.genericFunction('10','10');
             ]
         },{
             genericFunction: function(gen1, gen2) {
+            	console.log('generic: ');
+            	printConsoleObj(this._generic_);
                 return gen2 + " " + gen1;
             }.paramType(['T','V'])
         });
@@ -2671,28 +2686,48 @@ Underline für Private Convention
 //var result = baseClass.func(10);
 //console.log(result);
 
-var Class1 = Op.Class('Class1', null, {
-	init: function(val) {
-		console.log(val);
-	}
-});
+// var Class1 = Op.Class('Class1', null, {
+// 	init: function(val) {
+// 		console.log(val);
+// 	},
+// });
 
 
-var Class2 = Op.Class('Class2', {
-	'extends': Class1
-}, {
-	init: function(val) {
-		this.$$super(val);
-	}
-});
+// var Class2 = Op.Class('Class2', {
+// 	'extends': Class1
+// }, {
+// 	init: function(val) {
+// 		this.$$super(val);
+// 	}
+// });
 
-var Class3 = Op.Class('Class3', {
-	'extends': Class2
-}, {
-	init: function(val) {
-		this.$$super(val);
-	}
-});
+// var Class3 = Op.Class('Class3', {
+// 	'extends': Class2
+// }, {
+// 	init: function(val) {
+// 		this.$$super(val);
+// 	}
+// });
 
 
-var class3 = new Class3('hll');
+// var class3 = new Class3('hll');
+
+// var Class4 = Op.Class('Class4', {
+
+// },{
+// 	func: function(class1) {
+
+// 	}.paramType(['Class1'])
+// });
+
+// var Class5 = Op.Class('Class5', null, {
+// 	init: function(val) {
+// 		console.log(val);
+// 	},
+// });
+
+
+// var class4 = new Class4();
+// var class5 = new Class5();
+// class4.func(class3);
+// class4.func(class5);
