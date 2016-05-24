@@ -18,15 +18,15 @@ unicrypt.math.algebra.general.abstracts.AbstractSet = Op.AbstractClass('Abstract
 	init: function(valueClass) {
 		this._valueClass = valueClass;
 	},
-	// isSemiGroup: function() {
-	// 	 return this instanceof SemiGroup;
-	// }.returnType('boolean'),
+	isSemiGroup: function() {
+		 return this instanceof unicrypt.math.algebra.general.abstracts.AbstractSemiGroup;
+	}.returnType('boolean'),
 	// isMonoid: function() {
 	// 	 return this instanceof Monoid;
 	// }.returnType('boolean'),
-	// isGroup: function() {
-	// 	 return this instanceof Group;
-	// }.returnType('boolean'),
+	isGroup: function() {
+		 return this instanceof unicrypt.math.algebra.general.abstracts.AbstractGroup;
+	}.returnType('boolean'),
 	// isSemiRing: function() {
 	// 	 return this instanceof SemiRing;
 	// }.returnType('boolean'),
@@ -36,9 +36,9 @@ unicrypt.math.algebra.general.abstracts.AbstractSet = Op.AbstractClass('Abstract
 	// isField: function() {
 	// 	 return this instanceof Field;
 	// }.returnType('boolean'),
-	// isCyclic: function() {
-	// 	 return this instanceof CyclicGroup;
-	// }.returnType('boolean'),
+	isCyclic: function() {
+		 return this instanceof unicrypt.math.algebra.general.abstracts.AbstractCyclicGroup;
+	}.returnType('boolean'),
 	// isAdditive: function() {
 	// 	 return this instanceof AdditiveSemiGroup;
 	// }.returnType('boolean'),

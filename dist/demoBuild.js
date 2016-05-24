@@ -1291,7 +1291,7 @@ Op._.helper.matchReturnType = function(returnType, result, name, generic) {
 		didPass = false;
 	}
 	if(!didPass) {
-		throw new Error('The return value from function ' + name + ' was not from type ' + returnType);
+		throw new Error('The return value ' + result + ' from function ' + name + ' was not from type ' + returnType);
 	}
 }
 
@@ -1610,22 +1610,28 @@ Op.Class = function() {
 		}
 		var args = Array.prototype.slice.call(arguments);
 		//Generic Handling
-		if(!this._isCalledFromSuper_  && this._isGeneric_) {
-			var genericDec = this._generic_;
-			this._generic_ = {};
-			var genericDef = args[0];
-			if(!Array.isArray(genericDef)) {
-				throw new Error('Generic classes need to be typed as a first arguement!');
-			}
-			if(genericDef.length ==! this._generic_.length) {
-				throw new Error('Generic parameter missmatch!');
-			}
-			for(var i = 0; i < genericDec.length; i++) {
-				var genType = genericDec[i];
-				if(typeof genType === 'string') {
-					this._generic_[genType] = genericDef[i];
+		if(!this._isCalledFromSuper_) {
+			if(this._isGeneric_) {
+				var genericDec = this._generic_;
+				this._generic_ = {};
+				var genericDef = args[0];
+				if(!Array.isArray(genericDef)) {
+					throw new Error('Generic classes need to be typed as a first arguement!');
 				}
+				if(genericDef.length ==! this._generic_.length) {
+					throw new Error('Generic parameter missmatch!');
+				}
+				for(var i = 0; i < genericDec.length; i++) {
+					var genType = genericDec[i];
+					if(typeof genType === 'string') {
+						this._generic_[genType] = genericDef[i];
+					}
+				}
+				args.shift();
+			} else {
+				this._generic_ = {};
 			}
+		}	
 			//var tempArrayGeneric = [];
 			var extendObjGenericTemp = this._extendObjGeneric_;
 			if(Array.isArray(extendObjGenericTemp)) {
@@ -1647,24 +1653,23 @@ Op.Class = function() {
 					}
 				}
 			}
-			args.shift();
-		} 
-		//Tests the typing
-		var paramType = obj.init.prototype._paramType_;
-		if(Array.isArray(paramType)) {
-			Op._.helper.matchParamsArgs(paramType, args);
-		}
-		if(!this._initializedProps_){
-			//assign all instance variables
-			for(var prop in obj) {
-				if(!(['init', 'static','_init'].indexOf(prop) >= 0)) {
-					if(['number', 'boolean', 'string', 'object'].indexOf(typeof obj[prop]) >= 0) {
-						this[prop] = obj[prop];
+			
+			//Tests the typing
+			var paramType = obj.init.prototype._paramType_;
+			if(Array.isArray(paramType)) {
+				Op._.helper.matchParamsArgs(paramType, args);
+			}
+			if(!this._initializedProps_){
+				//assign all instance variables
+				for(var prop in obj) {
+					if(!(['init', 'static','_init'].indexOf(prop) >= 0)) {
+						if(['number', 'boolean', 'string', 'object'].indexOf(typeof obj[prop]) >= 0) {
+							this[prop] = obj[prop];
+						}
 					}
 				}
+				this._initializedProps_ = true;
 			}
-			this._initializedProps_ = true;
-		}
 		//execute the defined init function, as the oop constructor
 		obj.init.apply(this, args);
 	}
@@ -2500,9 +2505,7 @@ genericClass1.genericFunction('10','10');
             ]
         },{
             genericFunction: function(gen1, gen2) {
-            	console.log('generic: ');
-            	printConsoleObj(this._generic_);
-                return gen2 + " " + gen1;
+                 return gen2 + " " + gen1;
             }.paramType(['T','V'])
         });
         GenericClass2 = Op.Class('GenericClass2', {
@@ -2731,3 +2734,42 @@ Underline für Private Convention
 // var class5 = new Class5();
 // class4.func(class3);
 // class4.func(class5);
+
+
+var Class1 = Op.Class('Class1', {
+	'generic': ['E', 'V'],
+}, {
+	init: function(val) {
+		console.log(val);
+	},
+	testFunc: function(val) {
+		return 10;
+	}.returnType('V')
+});
+
+
+var Class2 = Op.Class('Class2', {
+	'generic': ['E', 'V'],
+	'extends': {
+		'class': Class1,
+		'generic': ['E', 'V']
+	}
+}, {
+	init: function(val) {
+		this.$$super(val);
+	}
+});
+
+var Class3 = Op.Class('Class3', {
+	'extends': {
+		'class': Class2,
+		'generic': ['string', 'int']
+	}
+}, {
+	init: function(val) {
+		this.$$super(val);
+	}
+});
+
+var class3 = new Class3(10);
+class3.testFunc(10);

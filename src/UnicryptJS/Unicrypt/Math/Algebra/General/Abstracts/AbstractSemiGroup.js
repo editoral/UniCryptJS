@@ -9,8 +9,8 @@ unicrypt.math.algebra.general.abstracts.AbstractSemiGroup = Op.AbstractClass('Ab
 		]
 	}
 },{
-	_init: function() {
-
+	_init: function(valueClass) {
+		this.$$super(valueClass);
 	},
 	apply: function(element1, element2) {
 		if (!this.contains(element1.getValue()) || !this.contains(element2.getValue())) {

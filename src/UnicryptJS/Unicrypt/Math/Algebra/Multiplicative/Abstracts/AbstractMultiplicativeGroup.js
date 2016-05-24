@@ -1,7 +1,7 @@
-unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeCyclicGroup = Op.AbstractClass('AbstractMultiplicativeCyclicGroup', {
+unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeGroup = Op.AbstractClass('AbstractMultiplicativeGroup', {
 	'generic': ['E', 'V'],
 	'extends': {
-		'class': unicrypt.math.algebra.general.abstracts.AbstractCyclicGroup,
+		'class': unicrypt.math.algebra.general.abstracts.AbstractGroup,
 		'generic': ['E', 'V']
 	}
 },{

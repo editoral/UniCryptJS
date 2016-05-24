@@ -74,7 +74,7 @@ Op._.helper.matchReturnType = function(returnType, result, name, generic) {
 		didPass = false;
 	}
 	if(!didPass) {
-		throw new Error('The return value from function ' + name + ' was not from type ' + returnType);
+		throw new Error('The return value ' + result + ' from function ' + name + ' was not from type ' + returnType);
 	}
 }
 
@@ -393,8 +393,8 @@ Op.Class = function() {
 		}
 		var args = Array.prototype.slice.call(arguments);
 		//Generic Handling
-		if(this._isGeneric_) {
-			if(!this._isCalledFromSuper_ ) {
+		if(!this._isCalledFromSuper_) {
+			if(this._isGeneric_) {
 				var genericDec = this._generic_;
 				this._generic_ = {};
 				var genericDef = args[0];
@@ -409,9 +409,12 @@ Op.Class = function() {
 					if(typeof genType === 'string') {
 						this._generic_[genType] = genericDef[i];
 					}
-				}				
+				}
 				args.shift();
+			} else {
+				this._generic_ = {};
 			}
+
 			//var tempArrayGeneric = [];
 			var extendObjGenericTemp = this._extendObjGeneric_;
 			if(Array.isArray(extendObjGenericTemp)) {
@@ -433,22 +436,23 @@ Op.Class = function() {
 					}
 				}
 			}
-		} 
-		//Tests the typing
-		var paramType = obj.init.prototype._paramType_;
-		if(Array.isArray(paramType)) {
-			Op._.helper.matchParamsArgs(paramType, args);
-		}
-		if(!this._initializedProps_){
-			//assign all instance variables
-			for(var prop in obj) {
-				if(!(['init', 'static','_init'].indexOf(prop) >= 0)) {
-					if(['number', 'boolean', 'string', 'object'].indexOf(typeof obj[prop]) >= 0) {
-						this[prop] = obj[prop];
+			
+			//Tests the typing
+			var paramType = obj.init.prototype._paramType_;
+			if(Array.isArray(paramType)) {
+				Op._.helper.matchParamsArgs(paramType, args);
+			}
+			if(!this._initializedProps_){
+				//assign all instance variables
+				for(var prop in obj) {
+					if(!(['init', 'static','_init'].indexOf(prop) >= 0)) {
+						if(['number', 'boolean', 'string', 'object'].indexOf(typeof obj[prop]) >= 0) {
+							this[prop] = obj[prop];
+						}
 					}
 				}
+				this._initializedProps_ = true;
 			}
-			this._initializedProps_ = true;
 		}
 		//execute the defined init function, as the oop constructor
 		obj.init.apply(this, args);
@@ -2019,15 +2023,15 @@ unicrypt.math.algebra.general.abstracts.AbstractSet = Op.AbstractClass('Abstract
 	init: function(valueClass) {
 		this._valueClass = valueClass;
 	},
-	// isSemiGroup: function() {
-	// 	 return this instanceof SemiGroup;
-	// }.returnType('boolean'),
+	isSemiGroup: function() {
+		 return this instanceof unicrypt.math.algebra.general.abstracts.AbstractSemiGroup;
+	}.returnType('boolean'),
 	// isMonoid: function() {
 	// 	 return this instanceof Monoid;
 	// }.returnType('boolean'),
-	// isGroup: function() {
-	// 	 return this instanceof Group;
-	// }.returnType('boolean'),
+	isGroup: function() {
+		 return this instanceof unicrypt.math.algebra.general.abstracts.AbstractGroup;
+	}.returnType('boolean'),
 	// isSemiRing: function() {
 	// 	 return this instanceof SemiRing;
 	// }.returnType('boolean'),
@@ -2037,9 +2041,9 @@ unicrypt.math.algebra.general.abstracts.AbstractSet = Op.AbstractClass('Abstract
 	// isField: function() {
 	// 	 return this instanceof Field;
 	// }.returnType('boolean'),
-	// isCyclic: function() {
-	// 	 return this instanceof CyclicGroup;
-	// }.returnType('boolean'),
+	isCyclic: function() {
+		 return this instanceof unicrypt.math.algebra.general.abstracts.AbstractCyclicGroup;
+	}.returnType('boolean'),
 	// isAdditive: function() {
 	// 	 return this instanceof AdditiveSemiGroup;
 	// }.returnType('boolean'),
@@ -2170,8 +2174,8 @@ unicrypt.math.algebra.general.abstracts.AbstractSemiGroup = Op.AbstractClass('Ab
 		]
 	}
 },{
-	_init: function() {
-
+	_init: function(valueClass) {
+		this.$$super(valueClass);
 	},
 	apply: function(element1, element2) {
 		if (!this.contains(element1.getValue()) || !this.contains(element2.getValue())) {
@@ -2201,27 +2205,21 @@ unicrypt.math.algebra.general.abstracts.AbstractSemiGroup = Op.AbstractClass('Ab
 
 });
 unicrypt.math.algebra.general.abstracts.AbstractMonoid = Op.AbstractClass('AbstractMonoid', {
-	'generic': [
-		'E', 'V'
-	],
+	'generic': ['E', 'V'],
 	'extends': {
 		'class': unicrypt.math.algebra.general.abstracts.AbstractSemiGroup,
-		'generic': [
-			'E','V'
-		]
+		'generic': ['E','V']
 	}
 },{
-	
+	_init: function(valueClass) {
+		this.$$super(valueClass);
+	},	
 });
 unicrypt.math.algebra.general.abstracts.AbstractGroup = Op.AbstractClass('AbstractGroup', {
-	'generic': [
-		'E', 'V'
-	],
+	'generic': ['E', 'V'],
 	'extends': {
 		'class': unicrypt.math.algebra.general.abstracts.AbstractMonoid,
-		'generic': [
-			'E','V'
-		]
+		'generic': ['E','V']
 	}
 },{
 	_init: function(valueClass) {
@@ -2259,14 +2257,10 @@ unicrypt.math.algebra.general.abstracts.AbstractGroup = Op.AbstractClass('Abstra
 	},
 });
 unicrypt.math.algebra.general.abstracts.AbstractCyclicGroup = Op.AbstractClass('AbstractCyclicGroup', {
-	'generic': [
-		'E', 'V'
-	],
+	'generic': ['E', 'V'],
 	'extends': {
 		'class': unicrypt.math.algebra.general.abstracts.AbstractGroup,
-		'generic': [
-			'E','V'
-		]
+		'generic': ['E', 'V']
 	}
 },{
 	_defaultGenerator: null,
@@ -2288,14 +2282,10 @@ unicrypt.math.algebra.general.abstracts.AbstractCyclicGroup = Op.AbstractClass('
 	}.paramType(['Element']).returnType('boolean'),
 });
 unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeCyclicGroup = Op.AbstractClass('AbstractMultiplicativeCyclicGroup', {
-	'generic': [
-		'E', 'V'
-	],
+	'generic': ['E', 'V'],
 	'extends': {
 		'class': unicrypt.math.algebra.general.abstracts.AbstractCyclicGroup,
-		'generic': [
-			'E','V'
-		]
+		'generic': ['E', 'V']
 	}
 },{
 	_init: function(valueClass) {
@@ -2303,7 +2293,7 @@ unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeCyclicGroup
 	},
 	multiply: function(element1, element2) {
 		return this.apply(element1, element2);
-	}.paramType(['Element', 'Element']).returnType('E'),
+	}.paramType(['Element', 'Element']),//.returnType('E'),
 	// multiply2: function() {
 
 	// }.paramType(['']).returnType(''),
@@ -2341,8 +2331,8 @@ unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeCyclicGroup
 });
 unicrypt.math.algebra.multiplicative.classes.GStarMod =  Op.Class('GStarMod', {
 	'extends': {
-		'class': unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeCyclicGroup,
-		'generic': ['GStarModElement', 'BigInteger']
+		'class' : unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeCyclicGroup,
+		'generic' : ['GStarModElement', 'BigInteger']
 	}
 },{
 	_modulus: null,
@@ -2515,9 +2505,7 @@ unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime = Op.Class('GStar
 	}
 });
 unicrypt.math.algebra.general.abstracts.AbstractElement = Op.AbstractClass('Element', {
-	'generic': [
-		'S', 'E', 'V'
-	],
+	'generic': ['S', 'E', 'V'],
 	'extends': unicrypt.UniCrypt
 },{
 	set: null,
@@ -2531,17 +2519,46 @@ unicrypt.math.algebra.general.abstracts.AbstractElement = Op.AbstractClass('Elem
 	},
 	getValue: function() {
 		return this.value;
-	}
+	},
+	apply: function(element) {
+		if (this.set.isSemiGroup()) {
+			var semiGroup = this.set;
+			return semiGroup.apply(this, element);
+		} else {
+			throw new Error('UnsupportedOperationException');
+		}
+	}.paramType(['Element']).returnType('E'),
+	applyInverse: function(amount) {
+		if (this.set.isSemiGroup()) {
+			var semiGroup = this.set;
+			return semiGroup.selfApply(this, amount);
+		} else {
+			throw new Error('UnsupportedOperationException');
+		}
+	}.paramType(['BigInteger']).returnType('E'),
+	selfApply: function(amount) {
+		if (this.set.isSemiGroup()) {
+			var semiGroup = this.set;
+			return semiGroup.selfApply(this, amount);
+		} else {
+			throw new Error('UnsupportedOperationException');
+		}
+	}.paramType(['BigInteger']).returnType('E'),
+	isGenerator: function() {
+		if (this.set.isCyclic()) {
+			var cyclicGroup = this.set;
+			return cyclicGroup.isGenerator(this);
+		} else {
+			throw new Error('UnsupportedOperationException');
+		}		
+	}.returnType('boolean')
+
 });
 unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeElement = Op.AbstractClass('AbstractMultiplicativeElement', {
-	'generic': [
-		'S', 'E', 'V'
-	],
+	'generic': ['S', 'E', 'V'],
 	'extends': {
 		'class': unicrypt.math.algebra.general.abstracts.AbstractElement,
-		'generic': [
-			'S', 'E','V'
-		]
+		'generic': ['S', 'E', 'V']
 	}
 },{
 	_init: function(semiGroup, value) {
@@ -2602,7 +2619,7 @@ var e1 = new u.BigInteger(4);
 var gStarE1 = gGstarMod.getElement(e1);
 var e2 = new u.BigInteger(16);
 var gStarE2 = gGstarMod.getElement(e2);
-var gStarE3 = gStarE1.multiply(gStarE2);
+var gStarE3 = gStarE1.apply(gStarE2);
 //todo
 //var gStarE3 = gStarE1.apply(gStarE2);
 console.log('Result: ' + gStarE3.getValue().intValue());

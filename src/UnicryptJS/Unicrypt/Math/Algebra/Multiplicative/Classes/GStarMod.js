@@ -1,7 +1,7 @@
 unicrypt.math.algebra.multiplicative.classes.GStarMod =  Op.Class('GStarMod', {
 	'extends': {
-		'class': unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeCyclicGroup,
-		'generic': ['GStarModElement', 'BigInteger']
+		'class' : unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeCyclicGroup,
+		'generic' : ['GStarModElement', 'BigInteger']
 	}
 },{
 	_modulus: null,

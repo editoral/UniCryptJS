@@ -26,7 +26,7 @@ var e1 = new u.BigInteger(4);
 var gStarE1 = gGstarMod.getElement(e1);
 var e2 = new u.BigInteger(16);
 var gStarE2 = gGstarMod.getElement(e2);
-var gStarE3 = gStarE1.multiply(gStarE2);
+var gStarE3 = gStarE1.apply(gStarE2);
 //todo
 //var gStarE3 = gStarE1.apply(gStarE2);
 console.log('Result: ' + gStarE3.getValue().intValue());

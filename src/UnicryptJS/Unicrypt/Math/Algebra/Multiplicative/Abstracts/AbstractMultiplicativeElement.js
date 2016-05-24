@@ -1,12 +1,8 @@
 unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeElement = Op.AbstractClass('AbstractMultiplicativeElement', {
-	'generic': [
-		'S', 'E', 'V'
-	],
+	'generic': ['S', 'E', 'V'],
 	'extends': {
 		'class': unicrypt.math.algebra.general.abstracts.AbstractElement,
-		'generic': [
-			'S', 'E','V'
-		]
+		'generic': ['S', 'E', 'V']
 	}
 },{
 	_init: function(semiGroup, value) {

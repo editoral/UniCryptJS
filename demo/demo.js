@@ -845,3 +845,42 @@ Underline für Private Convention
 // var class5 = new Class5();
 // class4.func(class3);
 // class4.func(class5);
+
+
+var Class1 = Op.Class('Class1', {
+	'generic': ['E', 'V'],
+}, {
+	init: function(val) {
+		console.log(val);
+	},
+	testFunc: function(val) {
+		return 10;
+	}.returnType('V')
+});
+
+
+var Class2 = Op.Class('Class2', {
+	'generic': ['E', 'V'],
+	'extends': {
+		'class': Class1,
+		'generic': ['E', 'V']
+	}
+}, {
+	init: function(val) {
+		this.$$super(val);
+	}
+});
+
+var Class3 = Op.Class('Class3', {
+	'extends': {
+		'class': Class2,
+		'generic': ['string', 'int']
+	}
+}, {
+	init: function(val) {
+		this.$$super(val);
+	}
+});
+
+var class3 = new Class3(10);
+class3.testFunc(10);
