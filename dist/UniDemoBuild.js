@@ -186,7 +186,7 @@ Op._.helper.generateTypingWrapper = function() {
 		//Execute the actual function
 		var result = execFuncIntern.apply(this, arguments);
 		if(intReturnType) {
-			//Op._.helper.matchReturnType(intReturnType, result, self.name, genericType);	
+			Op._.helper.matchReturnType(intReturnType, result, self.name, genericType);	
 		}
 		return result;
 	}
@@ -347,7 +347,6 @@ Op.Class = function() {
 			inheritanceChain = baseClass.prototype._inheritanceChain_.concat(newArr);
 			//baseClass.prototype = extendsOptionSpec['class'].prototype;
 			extendObjGeneric = extendsOptionSpec['generic'];
-			console.log(' Declare option generic ' + className + ' : '  + extendObjGeneric);
 		} else {
 			//throw new Error('Unknown extends format ' + typeof extendObjGeneric + ' in ' + className + '!');
 		}
@@ -414,33 +413,38 @@ Op.Class = function() {
 			} else {
 				this._generic_ = {};
 			}
-			console.log('Generic extended: ' + this.constructor.name + ' generic: ' + this._extendObjGeneric_);
 			
 			//var tempArrayGeneric = [];
-			var extendObjGenericTemp = this._extendObjGeneric_;
-			if(Array.isArray(extendObjGenericTemp)) {
-				console.log(this.constructor.name + ' objGenTemp : ' + extendObjGenericTemp);
-				//var baseClassGeneric = this._baseClass_.prototype._generic_;
-				var baseClassGeneric = this._baseClass_.prototype._generic_;
-				if(baseClassGeneric.length !== extendObjGenericTemp.length) {
-					throw new Error('Extends object does not specify the generic params of parent class!');
-				} 
-				for(var i = 0; i < extendObjGenericTemp.length; i++) {
-					var comparableObj = extendObjGenericTemp[i];
-					if(comparableObj.match(/^[A-Z]$/)) {
-						if(!this._generic_.hasOwnProperty(comparableObj)) {
-							throw new Error('Unknown generic Parameter in extends property!');
+
+
+			var proto = this.__proto__;
+			while (proto !== null) {
+				var extendObjGenericTemp = proto._extendObjGeneric_;
+				if(Array.isArray(extendObjGenericTemp)) {
+					//console.log('KKKK: ' + proto.constructor.name + ' objGenTemp : ' + extendObjGenericTemp);
+					//var baseClassGeneric = this._baseClass_.prototype._generic_;
+					if(proto.__proto__ !== null) {
+						var baseClassGeneric = proto.__proto__._generic_;
+						if(baseClassGeneric.length !== extendObjGenericTemp.length) {
+							throw new Error('Extends object does not specify the generic params of parent class!');
+						} 
+						for(var i = 0; i < extendObjGenericTemp.length; i++) {
+							var comparableObj = extendObjGenericTemp[i];
+							if(comparableObj.match(/^[A-Z]$/)) {
+								if(!proto._generic_.hasOwnProperty(comparableObj) && !(proto._generic_.indexOf(comparableObj) >= 0)) {
+									throw new Error('Unknown generic Parameter in extends property!');
+								}
+								//tempArrayGeneric.push(this._generic_[comparableObj])
+							} else {
+								this._generic_[baseClassGeneric[i]] = comparableObj;
+								//tempArrayGeneric.push(comparableObj);
+							}
 						}
-						//tempArrayGeneric.push(this._generic_[comparableObj])
-					} else {
-						this._generic_[baseClassGeneric[i]] = comparableObj;
-						//tempArrayGeneric.push(comparableObj);
 					}
 				}
+				proto = proto.__proto__;
 			}
-			
-			//console.log('Generic after inheritance extended: ' + this.constructor.name + ' ' + this._generic_);
-			printConsoleObj(this._generic_);
+
 			//Tests the typing
 			var paramType = obj.init.prototype._paramType_;
 			if(Array.isArray(paramType)) {
@@ -2341,8 +2345,7 @@ unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeCyclicGroup
 unicrypt.math.algebra.multiplicative.classes.GStarMod =  Op.Class('GStarMod', {
 	'extends': {
 		'class' : unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeCyclicGroup,
-		//'generic' : ['GStarModElement', 'BigInteger']
-		'generic': ['GStarMod', 'GStarModElement', 'BigInteger']
+		'generic' : ['GStarModElement', 'BigInteger']
 	}
 },{
 	_modulus: null,
