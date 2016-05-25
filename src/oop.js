@@ -58,9 +58,10 @@ Op._.helper = {}
 
 Op._.helper.matchParamsArgs = function(paramType, args, generic) {
 	if(paramType.length !== args.length) {
-		throw new Error("Number of parameter types and number of parameters missmatch!");
+		throw new Error("Number of parameter types and number of parameters missmatch! " + paramType.length + ' : ' + args.length);
 	}
 	for(var i = 0; i < paramType.length; i++) {
+		console.log('Parameter: ' + paramType[i] + ' ' + i + ' von ' + paramType.length);
 		Op._.typing.testTypes(paramType[i], args[i], generic);
 	}	
 }
@@ -108,6 +109,7 @@ Op._.helper.FunctionOverload.prototype.prepareOverloadedFunctions = function() {
 						executed = true;			
 					} catch(err) {
 						lastErrorMsg = err;
+						console.log(err);
 					}	
 				//}
 			}
@@ -181,12 +183,13 @@ Op._.helper.generateTypingWrapper = function() {
 		var intReturnType = self.prototype._returnType_;
 		var genericType = this._generic_;
 		if (Array.isArray(intParamType)) {
+			console.log('From TypingWrapper: ' + intParamType);
 			Op._.helper.matchParamsArgs(intParamType, arguments,genericType);
 		}
 		//Execute the actual function
 		var result = execFuncIntern.apply(this, arguments);
 		if(intReturnType) {
-			Op._.helper.matchReturnType(intReturnType, result, self.name, genericType);	
+			//Op._.helper.matchReturnType(intReturnType, result, self.name, genericType);	
 		}
 		return result;
 	}
@@ -232,9 +235,12 @@ Op._.helper.generateTypingWrapper = function() {
 		if (typeof val === "object") {
 			if(!(val.constructor.name === type)) {
 				if(!this.objInheritance(type,val)) {
+					console.log('From here: ' + type + ' ' + val.constructor.name);
 					throw new Error("param " + val + " is not from type " + type + "!");
 				}
+				console.log('From there: ' + type + ' ' + val.constructor.name);
 			}
+			console.log('From top: ' + type + ' ' + val.constructor.name);
 		} else {
 			throw new Error("param " + val + " is not an object!");
 		}

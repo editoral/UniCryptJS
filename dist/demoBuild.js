@@ -1276,7 +1276,7 @@ Op._.helper = {}
 
 Op._.helper.matchParamsArgs = function(paramType, args, generic) {
 	if(paramType.length !== args.length) {
-		throw new Error("Number of parameter types and number of parameters missmatch!");
+		throw new Error("Number of parameter types and number of parameters missmatch! " + paramType.length + ' : ' + args.length);
 	}
 	for(var i = 0; i < paramType.length; i++) {
 		Op._.typing.testTypes(paramType[i], args[i], generic);
@@ -1631,7 +1631,7 @@ Op.Class = function() {
 			} else {
 				this._generic_ = {};
 			}
-		}	
+
 			//var tempArrayGeneric = [];
 			var extendObjGenericTemp = this._extendObjGeneric_;
 			if(Array.isArray(extendObjGenericTemp)) {
@@ -1670,6 +1670,7 @@ Op.Class = function() {
 				}
 				this._initializedProps_ = true;
 			}
+		}
 		//execute the defined init function, as the oop constructor
 		obj.init.apply(this, args);
 	}
@@ -2670,24 +2671,35 @@ Underline für Private Convention
 
 
 
-// var BaseClass = Op.Class('BaseClass', null,{
-//             func1: function(int1) {
-//                 return int1;
-//             }.paramType(['int']).returnType('int'),
-//             func2: function(int1, int2) {
-//                 return int1 + int2;
-//             }.paramType(['int','int']).returnType('int'),
-//             func2: function(int1, int2, string1) {
-//                 return string1 + (int1 + int2);
-//             }.paramType(['int','int', 'string']).returnType('string'),
-//             func4: function(string1) {
-//                 return string1 + ' : one single argument';
-//             }.paramType(['string']).returnType('string')
-//         });
+var BaseClass = Op.Class('BaseClass', null,{
+            func1: function(int1) {
+                return int1;
+            }.paramType(['int']).returnType('int'),
+            func2: function(int1, int2) {
+                return int1 + int2;
+            }.paramType(['int','int']).returnType('int'),
+            func2: function(int1, int2, string1) {
+                return string1 + (int1 + int2);
+            }.paramType(['int','int', 'string']).returnType('string'),
+            func4: function(string1) {
+                return string1 + ' : one single argument';
+            }.paramType(['string']).returnType('string')
+        });
 
-// var baseClass = new BaseClass();
-//var result = baseClass.func(10);
-//console.log(result);
+var ChildClass = Op.Class('ChildClass',  {
+	'extends': BaseClass
+}, {
+
+});
+var GrandChildClass = Op.Class('GrandChildClass',  {
+	'extends': ChildClass
+}, {
+
+});
+var baseClass = new BaseClass();
+var grandChildClass = new GrandChildClass();
+var result = grandChildClass.func(10, 20, 'Result: ');
+console.log('overload: ' + result);
 
 // var Class1 = Op.Class('Class1', null, {
 // 	init: function(val) {

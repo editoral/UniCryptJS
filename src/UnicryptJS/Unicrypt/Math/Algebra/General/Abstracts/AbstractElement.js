@@ -37,7 +37,7 @@ unicrypt.math.algebra.general.abstracts.AbstractElement = Op.AbstractClass('Elem
 		} else {
 			throw new Error('UnsupportedOperationException');
 		}
-	}.paramType(['BigInteger']).returnType('E'),
+	}.paramType(['BigInteger']),//.returnType('E'),
 	isGenerator: function() {
 		if (this.set.isCyclic()) {
 			var cyclicGroup = this.set;

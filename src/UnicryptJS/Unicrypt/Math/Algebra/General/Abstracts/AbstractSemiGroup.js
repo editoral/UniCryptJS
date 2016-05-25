@@ -23,10 +23,10 @@ unicrypt.math.algebra.general.abstracts.AbstractSemiGroup = Op.AbstractClass('Ab
 			throw new Error('IllegalArgumentException');
 		}
 		return this.defaultSelfApply(element, amount);		
-	}.paramType(['Element','BigInteger']).returnType('E'),
+	}.paramType(['Element','BigInteger']),//.returnType('E'),
 	selfApply2: function(element) {
 		return this.apply(element, element);
-	}.paramType(['Element']).returnType('E'),
+	}.paramType(['Element']),//.returnType('E'),
 	defaultSelfApplyAlgorithm: function(element, posAmount) {
 		var result = element;
 		for (var i = posAmount.bitLength() - 2; i >= 0; i--) {

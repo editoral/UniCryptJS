@@ -1,4 +1,4 @@
- unicrypt.math.algebra.multiplicative.classes.ZStarMod = Op.Class('ZStarMod', {
+unicrypt.math.algebra.multiplicative.classes.ZStarMod = Op.Class('ZStarMod', {
 	'extends': {
 		'class' : unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeGroup,
 		'generic': ['ZStarModElement', 'BigInteger']
