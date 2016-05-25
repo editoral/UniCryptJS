@@ -857,6 +857,7 @@ console.log('overload: ' + result);
 // class4.func(class3);
 // class4.func(class5);
 
+console.log('START');
 
 var Class1 = Op.Class('Class1', {
 	'generic': ['E', 'V'],
@@ -865,8 +866,9 @@ var Class1 = Op.Class('Class1', {
 		console.log(val);
 	},
 	testFunc: function(val) {
+		console.log(this._generic_);
 		return 10;
-	}.returnType('V')
+	}.paramType(['V']).returnType('V')
 });
 
 
@@ -893,5 +895,13 @@ var Class3 = Op.Class('Class3', {
 	}
 });
 
-var class3 = new Class3(10);
-class3.testFunc(10);
+var Class4 = Op.Class('Class4', {
+	'extends': Class3,
+}, {
+	init: function(val) {
+		this.$$super(val);
+	}
+});
+
+var class4 = new Class4(10);
+console.log('Here: ' + class4.testFunc(10));

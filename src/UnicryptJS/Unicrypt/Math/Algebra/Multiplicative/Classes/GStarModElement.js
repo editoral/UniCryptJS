@@ -1,4 +1,4 @@
- unicrypt.math.algebra.multiplicative.classes.GStarModElement = Op.Class('GStarModElement', {
+unicrypt.math.algebra.multiplicative.classes.GStarModElement = Op.Class('GStarModElement', {
 	'extends': {
 		'class' : unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeElement,
 		'generic': ['GStarMod', 'GStarModElement', 'BigInteger']
@@ -8,3 +8,10 @@
 		this.$$super(gStarMod, value);
 	}.paramType(['GStarMod', 'BigInteger']),
 });
+
+// {
+// 	'extends': {
+// 		'class' : unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeElement,
+// 		'generic': ['GStarMod', 'GStarModElement', 'BigInteger']
+// 	}
+// }

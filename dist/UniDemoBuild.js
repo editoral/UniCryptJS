@@ -62,7 +62,6 @@ Op._.helper.matchParamsArgs = function(paramType, args, generic) {
 		throw new Error("Number of parameter types and number of parameters missmatch! " + paramType.length + ' : ' + args.length);
 	}
 	for(var i = 0; i < paramType.length; i++) {
-		console.log('Parameter: ' + paramType[i] + ' ' + i + ' von ' + paramType.length);
 		Op._.typing.testTypes(paramType[i], args[i], generic);
 	}	
 }
@@ -98,7 +97,6 @@ Op._.helper.FunctionOverload.prototype.prepareOverloadedFunctions = function() {
 			var args = Array.prototype.slice.call(arguments);
 			var len = args.length;
 			var executables = self.prototype._storedFunctions_;
-			//console.log('hi: ' + prop);
 			var executed = false;
 			var result;
 			var lastErrorMsg = '';
@@ -110,7 +108,6 @@ Op._.helper.FunctionOverload.prototype.prepareOverloadedFunctions = function() {
 						executed = true;			
 					} catch(err) {
 						lastErrorMsg = err;
-						console.log(err);
 					}	
 				//}
 			}
@@ -184,7 +181,6 @@ Op._.helper.generateTypingWrapper = function() {
 		var intReturnType = self.prototype._returnType_;
 		var genericType = this._generic_;
 		if (Array.isArray(intParamType)) {
-			console.log('From TypingWrapper: ' + intParamType);
 			Op._.helper.matchParamsArgs(intParamType, arguments,genericType);
 		}
 		//Execute the actual function
@@ -236,12 +232,9 @@ Op._.helper.generateTypingWrapper = function() {
 		if (typeof val === "object") {
 			if(!(val.constructor.name === type)) {
 				if(!this.objInheritance(type,val)) {
-					console.log('From here: ' + type + ' ' + val.constructor.name);
 					throw new Error("param " + val + " is not from type " + type + "!");
 				}
-				console.log('From there: ' + type + ' ' + val.constructor.name);
 			}
-			console.log('From top: ' + type + ' ' + val.constructor.name);
 		} else {
 			throw new Error("param " + val + " is not an object!");
 		}
@@ -354,6 +347,7 @@ Op.Class = function() {
 			inheritanceChain = baseClass.prototype._inheritanceChain_.concat(newArr);
 			//baseClass.prototype = extendsOptionSpec['class'].prototype;
 			extendObjGeneric = extendsOptionSpec['generic'];
+			console.log(' Declare option generic ' + className + ' : '  + extendObjGeneric);
 		} else {
 			//throw new Error('Unknown extends format ' + typeof extendObjGeneric + ' in ' + className + '!');
 		}
@@ -420,10 +414,12 @@ Op.Class = function() {
 			} else {
 				this._generic_ = {};
 			}
-
+			console.log('Generic extended: ' + this.constructor.name + ' generic: ' + this._extendObjGeneric_);
+			
 			//var tempArrayGeneric = [];
 			var extendObjGenericTemp = this._extendObjGeneric_;
 			if(Array.isArray(extendObjGenericTemp)) {
+				console.log(this.constructor.name + ' objGenTemp : ' + extendObjGenericTemp);
 				//var baseClassGeneric = this._baseClass_.prototype._generic_;
 				var baseClassGeneric = this._baseClass_.prototype._generic_;
 				if(baseClassGeneric.length !== extendObjGenericTemp.length) {
@@ -443,6 +439,8 @@ Op.Class = function() {
 				}
 			}
 			
+			//console.log('Generic after inheritance extended: ' + this.constructor.name + ' ' + this._generic_);
+			printConsoleObj(this._generic_);
 			//Tests the typing
 			var paramType = obj.init.prototype._paramType_;
 			if(Array.isArray(paramType)) {
@@ -557,7 +555,6 @@ Op.Class = function() {
 		var tempInterface = new TempInterface();
 		var functionsList = tempInterface.getFunctions();
 		//var inter = new eimplements[0]();
-		//console.log(inter.getFunctions());
 		for(var prop in functionsList) {
 			if(!(newClass.prototype.hasOwnProperty(prop) && typeof newClass.prototype[prop] === 'function')) {
 				isAbstract = true;
@@ -2344,7 +2341,8 @@ unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeCyclicGroup
 unicrypt.math.algebra.multiplicative.classes.GStarMod =  Op.Class('GStarMod', {
 	'extends': {
 		'class' : unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeCyclicGroup,
-		'generic' : ['GStarModElement', 'BigInteger']
+		//'generic' : ['GStarModElement', 'BigInteger']
+		'generic': ['GStarMod', 'GStarModElement', 'BigInteger']
 	}
 },{
 	_modulus: null,
@@ -2593,7 +2591,7 @@ unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeElement = O
 		throw new Error('UnsupportedOperationException');
 	}.paramType(['Element']).returnType('E'),
 });
- unicrypt.math.algebra.multiplicative.classes.GStarModElement = Op.Class('GStarModElement', {
+unicrypt.math.algebra.multiplicative.classes.GStarModElement = Op.Class('GStarModElement', {
 	'extends': {
 		'class' : unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeElement,
 		'generic': ['GStarMod', 'GStarModElement', 'BigInteger']
@@ -2603,6 +2601,13 @@ unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeElement = O
 		this.$$super(gStarMod, value);
 	}.paramType(['GStarMod', 'BigInteger']),
 });
+
+// {
+// 	'extends': {
+// 		'class' : unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeElement,
+// 		'generic': ['GStarMod', 'GStarModElement', 'BigInteger']
+// 	}
+// }
 unicrypt.math.algebra.multiplicative.abstracts.AbstractMultiplicativeGroup = Op.AbstractClass('AbstractMultiplicativeGroup', {
 	'generic': ['E', 'V'],
 	'extends': {
@@ -2749,6 +2754,8 @@ unicrypt.math.algebra.multiplicative.classes.ZStarMod = Op.Class('ZStarMod', {
 // var bigInt = bigInt.subtract(bigInt2);
 // //console.log('BigInteger: ' + bigInt.intValue());
 
+console.log('START');
+
  var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(23);
 // console.log('Modulus: ' + gGstarMod.getModulus().intValue());
 // console.log('ModuloFactorization: ' +  gGstarMod.getModuloFactorization().intValue());
@@ -2766,17 +2773,19 @@ unicrypt.math.algebra.multiplicative.classes.ZStarMod = Op.Class('ZStarMod', {
 // //todo
 // //var gStarE3 = gStarE1.apply(gStarE2);
 // console.log('Result: ' + gStarE3.getValue().intValue());
- e1 = new u.BigInteger(2);
-// e2 = new u.BigInteger(4);
-// e3 = new u.BigInteger(5);
-e4 = new u.BigInteger(3);
-var g1 = gGstarMod.getElement(e1);
-// var g2 = gGstarMod.getElement(e2);
-// var m = e3; // ZMod
-var r = e4; // ZMod
+  e1 = new u.BigInteger(2);
+// // e2 = new u.BigInteger(4);
+// // e3 = new u.BigInteger(5);
+// e4 = new u.BigInteger(3);
+ var g1 = gGstarMod.getElement(e1);
+// // var g2 = gGstarMod.getElement(e2);
+// // var m = e3; // ZMod
+// var r = e4; // ZMod
 
-console.log('--------Start-----------');
-gGstarMod.selfApply(g1, r);
+// //gGstarMod.selfApply(g1, r);
+// var t = gGstarMod.__proto__.__proto__.__proto__;
+// //var t = g1.__proto__.__proto__.__proto__;
+// console.log(t.constructor.name + ' ' + t._generic_);
 
 // var p = g1.selfApply(r).apply(g2.selfApply(m));
 // console.log('Result2: ' + p);

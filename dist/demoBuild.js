@@ -1314,7 +1314,6 @@ Op._.helper.FunctionOverload.prototype.prepareOverloadedFunctions = function() {
 			var args = Array.prototype.slice.call(arguments);
 			var len = args.length;
 			var executables = self.prototype._storedFunctions_;
-			//console.log('hi: ' + prop);
 			var executed = false;
 			var result;
 			var lastErrorMsg = '';
@@ -1404,7 +1403,7 @@ Op._.helper.generateTypingWrapper = function() {
 		//Execute the actual function
 		var result = execFuncIntern.apply(this, arguments);
 		if(intReturnType) {
-			Op._.helper.matchReturnType(intReturnType, result, self.name, genericType);	
+			//Op._.helper.matchReturnType(intReturnType, result, self.name, genericType);	
 		}
 		return result;
 	}
@@ -1565,6 +1564,7 @@ Op.Class = function() {
 			inheritanceChain = baseClass.prototype._inheritanceChain_.concat(newArr);
 			//baseClass.prototype = extendsOptionSpec['class'].prototype;
 			extendObjGeneric = extendsOptionSpec['generic'];
+			console.log(' Declare option generic ' + className + ' : '  + extendObjGeneric);
 		} else {
 			//throw new Error('Unknown extends format ' + typeof extendObjGeneric + ' in ' + className + '!');
 		}
@@ -1631,10 +1631,12 @@ Op.Class = function() {
 			} else {
 				this._generic_ = {};
 			}
-
+			console.log('Generic extended: ' + this.constructor.name + ' generic: ' + this._extendObjGeneric_);
+			
 			//var tempArrayGeneric = [];
 			var extendObjGenericTemp = this._extendObjGeneric_;
 			if(Array.isArray(extendObjGenericTemp)) {
+				console.log('KKKK: ' + this.constructor.name + ' objGenTemp : ' + extendObjGenericTemp);
 				//var baseClassGeneric = this._baseClass_.prototype._generic_;
 				var baseClassGeneric = this._baseClass_.prototype._generic_;
 				if(baseClassGeneric.length !== extendObjGenericTemp.length) {
@@ -1654,6 +1656,8 @@ Op.Class = function() {
 				}
 			}
 			
+			//console.log('Generic after inheritance extended: ' + this.constructor.name + ' ' + this._generic_);
+			printConsoleObj(this._generic_);
 			//Tests the typing
 			var paramType = obj.init.prototype._paramType_;
 			if(Array.isArray(paramType)) {
@@ -1768,7 +1772,6 @@ Op.Class = function() {
 		var tempInterface = new TempInterface();
 		var functionsList = tempInterface.getFunctions();
 		//var inter = new eimplements[0]();
-		//console.log(inter.getFunctions());
 		for(var prop in functionsList) {
 			if(!(newClass.prototype.hasOwnProperty(prop) && typeof newClass.prototype[prop] === 'function')) {
 				isAbstract = true;
@@ -2747,6 +2750,7 @@ console.log('overload: ' + result);
 // class4.func(class3);
 // class4.func(class5);
 
+console.log('START');
 
 var Class1 = Op.Class('Class1', {
 	'generic': ['E', 'V'],
@@ -2755,8 +2759,9 @@ var Class1 = Op.Class('Class1', {
 		console.log(val);
 	},
 	testFunc: function(val) {
+		console.log(this._generic_);
 		return 10;
-	}.returnType('V')
+	}.paramType(['V']).returnType('V')
 });
 
 
@@ -2783,5 +2788,13 @@ var Class3 = Op.Class('Class3', {
 	}
 });
 
+var Class4 = Op.Class('Class4', {
+	'extends': Class3,
+}, {
+	init: function(val) {
+		this.$$super(val);
+	}
+});
+
 var class3 = new Class3(10);
-class3.testFunc(10);
+console.log('Here: ' + class3.testFunc(10));

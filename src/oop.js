@@ -61,7 +61,6 @@ Op._.helper.matchParamsArgs = function(paramType, args, generic) {
 		throw new Error("Number of parameter types and number of parameters missmatch! " + paramType.length + ' : ' + args.length);
 	}
 	for(var i = 0; i < paramType.length; i++) {
-		console.log('Parameter: ' + paramType[i] + ' ' + i + ' von ' + paramType.length);
 		Op._.typing.testTypes(paramType[i], args[i], generic);
 	}	
 }
@@ -97,7 +96,6 @@ Op._.helper.FunctionOverload.prototype.prepareOverloadedFunctions = function() {
 			var args = Array.prototype.slice.call(arguments);
 			var len = args.length;
 			var executables = self.prototype._storedFunctions_;
-			//console.log('hi: ' + prop);
 			var executed = false;
 			var result;
 			var lastErrorMsg = '';
@@ -109,7 +107,6 @@ Op._.helper.FunctionOverload.prototype.prepareOverloadedFunctions = function() {
 						executed = true;			
 					} catch(err) {
 						lastErrorMsg = err;
-						console.log(err);
 					}	
 				//}
 			}
@@ -183,7 +180,6 @@ Op._.helper.generateTypingWrapper = function() {
 		var intReturnType = self.prototype._returnType_;
 		var genericType = this._generic_;
 		if (Array.isArray(intParamType)) {
-			console.log('From TypingWrapper: ' + intParamType);
 			Op._.helper.matchParamsArgs(intParamType, arguments,genericType);
 		}
 		//Execute the actual function
@@ -235,12 +231,9 @@ Op._.helper.generateTypingWrapper = function() {
 		if (typeof val === "object") {
 			if(!(val.constructor.name === type)) {
 				if(!this.objInheritance(type,val)) {
-					console.log('From here: ' + type + ' ' + val.constructor.name);
 					throw new Error("param " + val + " is not from type " + type + "!");
 				}
-				console.log('From there: ' + type + ' ' + val.constructor.name);
 			}
-			console.log('From top: ' + type + ' ' + val.constructor.name);
 		} else {
 			throw new Error("param " + val + " is not an object!");
 		}
@@ -353,6 +346,7 @@ Op.Class = function() {
 			inheritanceChain = baseClass.prototype._inheritanceChain_.concat(newArr);
 			//baseClass.prototype = extendsOptionSpec['class'].prototype;
 			extendObjGeneric = extendsOptionSpec['generic'];
+			console.log(' Declare option generic ' + className + ' : '  + extendObjGeneric);
 		} else {
 			//throw new Error('Unknown extends format ' + typeof extendObjGeneric + ' in ' + className + '!');
 		}
@@ -419,10 +413,12 @@ Op.Class = function() {
 			} else {
 				this._generic_ = {};
 			}
-
+			console.log('Generic extended: ' + this.constructor.name + ' generic: ' + this._extendObjGeneric_);
+			
 			//var tempArrayGeneric = [];
 			var extendObjGenericTemp = this._extendObjGeneric_;
 			if(Array.isArray(extendObjGenericTemp)) {
+				console.log('KKKK: ' + this.constructor.name + ' objGenTemp : ' + extendObjGenericTemp);
 				//var baseClassGeneric = this._baseClass_.prototype._generic_;
 				var baseClassGeneric = this._baseClass_.prototype._generic_;
 				if(baseClassGeneric.length !== extendObjGenericTemp.length) {
@@ -442,6 +438,8 @@ Op.Class = function() {
 				}
 			}
 			
+			//console.log('Generic after inheritance extended: ' + this.constructor.name + ' ' + this._generic_);
+			printConsoleObj(this._generic_);
 			//Tests the typing
 			var paramType = obj.init.prototype._paramType_;
 			if(Array.isArray(paramType)) {
@@ -556,7 +554,6 @@ Op.Class = function() {
 		var tempInterface = new TempInterface();
 		var functionsList = tempInterface.getFunctions();
 		//var inter = new eimplements[0]();
-		//console.log(inter.getFunctions());
 		for(var prop in functionsList) {
 			if(!(newClass.prototype.hasOwnProperty(prop) && typeof newClass.prototype[prop] === 'function')) {
 				isAbstract = true;
