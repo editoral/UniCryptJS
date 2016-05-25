@@ -22,20 +22,26 @@ unicrypt.math.algebra.general.abstracts.AbstractSemiGroup = Op.AbstractClass('Ab
 		if (!this.contains(element) || amount == null) {
 			throw new Error('IllegalArgumentException');
 		}
-		return this.defaultSelfApply(element, amount);		
-	}.paramType(['Element','BigInteger']),//.returnType('E'),
+		return this._defaultSelfApply(element, amount);		
+	}.paramType(['Element','BigInteger']).returnType('E'),
 	selfApply2: function(element) {
 		return this.apply(element, element);
-	}.paramType(['Element']),//.returnType('E'),
-	defaultSelfApplyAlgorithm: function(element, posAmount) {
+	}.paramType(['Element']).returnType('E'),
+	_defaultSelfApplyAlgorithm: function(element, posAmount) {
 		var result = element;
 		for (var i = posAmount.bitLength() - 2; i >= 0; i--) {
-			result = this.abstractApply(result, result);
+			result = this._abstractApply(result, result);
 			if (posAmount.testBit(i)) {
-				result = this.abstractApply(result, element);
+				result = this._abstractApply(result, element);
 			}
 		}
 		return result;		
-	}.paramType(['E', 'BigInteger']).returnType('E')
+	}.paramType(['E', 'BigInteger']).returnType('E'),
+	_defaultSelfApply: function(element,amount) {
+		if (amount.signum() <= 0) {
+			throw new Error('IllegalArgumentException');
+		}
+		return this._defaultSelfApplyAlgorithm(element, amount);
+	}.paramType(['E', 'BigInteger']).returnType('E'),
 
 });

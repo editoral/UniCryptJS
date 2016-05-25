@@ -100,15 +100,13 @@ Op._.helper.FunctionOverload.prototype.prepareOverloadedFunctions = function() {
 			var result;
 			var lastErrorMsg = '';
 			for(var fn in executables) {
-				//var paramType = executables[fn].prototype._paramType_;
-				//if(len === paramType.length) {
 					try {
 						result = executables[fn].apply(this,args);
 						executed = true;			
 					} catch(err) {
 						lastErrorMsg = err;
+						//console.log(err);
 					}	
-				//}
 			}
 			if (!executed) {
 				throw new Error('No overloaded Function found!');
@@ -231,7 +229,7 @@ Op._.helper.generateTypingWrapper = function() {
 		if (typeof val === "object") {
 			if(!(val.constructor.name === type)) {
 				if(!this.objInheritance(type,val)) {
-					throw new Error("param " + val + " is not from type " + type + "!");
+					throw new Error("param " + val.constructor.name + " is not from type " + type + "!");
 				}
 			}
 		} else {

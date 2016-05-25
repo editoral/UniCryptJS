@@ -38,9 +38,9 @@ unicrypt.math.algebra.multiplicative.classes.GStarMod =  Op.Class('GStarMod', {
 	// getCoFactor: function() {
 	// 	return this.getZStarMod().getOrder().divide(this.getOrder());
 	// }.returnType('BigInteger'),
-	// _defaultSelfApplyAlgorithm: function(element,posAmount) {
-	// 	return this.abstractGetElement(element.getValue().modPow(posAmount, this._modulus));
-	// }.paramType(['GStarModElement','BigInteger']).returnType('GStarModElement'),
+	_defaultSelfApplyAlgorithm: function(element,posAmount) {
+		return this._abstractGetElement(element.getValue().modPow(posAmount, this._modulus));
+	}.paramType(['GStarModElement','BigInteger']).returnType('GStarModElement'),
 	// _defaultToStringContent: function() {
 	// 	return this.getModulus().toString() + "," + this.getOrder().toString();
 	// }.returnType('string'),

@@ -54,6 +54,23 @@ unicrypt.math.algebra.general.abstracts.AbstractSet = Op.AbstractClass('Abstract
 	// isFinite: function() {
 	// 	return !this.getOrder().equals(Set.INFINITE);
 	// }.returnType('boolean'),
+	isEquivalent: function(other) {
+		if (other == null) {
+			throw new Error('IllegalArgumentException');
+		}
+		if (this == other) {
+			return true;
+		}
+		// matchAll if this.getClass() is a superclass of other.getClass()
+		if (this instanceof other) {
+			return this._defaultIsEquivalent(other);
+		}
+		// vice versa
+		if (other instanceof this) {
+			return other.isEquivalent(this);
+		}
+		return false;		
+	}.paramType(['AbstractSet']).returnType('boolean'),
 	// hasKnownOrder: function() {
 	// 	return !this.getOrder().equals(Set.UNKNOWN);
 	// }.returnType('boolean'),
@@ -110,21 +127,29 @@ unicrypt.math.algebra.general.abstracts.AbstractSet = Op.AbstractClass('Abstract
 		}
 		return this._abstractGetElement(value);
 	},//.paramType(['V']).returnType('E'),
-	contains: function(value) {
+	contains1: function(value) {
 		if (value == null) {
 			throw new Error('IllegalArgumentException');
 		}
 		return this._abstractContains(value);
-	},//.paramType(['V']).returnType('boolean'),
-	// contains2: function(element) {
-	// 	if (element == null) {
-	// 		throw new Error('IllegalArgumentException');
-	// 	}
-	// 	if (!this.valueClass.isInstance(element.getValue())) {
-	// 		return false;
-	// 	}
-	// 	return this.defaultContains(element);
-	// }.paramType(['Element']).returnType('boolean'),
+	}.paramType(['V']).returnType('boolean'),
+	contains2: function(element) {
+		if (element == null) {
+			throw new Error('IllegalArgumentException');
+		}
+
+		var val = element.getValue();
+		if (!val instanceof this._valueClass) {
+			return false;
+		}
+		return this._defaultContains(element);
+	}.paramType(['Element']).returnType('boolean'),
+	_defaultContains: function(element) {
+		return this.isEquivalent(element.getSet());
+	}.paramType(['Element']).returnType('boolean'),
+	_defaultIsEquivalent: function() {
+		return this.abstractEquals(set);
+	}.paramType(['AbstractSet']).returnType('boolean'),
 	// getRandomElement1: function() {
 	// 	return this.abstractGetRandomElement(HybridRandomByteSequence.getInstance());
 	// }.returnType('E'),

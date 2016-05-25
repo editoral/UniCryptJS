@@ -101,15 +101,13 @@ Op._.helper.FunctionOverload.prototype.prepareOverloadedFunctions = function() {
 			var result;
 			var lastErrorMsg = '';
 			for(var fn in executables) {
-				//var paramType = executables[fn].prototype._paramType_;
-				//if(len === paramType.length) {
 					try {
 						result = executables[fn].apply(this,args);
 						executed = true;			
 					} catch(err) {
 						lastErrorMsg = err;
+						//console.log(err);
 					}	
-				//}
 			}
 			if (!executed) {
 				throw new Error('No overloaded Function found!');
@@ -232,7 +230,7 @@ Op._.helper.generateTypingWrapper = function() {
 		if (typeof val === "object") {
 			if(!(val.constructor.name === type)) {
 				if(!this.objInheritance(type,val)) {
-					throw new Error("param " + val + " is not from type " + type + "!");
+					throw new Error("param " + val.constructor.name + " is not from type " + type + "!");
 				}
 			}
 		} else {
@@ -2072,6 +2070,23 @@ unicrypt.math.algebra.general.abstracts.AbstractSet = Op.AbstractClass('Abstract
 	// isFinite: function() {
 	// 	return !this.getOrder().equals(Set.INFINITE);
 	// }.returnType('boolean'),
+	isEquivalent: function(other) {
+		if (other == null) {
+			throw new Error('IllegalArgumentException');
+		}
+		if (this == other) {
+			return true;
+		}
+		// matchAll if this.getClass() is a superclass of other.getClass()
+		if (this instanceof other) {
+			return this._defaultIsEquivalent(other);
+		}
+		// vice versa
+		if (other instanceof this) {
+			return other.isEquivalent(this);
+		}
+		return false;		
+	}.paramType(['AbstractSet']).returnType('boolean'),
 	// hasKnownOrder: function() {
 	// 	return !this.getOrder().equals(Set.UNKNOWN);
 	// }.returnType('boolean'),
@@ -2128,21 +2143,29 @@ unicrypt.math.algebra.general.abstracts.AbstractSet = Op.AbstractClass('Abstract
 		}
 		return this._abstractGetElement(value);
 	},//.paramType(['V']).returnType('E'),
-	contains: function(value) {
+	contains1: function(value) {
 		if (value == null) {
 			throw new Error('IllegalArgumentException');
 		}
 		return this._abstractContains(value);
-	},//.paramType(['V']).returnType('boolean'),
-	// contains2: function(element) {
-	// 	if (element == null) {
-	// 		throw new Error('IllegalArgumentException');
-	// 	}
-	// 	if (!this.valueClass.isInstance(element.getValue())) {
-	// 		return false;
-	// 	}
-	// 	return this.defaultContains(element);
-	// }.paramType(['Element']).returnType('boolean'),
+	}.paramType(['V']).returnType('boolean'),
+	contains2: function(element) {
+		if (element == null) {
+			throw new Error('IllegalArgumentException');
+		}
+
+		var val = element.getValue();
+		if (!val instanceof this._valueClass) {
+			return false;
+		}
+		return this._defaultContains(element);
+	}.paramType(['Element']).returnType('boolean'),
+	_defaultContains: function(element) {
+		return this.isEquivalent(element.getSet());
+	}.paramType(['Element']).returnType('boolean'),
+	_defaultIsEquivalent: function() {
+		return this.abstractEquals(set);
+	}.paramType(['AbstractSet']).returnType('boolean'),
 	// getRandomElement1: function() {
 	// 	return this.abstractGetRandomElement(HybridRandomByteSequence.getInstance());
 	// }.returnType('E'),
@@ -2200,21 +2223,27 @@ unicrypt.math.algebra.general.abstracts.AbstractSemiGroup = Op.AbstractClass('Ab
 		if (!this.contains(element) || amount == null) {
 			throw new Error('IllegalArgumentException');
 		}
-		return this.defaultSelfApply(element, amount);		
-	}.paramType(['Element','BigInteger']),//.returnType('E'),
+		return this._defaultSelfApply(element, amount);		
+	}.paramType(['Element','BigInteger']).returnType('E'),
 	selfApply2: function(element) {
 		return this.apply(element, element);
-	}.paramType(['Element']),//.returnType('E'),
-	defaultSelfApplyAlgorithm: function(element, posAmount) {
+	}.paramType(['Element']).returnType('E'),
+	_defaultSelfApplyAlgorithm: function(element, posAmount) {
 		var result = element;
 		for (var i = posAmount.bitLength() - 2; i >= 0; i--) {
-			result = this.abstractApply(result, result);
+			result = this._abstractApply(result, result);
 			if (posAmount.testBit(i)) {
-				result = this.abstractApply(result, element);
+				result = this._abstractApply(result, element);
 			}
 		}
 		return result;		
-	}.paramType(['E', 'BigInteger']).returnType('E')
+	}.paramType(['E', 'BigInteger']).returnType('E'),
+	_defaultSelfApply: function(element,amount) {
+		if (amount.signum() <= 0) {
+			throw new Error('IllegalArgumentException');
+		}
+		return this._defaultSelfApplyAlgorithm(element, amount);
+	}.paramType(['E', 'BigInteger']).returnType('E'),
 
 });
 unicrypt.math.algebra.general.abstracts.AbstractMonoid = Op.AbstractClass('AbstractMonoid', {
@@ -2247,27 +2276,21 @@ unicrypt.math.algebra.general.abstracts.AbstractGroup = Op.AbstractClass('Abstra
 	applyInverse: function(elemnt1, element2) {
 		return this.apply(element1, this.invert(element2));
 	}.paramType(['Element', 'Element']).returnType('E'),
-	defaultSelfApply: function(element, amount) {
-		var negAmount = (amount.signum() < 0);
-		amount = amount.abs();
-		if (this.isFinite() && this.hasKnownOrder()) {
-			amount = amount.mod(this.getOrder());
-		}
-		if (amount.signum() == 0) {
-			return this.getIdentityElement();
-		}
-		var result = this.defaultSelfApplyAlgorithm(element, amount);
-		if (negAmount) {
-			return this.invert(result);
-		}
-		return result;
-	}.paramType(['Element', 'BigInteger']),
-	func: function() {
-
-	},
-	func: function() {
-
-	},
+	// _defaultSelfApply: function(element, amount) {
+	// 	var negAmount = (amount.signum() < 0);
+	// 	amount = amount.abs();
+	// 	if (this.isFinite() && this.hasKnownOrder()) {
+	// 		amount = amount.mod(this.getOrder());
+	// 	}
+	// 	if (amount.signum() == 0) {
+	// 		return this.getIdentityElement();
+	// 	}
+	// 	var result = this._defaultSelfApplyAlgorithm(element, amount);
+	// 	if (negAmount) {
+	// 		return this.invert(result);
+	// 	}
+	// 	return result;
+	// }.paramType(['Element', 'BigInteger']),
 });
 unicrypt.math.algebra.general.abstracts.AbstractCyclicGroup = Op.AbstractClass('AbstractCyclicGroup', {
 	'generic': ['E', 'V'],
@@ -2382,9 +2405,9 @@ unicrypt.math.algebra.multiplicative.classes.GStarMod =  Op.Class('GStarMod', {
 	// getCoFactor: function() {
 	// 	return this.getZStarMod().getOrder().divide(this.getOrder());
 	// }.returnType('BigInteger'),
-	// _defaultSelfApplyAlgorithm: function(element,posAmount) {
-	// 	return this.abstractGetElement(element.getValue().modPow(posAmount, this._modulus));
-	// }.paramType(['GStarModElement','BigInteger']).returnType('GStarModElement'),
+	_defaultSelfApplyAlgorithm: function(element,posAmount) {
+		return this._abstractGetElement(element.getValue().modPow(posAmount, this._modulus));
+	}.paramType(['GStarModElement','BigInteger']).returnType('GStarModElement'),
 	// _defaultToStringContent: function() {
 	// 	return this.getModulus().toString() + "," + this.getOrder().toString();
 	// }.returnType('string'),
@@ -2757,8 +2780,6 @@ unicrypt.math.algebra.multiplicative.classes.ZStarMod = Op.Class('ZStarMod', {
 // var bigInt = bigInt.subtract(bigInt2);
 // //console.log('BigInteger: ' + bigInt.intValue());
 
-console.log('START');
-
  var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(23);
 // console.log('Modulus: ' + gGstarMod.getModulus().intValue());
 // console.log('ModuloFactorization: ' +  gGstarMod.getModuloFactorization().intValue());
@@ -2776,19 +2797,22 @@ console.log('START');
 // //todo
 // //var gStarE3 = gStarE1.apply(gStarE2);
 // console.log('Result: ' + gStarE3.getValue().intValue());
-  e1 = new u.BigInteger(2);
-// // e2 = new u.BigInteger(4);
-// // e3 = new u.BigInteger(5);
-// e4 = new u.BigInteger(3);
- var g1 = gGstarMod.getElement(e1);
-// // var g2 = gGstarMod.getElement(e2);
-// // var m = e3; // ZMod
-// var r = e4; // ZMod
+e1 = new u.BigInteger(2);
+e2 = new u.BigInteger(4);
+e3 = new u.BigInteger(5);
+e4 = new u.BigInteger(3);
+var g1 = gGstarMod.getElement(e1);
+var g2 = gGstarMod.getElement(e2);
+var m = e3; // ZMod
+var r = e4; // ZMod
 
-// //gGstarMod.selfApply(g1, r);
-// var t = gGstarMod.__proto__.__proto__.__proto__;
-// //var t = g1.__proto__.__proto__.__proto__;
-// console.log(t.constructor.name + ' ' + t._generic_);
+console.log('START');
+
+var x = gGstarMod.selfApply(g2, r);
+console.log(x.getValue().intValue());
+
+//var t = g1.__proto__.__proto__.__proto__;
+//console.log(t.constructor.name + ' ' + t._generic_);
 
 // var p = g1.selfApply(r).apply(g2.selfApply(m));
-// console.log('Result2: ' + p);
+// console.log('Result2: ' + p.getValue().intValue());
