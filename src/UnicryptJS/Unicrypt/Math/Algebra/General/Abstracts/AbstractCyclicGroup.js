@@ -16,10 +16,10 @@ unicrypt.math.algebra.general.abstracts.AbstractCyclicGroup = Op.AbstractClass('
 		}
 		return this.defaultGenerator;
 	}.returnType('E'),
-	isGenerator: function() {
+	isGenerator: function(element) {
 		if (!this.contains(element)) {
 			throw new Error('IllegalArgumentException');
 		}
-		return this.abstractIsGenerator(element);
+		return this._abstractIsGenerator(element);
 	}.paramType(['Element']).returnType('boolean'),
 });

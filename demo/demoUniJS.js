@@ -47,5 +47,11 @@ console.log(x.getValue().intValue());
 //var t = g1.__proto__.__proto__.__proto__;
 //console.log(t.constructor.name + ' ' + t._generic_);
 
-// var p = g1.selfApply(r).apply(g2.selfApply(m));
-// console.log('Result2: ' + p.getValue().intValue());
+var p = g1.selfApply(r).apply(g2.selfApply(m));
+console.log('Result: ' + p.getValue().intValue());
+
+var pScheme = new unicrypt.crypto.schemes.commitment.classes.PedersenCommitmentScheme.getInstance(gGstarMod);
+var p2 = pScheme.commit(m, r);
+console.log('Result2: ' + p2.getValue().intValue());
+var p3 = pScheme.decommit(m, r,p2);
+console.log('Decommited: ' + p3);

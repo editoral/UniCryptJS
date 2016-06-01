@@ -4,23 +4,27 @@ module.exports = function(grunt) {
  	grunt.loadNpmTasks('grunt-mocha-test');
  	grunt.loadNpmTasks('grunt-jsdoc');
  	grunt.loadNpmTasks('grunt-execute');
+ 	grunt.loadNpmTasks('grunt-contrib-connect');
+ 	grunt.loadNpmTasks('grunt-contrib-copy');
  	
 	grunt.initConfig({
 		concat: {
 			options: {
 				separator: '\n',
 			},
-			dist: {
-				src: ['src/*.js'],
-				dest: 'dist/build.js',
-			},
+			// dist: {
+			// 	src: ['src/*.js'],
+			// 	dest: 'dist/build.js',
+			// },
 			demoDist: {
 				src: ['demo/littleNodeHelper.js', 'vendor/*.js', 'src/oop.js', 'demo/demo.js'],
 				dest: 'dist/demoBuild.js'
 			},
-			demoUniDist: {
-				src: ['demo/littleNodeHelper.js', 'src/oop.js', 'vendor/*.js', 'src/UnicryptJS/_Reqs/*.js', 
-				//'src/UnicryptJS/Unicrypt/**/*.js'
+			dist: {
+				src: [
+				//'demo/littleNodeHelper.js', 
+				// FW and Requirements
+				'src/oop.js', 'vendor/*.js', 'src/UnicryptJS/_Reqs/*.js', 
 				//GStarMod
 				'src/UnicryptJS/Unicrypt/Helper/Math/MathUtil.js', 'src/UnicryptJS/Unicrypt/unicrypt.js', 'src/UnicryptJS/Unicrypt/Math/Algebra/General/Abstracts/AbstractSet.js',
 				'src/UnicryptJS/Unicrypt/Math/Algebra/General/Abstracts/AbstractSemiGroup.js','src/UnicryptJS/Unicrypt/Math/Algebra/General/Abstracts/AbstractMonoid.js',
@@ -32,9 +36,22 @@ module.exports = function(grunt) {
 				//ZStarMod
 				'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Abstracts/AbstractMultiplicativeGroup.js', 'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Classes/ZStarMod.js',
 				'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Classes/ZStarModPrime.js',
+				//Scheme
+				'src/UnicryptJS/Unicrypt/Crypto/Schemes/Commitment/Classes/PedersenCommitmentScheme.js',
 				//Tester
-				'demo/demoUniJS.js'],
+				//'demo/demoUniJS.js'
+				],
+				dest: 'dist/UniCryptJS.js'
+			},
+			demoUniDist: {
+				src: ['demo/littleNodeHelper.js', 'dist/UniCryptJS.js', 'demo/demoUniJS.js'],
 				dest: 'dist/UniDemoBuild.js'
+			}
+		},
+		copy: {
+			server: {
+				src: 'dist/UniCryptJS.js',
+				dest: 'webExample/dist/UniCryptJS.js'
 			}
 		},
 		mochaTest: {
@@ -79,6 +96,15 @@ module.exports = function(grunt) {
 	    	uniDemo: {
 	    		src: ['dist/UniDemoBuild.js']
 	    	}
+	    }, 
+	    connect : {
+	   		server: {
+	   			options: {
+	   				port: 8000,
+	   				base: 'webExample',
+	   				keepalive: true
+	   			}
+	   		} 	
 	    }
 	});
 
@@ -86,5 +112,6 @@ module.exports = function(grunt) {
 	grunt.registerTask('default', ['concat:dist', 'mochaTest:test']);
 	grunt.registerTask('demo', ['concat:demoDist', 'jsdoc:demo', 'mochaTest:testDemo']);
 	grunt.registerTask('runDemo', ['concat:demoDist', 'execute:demo']);
-	grunt.registerTask('runUni', ['concat:demoUniDist', 'execute:uniDemo']);
+	grunt.registerTask('runUni', ['concat:dist', 'concat:demoUniDist', 'execute:uniDemo']);
+	grunt.registerTask('server', ['concat:dist', 'copy:server', 'connect:server']);
 };

@@ -1,4 +1,4 @@
-GLOBAL.u = {},
+globalScope.u = {},
 u.BigInteger = Op.Class('BigInteger',null, {
 	bigInt: null,
 	init: function init(num) {
@@ -10,6 +10,11 @@ u.BigInteger = Op.Class('BigInteger',null, {
 	isProbablePrime: function(num) {
 		return this.bigInt.isProbablePrime(num);
 	}.paramType(['int']),
+	add: function(value) {
+		newBigInt = new u.BigInteger(1);
+		newBigInt.bigInt = this.bigInt.add(value.bigInt);
+		return newBigInt;
+	}.paramType(['BigInteger']).returnType('BigInteger'),
 	subtract: function(value) {
 		newBigInt = new u.BigInteger(1);
 		newBigInt.bigInt = this.bigInt.subtract(value.bigInt);
@@ -57,7 +62,7 @@ u.BigInteger = Op.Class('BigInteger',null, {
 	}.paramType(['int']).returnType('boolean'),
 	modPow: function(exponent, m) {
 		newBigInt = new u.BigInteger(1);
-		newBigInt.bigInt = this.bigInt.modPow(exponent, m);
+		newBigInt.bigInt = this.bigInt.modPow(exponent.bigInt, m.bigInt);
 		return newBigInt;
 	}.paramType(['BigInteger', 'BigInteger']),
 	static: {

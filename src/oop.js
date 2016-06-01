@@ -1,15 +1,19 @@
-//Very useless and distached method
-GLOBAL.printConsoleObj = function printConsoleObj(obj) {
-	for(var prop in obj) {
-		console.log(prop + ' : ' + obj[prop]);
-	}
-}
+// //Very useless and distached method
+// GLOBAL.printConsoleObj = function printConsoleObj(obj) {
+// 	for(var prop in obj) {
+// 		console.log(prop + ' : ' + obj[prop]);
+// 	}
+// }
 
 
 //Op Framework to add class based inheritance as known from Java
+if(window) {
+	globalScope = window;
+} else {
+	globalScope = GLOBAL;
+}
 
-
-GLOBAL.Op = {}
+globalScope.Op = {}
 
 //Extend the function prototype, so it is possible to assign a paramType
 Function.prototype.paramType = function paramType() {

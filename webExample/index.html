@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="./css.css">
+	<script language="javascript" type="text/javascript" src="./vendor/jquery-2.2.4.min.js"></script>
+	<script language="javascript" type="text/javascript" src="../dist/UniCryptJS.js"></script>
+	<script language="javascript" type="text/javascript" src="./js.js"></script>
+</head>
+<body>
+<div class='container pederson'>
+<h1>Pederson Commitment</h1>
+	<div class='inputBox'>
+		<label class='inputLabel' for='message'>Message:</label>
+		<input type="number" class='message'  name="message"><br>
+	</div>
+	<div class='inputBox'>
+		<label class='inputLabel' for='r'>Randomization:</label>
+		<input type="number" class='r' name="r"><br>
+	</div>
+	<div class='inputBox'>
+		<label class='inputLabel' for='generator1'>Generator1:</label>
+		<input type="number" class='generator1' name="generator1"><br>
+	</div>
+	<div class='inputBox'>
+		<label class='inputLabel' for='generator2'>Generator2:</label>
+		<input type="number" class='generator2' name="generator2"><br>
+	</div>
+	<button type="button" class='eval'>Commit</button>
+	<div class='inputBox'>
+		<label class='inputLabel' for='result'>Result: </label>
+		<textarea class='result'></textarea><br>
+	</div>
+</div>
+</body>
+</html>

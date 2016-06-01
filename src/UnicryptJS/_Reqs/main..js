@@ -1,4 +1,4 @@
-GLOBAL.unicrypt = {};
+globalScope.unicrypt = {};
 unicrypt.math = {};
 unicrypt.math.algebra = {};
 unicrypt.math.algebra.general = {};
@@ -12,9 +12,11 @@ unicrypt.crypto = {};
 unicrypt.crypto.schemes = {};
 unicrypt.crypto.schemes.scheme = {};
 unicrypt.crypto.schemes.scheme.abstracts = {};
-
+unicrypt.crypto.schemes.commitment = {};
+unicrypt.crypto.schemes.commitment.classes = {};
 
 unicrypt.helper = {};
 unicrypt.helper.factorization = {};
 unicrypt.helper.map = {};
 unicrypt.helper.math = {};
+

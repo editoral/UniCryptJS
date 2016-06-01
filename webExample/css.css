@@ -1,0 +1,10 @@
+.inputBox {
+	width: 400px;
+}
+.inputLabel {
+	width: 200px;
+	float: left;
+}
+.inputBox input {
+	margin-left: 200;
+}

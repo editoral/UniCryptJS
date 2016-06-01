@@ -126,7 +126,7 @@ unicrypt.math.algebra.general.abstracts.AbstractSet = Op.AbstractClass('Abstract
 			throw new Error('IllegalArgumentException');
 		}
 		return this._abstractGetElement(value);
-	},//.paramType(['V']).returnType('E'),
+	}.paramType(['V']).returnType('E'),
 	contains1: function(value) {
 		if (value == null) {
 			throw new Error('IllegalArgumentException');
