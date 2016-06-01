@@ -1,16 +1,20 @@
 GLOBAL.navigator = "Test";
-//Very useless and distached method
-GLOBAL.printConsoleObj = function printConsoleObj(obj) {
-	for(var prop in obj) {
-		console.log(prop + ' : ' + obj[prop]);
-	}
-}
+// //Very useless and distached method
+// GLOBAL.printConsoleObj = function printConsoleObj(obj) {
+// 	for(var prop in obj) {
+// 		console.log(prop + ' : ' + obj[prop]);
+// 	}
+// }
 
 
 //Op Framework to add class based inheritance as known from Java
+if(typeof window !== 'undefined') {
+	globalScope = window;
+} else {
+	globalScope = GLOBAL;
+}
 
-
-GLOBAL.Op = {}
+globalScope.Op = {}
 
 //Extend the function prototype, so it is possible to assign a paramType
 Function.prototype.paramType = function paramType() {
@@ -1893,7 +1897,7 @@ BigInteger.prototype.square = bnSquare;
 // long longValue()
 // static BigInteger valueOf(long val)
 
-GLOBAL.u = {},
+globalScope.u = {},
 u.BigInteger = Op.Class('BigInteger',null, {
 	bigInt: null,
 	init: function init(num) {
@@ -1971,7 +1975,7 @@ u.BigInteger = Op.Class('BigInteger',null, {
 	
 		
 });
-GLOBAL.unicrypt = {};
+globalScope.unicrypt = {};
 unicrypt.math = {};
 unicrypt.math.algebra = {};
 unicrypt.math.algebra.general = {};
@@ -2523,9 +2527,8 @@ unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime = Op.Class('GStar
 
 	// }.paramType(['E']).returnType(''),
 	static: {
-		getInstance: function(modulus) {
-			var mod = new u.BigInteger(modulus);
-			if (modulus == null) {
+		getInstance: function(mod) {
+			if (mod == null) {
 				throw new Error('IllegalArgumentException');
 			}
 			//var instance = this._static_.instances.get(modulus, orderFactor);
@@ -2884,8 +2887,8 @@ unicrypt.crypto.schemes.commitment.classes.PedersenCommitmentScheme = Op.Class('
 // var bigInt2 = new u.BigInteger(30);
 // var bigInt = bigInt.subtract(bigInt2);
 // //console.log('BigInteger: ' + bigInt.intValue());
-
- var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(23);
+var bigIntMod = new u.BigInteger(23);
+ var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(bigIntMod);
 // console.log('Modulus: ' + gGstarMod.getModulus().intValue());
 // console.log('ModuloFactorization: ' +  gGstarMod.getModuloFactorization().intValue());
 // console.log('orderFactorization: ' +  gGstarMod.getOrderFactorization().intValue());

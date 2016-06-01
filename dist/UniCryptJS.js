@@ -7,12 +7,13 @@
 
 
 //Op Framework to add class based inheritance as known from Java
-
-if(window) {
-	window.Op = {}
+if(typeof window !== 'undefined') {
+	globalScope = window;
 } else {
-	GLOBAL.Op = {}
+	globalScope = GLOBAL;
 }
+
+globalScope.Op = {}
 
 //Extend the function prototype, so it is possible to assign a paramType
 Function.prototype.paramType = function paramType() {
@@ -1895,7 +1896,7 @@ BigInteger.prototype.square = bnSquare;
 // long longValue()
 // static BigInteger valueOf(long val)
 
-GLOBAL.u = {},
+globalScope.u = {},
 u.BigInteger = Op.Class('BigInteger',null, {
 	bigInt: null,
 	init: function init(num) {
@@ -1973,7 +1974,7 @@ u.BigInteger = Op.Class('BigInteger',null, {
 	
 		
 });
-GLOBAL.unicrypt = {};
+globalScope.unicrypt = {};
 unicrypt.math = {};
 unicrypt.math.algebra = {};
 unicrypt.math.algebra.general = {};
@@ -2525,9 +2526,8 @@ unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime = Op.Class('GStar
 
 	// }.paramType(['E']).returnType(''),
 	static: {
-		getInstance: function(modulus) {
-			var mod = new u.BigInteger(modulus);
-			if (modulus == null) {
+		getInstance: function(mod) {
+			if (mod == null) {
 				throw new Error('IllegalArgumentException');
 			}
 			//var instance = this._static_.instances.get(modulus, orderFactor);

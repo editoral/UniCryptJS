@@ -8,9 +8,8 @@ unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime = Op.Class('GStar
 
 	// }.paramType(['E']).returnType(''),
 	static: {
-		getInstance: function(modulus) {
-			var mod = new u.BigInteger(modulus);
-			if (modulus == null) {
+		getInstance: function(mod) {
+			if (mod == null) {
 				throw new Error('IllegalArgumentException');
 			}
 			//var instance = this._static_.instances.get(modulus, orderFactor);

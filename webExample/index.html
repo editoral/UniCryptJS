@@ -13,25 +13,35 @@
 <h1>Pederson Commitment</h1>
 	<div class='inputBox'>
 		<label class='inputLabel' for='message'>Message:</label>
-		<input type="number" class='message'  name="message"><br>
+		<input type="number" value='5' class='message'  name="message"><br>
 	</div>
 	<div class='inputBox'>
 		<label class='inputLabel' for='r'>Randomization:</label>
-		<input type="number" class='r' name="r"><br>
+		<input type="number" class='r' value='3' name="r"><br>
 	</div>
 	<div class='inputBox'>
 		<label class='inputLabel' for='generator1'>Generator1:</label>
-		<input type="number" class='generator1' name="generator1"><br>
+		<input type="number" value='2' class='generator1' name="generator1"><br>
 	</div>
 	<div class='inputBox'>
 		<label class='inputLabel' for='generator2'>Generator2:</label>
-		<input type="number" class='generator2' name="generator2"><br>
+		<input type="number" value='4' class='generator2' name="generator2"><br>
 	</div>
+	<div class='inputBox'>
+		<label class='inputLabel' for='mod'>Modulo:</label>
+		<input type="number" value='23' class='mod' name="mod"><br>
+	</div>	
 	<button type="button" class='eval'>Commit</button>
 	<div class='inputBox'>
-		<label class='inputLabel' for='result'>Result: </label>
+		<label class='inputLabel' for='result'>Commitment: </label>
 		<textarea class='result'></textarea><br>
 	</div>
+	<hr width="100%">
+	<button  type="button" class='decommit'>Decommit</button>
+	<div class='inputBox'>
+		<label class='inputLabel' for='commitResult'>Commitment match: </label>
+		<textarea class='commitResult'></textarea><br>
+	</div>	
 </div>
 </body>
 </html>

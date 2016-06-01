@@ -12,8 +12,8 @@
 // var bigInt2 = new u.BigInteger(30);
 // var bigInt = bigInt.subtract(bigInt2);
 // //console.log('BigInteger: ' + bigInt.intValue());
-
- var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(23);
+var bigIntMod = new u.BigInteger(23);
+ var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(bigIntMod);
 // console.log('Modulus: ' + gGstarMod.getModulus().intValue());
 // console.log('ModuloFactorization: ' +  gGstarMod.getModuloFactorization().intValue());
 // console.log('orderFactorization: ' +  gGstarMod.getOrderFactorization().intValue());
@@ -39,10 +39,10 @@ var g2 = gGstarMod.getElement(e2);
 var m = e3; // ZMod
 var r = e4; // ZMod
 
-console.log('START');
+// console.log('START');
 
-var x = gGstarMod.selfApply(g2, r);
-console.log(x.getValue().intValue());
+// var x = gGstarMod.selfApply(g2, r);
+// console.log(x.getValue().intValue());
 
 //var t = g1.__proto__.__proto__.__proto__;
 //console.log(t.constructor.name + ' ' + t._generic_);

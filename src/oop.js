@@ -7,7 +7,7 @@
 
 
 //Op Framework to add class based inheritance as known from Java
-if(window) {
+if(typeof window !== 'undefined') {
 	globalScope = window;
 } else {
 	globalScope = GLOBAL;

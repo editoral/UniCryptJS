@@ -1,5 +1,5 @@
 .inputBox {
-	width: 400px;
+	/*width: 400px;*/
 }
 .inputLabel {
 	width: 200px;
@@ -7,4 +7,7 @@
 }
 .inputBox input {
 	margin-left: 200;
+}
+.container {
+	width: 400px;
 }
