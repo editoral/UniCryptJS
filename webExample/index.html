@@ -43,5 +43,54 @@
 		<textarea class='commitResult'></textarea><br>
 	</div>	
 </div>
+
+
+<div class='container elGamal'>
+<h1>ElGamal Encryption</h1>
+	<div class='inputBox'>
+		<label class='inputLabel' for='message'>Message:</label>
+		<input type="number" value='8' class='message'  name="message"><br>
+	</div>
+	<div class='inputBox'>
+		<label class='inputLabel' for='r'>Randomization:</label>
+		<input type="number" value='3' class='r' name="r"><br>
+	</div>
+	<div class='inputBox'>
+		<label class='inputLabel' for='secret'>Secret:</label>
+		<input type="number" value='2' class='secret' name="secret"><br>
+	</div>
+	<div class='inputBox'>
+		<label class='inputLabel' for='generator'>Generator:</label>
+		<input type="number" value='4' class='generator' name="generator"><br>
+	</div>
+	<div class='inputBox'>
+		<label class='inputLabel' for='mod'>Modulo:</label>
+		<input type="number" value='23' class='mod' name="mod"><br>
+	</div>		
+	<button type="button" class='enc'>Encrypt</button>
+	<div class='inputBox'>
+		<label class='inputLabel' for='result'>encrypted: </label>
+		<textarea class='result'></textarea><br>
+	</div>
+	<hr width="100%">
+	<button  type="button" class='dec'>Decrypt</button>
+	<div class='inputBox'>
+		<label class='inputLabel' for='decrypted'>decrypted: </label>
+		<textarea class='decrypted'></textarea><br>
+	</div>	
+</div>
+
+<div class='container getElements'>
+<h1>Get group Elements</h1>
+	<div class='inputBox'>
+		<label class='inputLabel' for='modulo'>Modulo:</label>
+		<input type="number" value='23' class='modulo'  name="modulo"><br>
+	</div>
+	<button type="button" class='eval'>getElements</button>
+	<div class='inputBox'>
+		<label class='inputLabel' for='result'>Elements: </label>
+		<textarea class='result'></textarea><br>
+	</div>
+</div>
 </body>
 </html>

@@ -2282,9 +2282,9 @@ unicrypt.math.algebra.general.abstracts.AbstractGroup = Op.AbstractClass('Abstra
 		if (!this.contains(element)) {
 			throw new Error('IllegalArgumentException');
 		}
-		return this.abstractInvert(element);		
+		return this._abstractInvert(element);		
 	}.paramType(['Element']).returnType('E'),
-	applyInverse: function(elemnt1, element2) {
+	applyInverse: function(element1, element2) {
 		return this.apply(element1, this.invert(element2));
 	}.paramType(['Element', 'Element']).returnType('E'),
 	// _defaultSelfApply: function(element, amount) {
