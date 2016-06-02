@@ -28,7 +28,7 @@ unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime = Op.Class('GStar
 			}			
 			var instance = new unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime(mod);
 			return instance;
-		}.paramType(['long']),
+		}.paramType(['BigInteger']),
 		//instances: null
 	}
 });

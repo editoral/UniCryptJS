@@ -280,6 +280,7 @@ Op._.typing.testTypes = function(type, val, generic) {
 		case 'short':
 		break;
 		case 'long':
+		//h.integer(val);
 		break;
 		case 'float':
 		break;

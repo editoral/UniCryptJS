@@ -13,7 +13,7 @@
 // var bigInt = bigInt.subtract(bigInt2);
 // //console.log('BigInteger: ' + bigInt.intValue());
 var bigIntMod = new u.BigInteger(23);
- var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(bigIntMod);
+var gGstarMod = unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime.getInstance(bigIntMod);
 // console.log('Modulus: ' + gGstarMod.getModulus().intValue());
 // console.log('ModuloFactorization: ' +  gGstarMod.getModuloFactorization().intValue());
 // console.log('orderFactorization: ' +  gGstarMod.getOrderFactorization().intValue());

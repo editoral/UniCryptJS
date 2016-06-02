@@ -7,6 +7,11 @@ unicrypt.math.algebra.general.abstracts = {};
 unicrypt.math.algebra.multiplicative = {};
 unicrypt.math.algebra.multiplicative.abstracts = {};
 unicrypt.math.algebra.multiplicative.classes = {};
+unicrypt.math.algebra.dualistic = {};
+unicrypt.math.algebra.dualistic.classes = {};
+unicrypt.math.algebra.dualistic.abstracts = {};
+unicrypt.math.algebra.additive = {};
+unicrypt.math.algebra.additive.abstracts = {};
 
 unicrypt.crypto = {};
 unicrypt.crypto.schemes = {};

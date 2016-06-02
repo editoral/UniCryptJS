@@ -1,12 +1,81 @@
-[31m>> [39mMocha exploded!
-[31m>> [39mError: Number of parameter types and number of parameters missmatch![31m
->> [39m    at Object.Op._.helper.matchParamsArgs (C:\Users\marce\git\junicrypt\dist\demoBuild.js:1279:9)[31m
->> [39m    at GenericClass2.newClass (C:\Users\marce\git\junicrypt\dist\demoBuild.js:1661:16)[31m
->> [39m    at new GenericClass2 (eval at <anonymous> (C:\Users\marce\git\junicrypt\dist\demoBuild.js:1386:11), <anonymous>:2:68)[31m
->> [39m    at Object.<anonymous> (C:\Users\marce\git\junicrypt\dist\demoBuild.js:2529:23)[31m
->> [39m    at Module._compile (module.js:409:26)[31m
->> [39m    at Object.Module._extensions..js (module.js:416:10)[31m
->> [39m    at Module.load (module.js:343:32)[31m
->> [39m    at Function.Module._load (module.js:300:12)[31m
->> [39m    at Module.require (module.js:353:17)[31m
->> [39m    at require (internal/module.js:12:17)
+Test: Apfel: 5
+{ T: 'int', K: 'int', V: 'string' }
+here: function StaticVariables() { return call(this, arguments) }
+hello
+hi: 20
+START
+10
+C1: 30
+C2: 30
+
+[0m[0m
+[0m  Class declaration and inheritance[0m
+[2K[0G  [32m  √[0m[90m checks typing correctness in constructor[0m
+[2K[0G  [32m  √[0m[90m checks typing correctness in function parameter int[0m
+[2K[0G  [32m  √[0m[90m checks typing correctness in function parameter int[0m
+[2K[0G  [32m  √[0m[90m checks typing correctness in function parameter boolean[0m
+[2K[0G  [32m  √[0m[90m checks typing correctness in function parameter string[0m
+[2K[0G  [32m  √[0m[90m checks typing correctness in function parameter working[0m
+[2K[0G  [32m  √[0m[90m checks typing correctness wrong nr of params[0m
+[2K[0G  [32m  √[0m[90m checks typing correctness in function parameter with named classes[0m
+[2K[0G  [32m  √[0m[90m checks typing correctness in function parameter with named classes working[0m
+[2K[0G  [32m  √[0m[90m test typing correctness of return value[0m
+[2K[0G  [32m  √[0m[90m test typing correctness of return value 2[0m
+[2K[0G  [32m  √[0m[90m tests correctness of properties in Baseclass[0m
+[2K[0G  [32m  √[0m[90m tests correctness of properties in ChildClass[0m
+[2K[0G  [32m  √[0m[90m tests correctness of overwriting properties in ChildClass[0m
+[2K[0G  [32m  √[0m[90m tests constructor and superconstructor in ChildClass[0m
+[2K[0G  [32m  √[0m[90m instantiate a grandchild and tests function[0m
+[2K[0G  [32m  √[0m[90m instantiate a grandchild and tests parent function[0m
+
+[0m  Function overloading[0m
+[2K[0G  [32m  √[0m[90m tests overload with int param[0m
+[2K[0G  [32m  √[0m[90m tests overload with string param[0m
+[2K[0G  [32m  √[0m[90m tests overload with double int param[0m
+[2K[0G  [32m  √[0m[90m tests overload with tripple param[0m
+
+[0m  Abstract classes and inheritance[0m
+[2K[0G  [32m  √[0m[90m tries to instantiate an abstract class[0m
+[2K[0G  [32m  √[0m[90m tires to instantiate a class not implementing abstract Functions[0m
+[2K[0G  [32m  √[0m[90m instantiate a class implementing all abstract methods[0m
+[2K[0G  [32m  √[0m[90m instantiating a abstract class without abstract methods fails[0m
+[2K[0G  [32m  √[0m[90m tests constructor of abstract parent class[0m
+[2K[0G  [32m  √[0m[90m tests constructor of abstract parent class 2[0m
+[2K[0G  [32m  √[0m[90m tests multiple abstract Functions[0m
+[2K[0G  [32m  √[0m[90m varables have no inpact on abstractness of class[0m
+[2K[0G  [32m  √[0m[90m normal classes can be made abstract by adding abstract Methods[0m
+[2K[0G  [32m  √[0m[90m can instantiate a grandchild and call a grandparent function[0m
+
+[0m  Generic Typing[0m
+[2K[0G  [32m  √[0m[90m fails if no generic type is delared[0m
+[2K[0G  [32m  √[0m[90m delcared types working[0m
+[2K[0G  [32m  √[0m[90m fails if generic type missmatch[0m
+[2K[0G  [32m  √[0m[90m generic class extends another generic class[0m
+
+[0m  Static Variables, Functions and private constructors[0m
+[2K[0G  [32m  √[0m[90m uses a static Variable [0m
+[2K[0G  [32m  √[0m[90m uses a static Function[0m
+[2K[0G  [31m  1) fails when there is a private constructor and no getInstance method[0m
+[2K[0G  [32m  √[0m[90m uses the getInstance Method to get an Instance[0m
+[2K[0G  [32m  √[0m[90m uses a publicFunction which accesses a static variable[0m
+[2K[0G  [32m  √[0m[90m other and shorter form to access static Variables[0m
+
+
+[92m [0m[32m 40 passing[0m[90m (116ms)[0m
+[31m  1 failing[0m
+
+[0m  1) Static Variables, Functions and private constructors fails when there is a private constructor and no getInstance method:
+[0m[31m     Error: expected fn to throw an exception[0m[90m
+      at Assertion.assert (C:\Users\marce\git\junicrypt\node_modules\expect.js\index.js:96:13)
+      at Assertion.throwError.Assertion.throwException (C:\Users\marce\git\junicrypt\node_modules\expect.js\index.js:171:10)
+      at Context.<anonymous> (C:\Users\marce\git\junicrypt\test\oopTest.js:464:25)
+      at callFn (C:\Users\marce\git\junicrypt\node_modules\mocha\lib\runnable.js:286:21)
+      at Test.Runnable.run (C:\Users\marce\git\junicrypt\node_modules\mocha\lib\runnable.js:279:7)
+      at Runner.runTest (C:\Users\marce\git\junicrypt\node_modules\mocha\lib\runner.js:421:10)
+      at C:\Users\marce\git\junicrypt\node_modules\mocha\lib\runner.js:528:12
+      at next (C:\Users\marce\git\junicrypt\node_modules\mocha\lib\runner.js:341:14)
+      at C:\Users\marce\git\junicrypt\node_modules\mocha\lib\runner.js:351:7
+      at next (C:\Users\marce\git\junicrypt\node_modules\mocha\lib\runner.js:283:14)
+[0m
+
+

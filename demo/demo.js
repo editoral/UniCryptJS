@@ -720,7 +720,8 @@ demo.fw.PrivateConstructor = Op.Class('PrivateConstructor', null, {
 	x: 10
 });
 
-var privateTester = new demo.fw.PrivateConstructor.getInstance();
+var privateTester = demo.fw.PrivateConstructor.getInstance();
+//var fehlerWerfen = new demo.fw.PrivateConstructor(20);
 console.log('hi: ' + privateTester.x);
 
 
@@ -782,34 +783,34 @@ Underline für Private Convention
 
 
 var BaseClass = Op.Class('BaseClass', null,{
-            func1: function(int1) {
-                return int1;
-            }.paramType(['int']).returnType('int'),
-            func2: function(int1, int2) {
-                return int1 + int2;
-            }.paramType(['int','int']).returnType('int'),
-            func2: function(int1, int2, string1) {
-                return string1 + (int1 + int2);
-            }.paramType(['int','int', 'string']).returnType('string'),
-            func4: function(string1) {
-                return string1 + ' : one single argument';
-            }.paramType(['string']).returnType('string')
-        });
+    func1: function(int1) {
+        return int1;
+    }.paramType(['int']).returnType('int'),
+    func2: function(int1, int2) {
+        return int1 + int2;
+    }.paramType(['int','int']).returnType('int'),
+    func2: function(int1, int2, string1) {
+        return string1 + (int1 + int2);
+    }.paramType(['int','int', 'string']).returnType('string'),
+    func4: function(string1) {
+        return string1 + ' : one single argument';
+    }.paramType(['string']).returnType('string')
+});
 
 var ChildClass = Op.Class('ChildClass',  {
 	'extends': BaseClass
 }, {
 
 });
-var GrandChildClass = Op.Class('GrandChildClass',  {
-	'extends': ChildClass
-}, {
 
-});
-var baseClass = new BaseClass();
-var grandChildClass = new GrandChildClass();
-var result = grandChildClass.func(10, 20, 'Result: ');
-console.log('overload: ' + result);
+var childClass = new ChildClass();
+var result = childClass.func(10, 20, 'Result: ');
+var result2 = childClass.func('Result: ');
+var result3 = childClass.func1(10);
+console.log('1: ' + result); // Log: 1: Result: 30
+console.log('2: ' + result2); // Log: 2: Result:  : one single argument
+console.log('3: ' + result3); // Log: 3: 10
+
 
 // var Class1 = Op.Class('Class1', null, {
 // 	init: function(val) {
@@ -904,4 +905,147 @@ var Class4 = Op.Class('Class4', {
 });
 
 var class4 = new Class4(10);
-console.log('Here: ' + class4.testFunc(10));
+//console.log('Here: ' + class4.$$super(10));
+
+
+// var func = function(param1, param2) {
+// 	return param1 + param2
+// }
+// console.log('Ex1: ' + func(10, 20));
+// console.log('Ex2: ' + func(10));
+// console.log('Ex3: ' + func(10, null));
+// console.log('Ex3: ' + func(10, '20'));
+// console.log('Ex3: ' + func(10, {x:20}.x));
+
+
+// // Funktioniert, da es der JavaScript Syntax entspricht
+// // Hat aber rein gar nix mehr mit Java zu tun und ist deshalb nicht zu empfehlen
+// var obj = {};
+// obj['_x'] = 10;
+// obj['func'] = function(int1) {
+//     return int1 + this._x + this._privateFunc();
+// }.paramType(['int']).returnType('int');
+// obj._privateFunc = function() {
+// 	return 10;
+// }.returnType('int');
+
+// var Class1 = Op.Class('BaseClass', null,obj);
+
+// //So wird eine Klasse richtig Definiert
+// //Die Eigenschaften werden direkt in dem Objekt definiert
+// var Class2 = Op.Class('BaseClass', null,{
+// 	_x: 10, //Per Konvention eine Private Variable
+//     func: function(int1) {
+//         return int1 + this._x + this._privateFunc();
+//     }.paramType(['int']).returnType('int'),
+//     _privateFunc: function() {
+//     	return 10;
+//     }.returnType('int')
+// });
+
+// var c1 = new Class1();
+// var c2 = new Class2();
+// console.log('C1: ' + c1.func(10));
+// console.log('C2: ' + c2.func(10));
+
+
+
+// demo.StaticClass = Op.Class('StaticClass', null, {
+// 	static: {
+// 		z: 0,
+// 		y: 0,
+// 		increment: function() {
+// 			demo.StaticClass.z += 1;
+// 		}
+// 	},
+// 	setY: function(y) {
+// 		this.static.y = y;
+// 	}	
+// });
+
+// var staticClass = new demo.StaticClass();
+// demo.StaticClass.increment();
+// console.log('Z: ' + demo.StaticClass.z);
+// demo.StaticClass.increment();
+// console.log('Z: ' + demo.StaticClass.z);
+// staticClass.setY(10);
+// console.log('Y: ' + demo.StaticClass.y);
+
+
+
+//Fantasy
+
+// var Calculator = Op.Class('Calculator', null,{
+// 	y: Op.Var('int').set(null),
+// 	x: Op.Var('int').set(null),
+// 	setter: function(x, y) {
+// 		this.x.set(x);
+// 		this.y.set(y);
+// 	},
+// 	divide: function() {
+// 		var result = Op.Var('float').set(this.x.get() / this.y.get());
+// 		return result;
+// 	}.returnType('float');
+// });
+
+// var Divide10 = Op.Class('Divide10', {
+// }, {
+// 	x: Op.Var('int').set(10),
+// 	result: Op.Var('float'),
+// 	init: function(val) {
+// 		var calc = Op.Var('Calculator');
+// 		calc.set(new Calculator());
+// 		calc.get().setter(this.x.get(),val);
+// 		this.result.set(calc.divide());
+// 	}.paramType(['int']),
+// 	getDivisionResult: function() {
+// 		return this.result.get();
+// 	}
+// });
+
+
+
+
+
+var BaseClass = Op.Class('BaseClass', {
+	'generic': ['E', 'V'],
+}, {
+	x: null,
+	init: function(val) {
+		this.x = val;
+	}.paramType(['E']),
+	testFuncOne: function(val) {
+		return this.x + val;
+	}.paramType(['V']).returnType('E'),
+	testFuncTwo: function(val) {
+		return val + this.x;
+	}.paramType(['V']).returnType('V'),
+});
+
+var ChildClass1 = Op.Class('ChildClass1', {
+	'extends': {
+		'class': BaseClass,
+		'generic': ['string', 'int']
+	}
+}, {
+	init: function(val) {
+		this.$$super(val);
+	}
+});
+
+var ChildClass2 = Op.Class('ChildClass2', {
+	'generic': ['E', 'V'],
+	'extends': {
+		'class': BaseClass,
+		'generic': ['E', 'V']
+	}
+}, {
+	init: function(val) {
+		this.$$super(val);
+	}
+});
+
+var childClass1 = new ChildClass1('Nr. ');
+var childClass2 = new ChildClass2(['int', 'string'],2);
+console.log(childClass1.testFuncOne(1));
+console.log(childClass2.testFuncTwo('Nr. '));

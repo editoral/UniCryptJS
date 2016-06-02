@@ -280,6 +280,7 @@ Op._.typing.testTypes = function(type, val, generic) {
 		case 'short':
 		break;
 		case 'long':
+		//h.integer(val);
 		break;
 		case 'float':
 		break;
@@ -1962,7 +1963,12 @@ u.BigInteger = Op.Class('BigInteger',null, {
 		newBigInt = new u.BigInteger(1);
 		newBigInt.bigInt = this.bigInt.modPow(exponent.bigInt, m.bigInt);
 		return newBigInt;
-	}.paramType(['BigInteger', 'BigInteger']),
+	}.paramType(['BigInteger', 'BigInteger']).returnType('BigInteger'),
+	abs: function() {
+		newBigInt = new u.BigInteger(1);
+		newBigInt.bigInt = this.bigInt.abs();
+		return newBigInt;
+	}.returnType('BigInteger'),
 	static: {
 		valueOf: function(long) {
 			return new u.BigInteger(long)
@@ -1983,6 +1989,11 @@ unicrypt.math.algebra.general.abstracts = {};
 unicrypt.math.algebra.multiplicative = {};
 unicrypt.math.algebra.multiplicative.abstracts = {};
 unicrypt.math.algebra.multiplicative.classes = {};
+unicrypt.math.algebra.dualistic = {};
+unicrypt.math.algebra.dualistic.classes = {};
+unicrypt.math.algebra.dualistic.abstracts = {};
+unicrypt.math.algebra.additive = {};
+unicrypt.math.algebra.additive.abstracts = {};
 
 unicrypt.crypto = {};
 unicrypt.crypto.schemes = {};
@@ -2003,7 +2014,22 @@ unicrypt.helper.math.MathUtil = Op.Class('MathUtil', {
 	static: {
 		areRelativelyPrime: function(value1, value2) {
 			return value1.gcd(value2).equals(u.BigInteger.ONE())
-		}.paramType(['BigInteger', 'BigInteger'])
+		}.paramType(['BigInteger', 'BigInteger']),
+		NUMBER_OF_PRIME_TESTS: 40,
+		isPrime: function(value) {
+			return value.signum() > 0 && value.isProbablePrime(unicrypt.helper.math.MathUtil.NUMBER_OF_PRIME_TESTS);
+		},
+		// removeDuplicates: function(a) {
+		//     var prims = {"boolean":{}, "number":{}, "string":{}}, objs = [];
+
+		//     return a.filter(function(item) {
+		//         var type = typeof item;
+		//         if(type in prims)
+		//             return prims[type].hasOwnProperty(item) ? false : (prims[type][item] = true);
+		//         else
+		//             return objs.indexOf(item) >= 0 ? false : objs.push(item);
+		//     });
+		// }.paramType('array').returnType('array'),
 	}
 });
 unicrypt.UniCrypt = Op.AbstractClass('UniCrypt', null, {
@@ -2057,9 +2083,9 @@ unicrypt.math.algebra.general.abstracts.AbstractSet = Op.AbstractClass('Abstract
 	// isSemiRing: function() {
 	// 	 return this instanceof SemiRing;
 	// }.returnType('boolean'),
-	// isRing: function() {
-	// 	 return this instanceof Ring;
-	// }.returnType('boolean'),
+	isRing: function() {
+		 return this instanceof unicrypt.math.algebra.dualistic.abstracts.AbstractRing;
+	}.returnType('boolean'),
 	// isField: function() {
 	// 	 return this instanceof Field;
 	// }.returnType('boolean'),
@@ -2098,9 +2124,9 @@ unicrypt.math.algebra.general.abstracts.AbstractSet = Op.AbstractClass('Abstract
 		}
 		return false;		
 	}.paramType(['AbstractSet']).returnType('boolean'),
-	// hasKnownOrder: function() {
-	// 	return !this.getOrder().equals(Set.UNKNOWN);
-	// }.returnType('boolean'),
+	hasKnownOrder: function() {
+		return !this.getOrder().equals(AbstractSet.UNKNOWN);
+	}.returnType('boolean'),
 	getOrder: function() {
 		if (this.order == null) {
 			this.order = this._abstractGetOrder();
@@ -2546,7 +2572,7 @@ unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime = Op.Class('GStar
 			}			
 			var instance = new unicrypt.math.algebra.multiplicative.classes.GStarModSafePrime(mod);
 			return instance;
-		}.paramType(['long']),
+		}.paramType(['BigInteger']),
 		//instances: null
 	}
 });
@@ -2774,6 +2800,302 @@ unicrypt.math.algebra.multiplicative.classes.ZStarMod = Op.Class('ZStarMod', {
 			return instance;
 		}.paramType(['long']),
 	}
+});
+unicrypt.math.algebra.additive.abstracts.AbstractAdditiveMonoid = Op.AbstractClass('AbstractAdditiveMonoid', {
+	'generic': ['E', 'V'],
+	'extends': {
+		'class': unicrypt.math.algebra.general.abstracts.AbstractMonoid,
+		'generic': ['E','V']
+	}
+},{
+	_init: function(valueClass) {
+		this.$$super(valueClass);
+	},
+	add: function(element1, element2) {
+		return this.apply(element1, element2);
+	}.paramType(['Element','Element']).returnType('E'),
+	times: function(element, amount) {
+		return this.selfApply(element, amount);
+	}.paramType(['Element','BigInteger']).returnType('E'),
+	timesTwo: function(element) {
+		return this.selfApply(element);
+	}.paramType(['Element']).returnType('E'),
+	getZeroElement: function() {
+		return this.getIdentityElement();
+	}.returnType('E'),
+});
+unicrypt.math.algebra.additive.abstracts.AbstractAdditiveElement = Op.AbstractClass('AbstractAdditiveElement', {
+	'generic': ['S', 'E', 'V'],
+	'extends': {
+		'class': unicrypt.math.algebra.general.abstracts.AbstractElement,
+		'generic': ['S', 'E', 'V']
+	}
+},{
+	_init: function(semiGroup, value) {
+		this.$$super(semiGroup, value);
+	},
+	add: function(element) {
+		return this.getSet().add(this, element);
+	}.paramType(['Element']).returnType('E'),
+	subtract: function(element) {
+		if (this.getSet().isGroup()) {
+			var group = this.getSet();
+			return group.subtract(this, element);
+		}
+		throw new Error('UnsupportedOperationException');
+	}.paramType(['Element']).returnType('E'),
+	times: function(amount) {
+		return this.getSet().times(this, amount);
+	}.paramType(['BigInteger']).returnType('E'),
+	timesTwo: function() {
+		return this.getSet().timesTwo(this);
+	}.returnType('E'),
+	negate: function() {
+		if (this.getSet().isGroup()) {
+			var group = this.getSet();
+			return group.invert(this);
+		}
+		throw new Error('UnsupportedOperationException');		
+	}.returnType('E'),
+	isZero: function() {
+		if (this.getSet().isMonoid()) {
+			var monoid = this.getSet();
+			return monoid.isZeroElement(this);
+		}
+		throw new Error('UnsupportedOperationException');		
+	}.returnType('boolean')
+
+});
+unicrypt.math.algebra.dualistic.abstracts.AbstractSemiRing = Op.AbstractClass('AbstractSemiRing', {
+	'generic': ['E', 'V'],
+	'extends': {
+		'class': unicrypt.math.algebra.additive.abstracts.AbstractAdditiveMonoid,
+		'generic': ['E', 'V']
+	}
+},{
+	_one:  null,
+	_init: function(valueClass) {
+		this.$$super(valueClass);
+	},
+	multiply: function(element1, element2) {
+		if (!this.contains(element1) || !this.contains(element2)) {
+			throw new Error('IllegalArgumentException');
+		}
+		return this._abstractMultiply(element1, element2);
+	}.paramType(['Element', 'Element']).returnType('E'),
+	power: function(element, amount) {
+		if (!this.contains(element) || (amount == null)) {
+			throw new Error('IllegalArgumentException');
+		}
+		return this._defaultPower(element, amount);
+	}.paramType(['Element','BigInteger']).returnType('E'),
+	square: function(element) {
+		return this.multiply(element, element)
+	}.paramType(['Element']).returnType('E'),
+	getOneElement: function() {
+		if (this._one == null) {
+			this._one = this._abstractGetOne();
+		}
+		return this._one;
+	}.returnType('E'),
+	_defaultPower: function(element,amount) {
+		if (amount.signum() < 0) {
+			throw new Error('IllegalArgumentException');
+		}
+		if (amount.signum() == 0) {
+			return this.getOneElement();
+		}
+		return this._defaultPowerAlgorithm(element, amount);
+	}.paramType(['E','BigInteger']).returnType('E'),
+	_defaultPowerAlgorithm: function(element,posAmount) {
+		var result = element;
+		for (var i = posAmount.bitLength() - 2; i >= 0; i--) {
+			result = this._abstractMultiply(result, result);
+			if (posAmount.testBit(i)) {
+				result = this._abstractMultiply(result, element);
+			}
+		}
+		return result;
+	}.paramType(['E','BigInteger']).returnType('E'),
+
+});
+unicrypt.math.algebra.dualistic.abstracts.AbstractRing = Op.AbstractClass('AbstractRing', {
+	'generic': [
+		'E', 'V'
+	],
+	'extends': {
+		'class': unicrypt.math.algebra.dualistic.abstracts.AbstractSemiRing,
+		'generic': [
+			'E','V'
+		]
+	}
+},{
+	_init: function(valueClass) {
+		this.$$super(valueClass);
+	},
+	invert: function(element) {
+		if (!this.contains(element)) {
+			throw new Error('IllegalArgumentException');
+		}
+		return this._abstractInvert(element);		
+	}.paramType(['Element']).returnType('E'),
+	applyInverse: function(element1, element2) {
+		return this.apply(element1, this.invert(element2));
+	}.paramType(['Element', 'Element']).returnType('E'),	
+	subtract: function(element1, element2) {
+		return this.applyInverse(element1, element2)
+	}.paramType(['Element', 'Element']).returnType('E'),
+	negate: function(element) {
+		return this.invert(element);
+	}.paramType(['Element']).returnType('E'),
+	_defaultSelfApply: function(element,amount) {
+		var negAmount = (amount.signum() < 0);
+		amount = amount.abs();
+		if (this.isFinite() && this.hasKnownOrder()) {
+			amount = amount.mod(this.getOrder());
+		}
+		if (amount.signum() == 0) {
+			return this.getIdentityElement();
+		}
+		var result = this._defaultSelfApplyAlgorithm(element, amount);
+		if (negAmount) {
+			return this.invert(result);
+		}
+		return result;
+	}.paramType(['E', 'BigInteger']).returnType('E'),
+
+});
+unicrypt.math.algebra.dualistic.abstracts.AbstractCyclicRing = Op.AbstractClass('AbstractCyclicRing', {
+	'generic': ['E', 'V'],
+	'extends': {
+		'class': unicrypt.math.algebra.dualistic.abstracts.AbstractRing,
+		'generic': ['E', 'V']
+	}
+},{
+	_defaultGenerator: null,
+	_init: function(valueClass) {
+		this.$$super(valueClass)	
+	},
+	getDefaultGenerator: function() {
+		if (this._defaultGenerator == null) {
+			this._defaultGenerator = this._abstractGetDefaultGenerator();
+		}
+		return this._defaultGenerator;
+	}.returnType('E'),
+	isGenerator: function(element) {
+		if (!this.contains(element)) {
+			throw new Error('IllegalArgumentException');
+		}
+		return this._abstractIsGenerator(element);
+	}.paramType(['Element']).returnType('boolean'),
+
+});
+unicrypt.math.algebra.dualistic.abstracts.AbstractDualisticElement = Op.AbstractClass('AbstractDualisticElement', {
+	'generic': ['S', 'E', 'V'],
+	'extends': {
+		'class': unicrypt.math.algebra.additive.abstracts.AbstractAdditiveElement,
+		'generic': ['S', 'E', 'V']
+	}
+},{
+	_init: function(ring, value) {
+		this.$$super(ring, value);
+	},
+	multiply: function(element) {
+		return this.getSet().multiply(this, element);
+	}.paramType(['Element']).returnType('E'),
+	power: function(amount) {
+		return this.getSet().power(this, amount);
+	}.paramType(['BigInteger']).returnType('E'),
+	square: function() {
+		return this.getSet().square(this);
+	}.returnType('E'),
+	divide: function(element) {
+		if (this.getSet().isField()) {
+			var field = this.getSet();
+			return field.divide(this, element);
+		}
+		throw new Error('UnsupportedOperationException');
+	}.paramType(['Element']).returnType('E'),
+});
+unicrypt.math.algebra.dualistic.classes.ZMod =  Op.Class('ZMod', {
+	'extends': {
+		'class' : unicrypt.math.algebra.dualistic.abstracts.AbstractCyclicRing,
+		'generic' : ['ZModElement', 'BigInteger']
+	}
+},{
+	_modulus: null,
+	_init: function(modulus) {
+		this.$$super(u.BigInteger);
+		this._modulus = moduloFactorization;
+	}.paramType(['BigInteger']),
+	getModulus: function() {
+		return this._modulus;
+	}.returnType('BigInteger'),
+	_defaultSelfApplyAlgorithm: function(element,posAmount) {
+		return this._abstractGetElement(element.getValue().multiply(posAmount).mod(this._modulus));
+	}.paramType(['ZModElement','BigInteger']).returnType('ZModElement'),
+	_defaultPowerAlgorithm: function(element,posAmount) {
+		return this._abstractGetElement(element.getValue().modPow(posAmount, this._modulus));
+	}.paramType(['ZModElement','BigInteger']).returnType('ZModElement'),
+	// _defaultToStringContent: function() {
+	// 	return this.getModulus().toString() + "," + this.getOrder().toString();
+	// }.returnType('string'),
+	_abstractContains: function(value) {
+		return value.signum() >= 0 && value.compareTo(this._modulus) < 0;
+	}.paramType(['BigInteger']).returnType('boolean'),
+	_abstractGetElement: function(value) {
+		return new unicrypt.math.algebra.dualistic.classes.ZModElement(this, value);
+	}.paramType(['BigInteger']).returnType('ZModElement'),
+	_abstractGetIdentityElement: function() {
+		return this._abstractGetElement(u.BigInteger.ONE);
+	}.returnType('ZModElement'),
+	_abstractApply: function(element1,element2) {
+		return this._abstractGetElement(element1.getValue().add(element2.getValue()).mod(this._modulus));
+	}.paramType(['ZModElement','ZModElement']).returnType('ZModElement'),
+	_abstractInvert: function(element) {
+		return this._abstractGetElement(this._modulus.subtract(element.getValue()).mod(this._modulus));
+	}.paramType(['ZModElement']).returnType('ZModElement'),
+	_abstractMultiply: function(element1,element2) {
+		return this._abstractGetElement(element1.getValue().multiply(element2.getValue()).mod(this._modulus));
+	}.paramType(['ZModElement','ZModElement']).returnType('ZModElement'),
+	_abstractGetOne: function() {
+		return this._abstractGetElement(BigInteger.ONE.mod(this._modulus));
+	}.returnType('ZModElement'),
+	_abstractGetOrder: function() {
+		return this._modulus;
+	}.returnType('BigInteger'),
+	_abstractGetDefaultGenerator: function() {
+		return this._abstractGetElement(BigInteger.ONE.mod(this._modulus));
+	}.returnType('ZModElement'),	
+	_abstractIsGenerator: function() {
+		if (this._modulus.equals(BigInteger.ONE)) {
+			return true;
+		}
+		return unicrypt.helper.math.MathUtil.areRelativelyPrime(element.getValue(), this._modulus);
+	}.paramType(['ZModElement']).returnType('boolean'),
+	_abstractEquals: function(set) {
+		var zMod = set;
+		return this._modulus.equals(zMod.getModulus());
+	}.paramType(['Set']).returnType('boolean'),
+	static: {
+		getInstance: function(modulus) {
+			if ((modulus == null) || (modulus.compareTo(u.BigInteger.valueOf(2)) < 0)) {
+				throw new Error('IllegalArgumentException');
+			}
+			var instance =  new ZMod(modulus);
+			return instance;
+		}.paramType(['BigInteger']).returnType('ZMod')
+	}
+});
+unicrypt.math.algebra.dualistic.classes.ZModElement  = Op.Class('ZModElement', {
+	'extends': {
+		'class' : unicrypt.math.algebra.dualistic.abstracts.AbstractDualisticElement,
+		'generic': ['ZMod', 'ZModElement', 'BigInteger']
+	}
+},{
+	init: function(zMod, value) {
+		this.$$super(zMod, value);
+	}.paramType(['ZMod', 'BigInteger']),
 });
 // unicrypt.crypto.schemes.commitment.classes.PedersenCommitmentScheme = Op.AbstractClass('PedersenCommitmentScheme', {
 // 	'extends': {

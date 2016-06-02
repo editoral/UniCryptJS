@@ -25,10 +25,11 @@ module.exports = function(grunt) {
 				//'demo/littleNodeHelper.js', 
 				// FW and Requirements
 				'src/oop.js', 'vendor/*.js', 'src/UnicryptJS/_Reqs/*.js', 
-				//GStarMod
+				//Algebra General
 				'src/UnicryptJS/Unicrypt/Helper/Math/MathUtil.js', 'src/UnicryptJS/Unicrypt/unicrypt.js', 'src/UnicryptJS/Unicrypt/Math/Algebra/General/Abstracts/AbstractSet.js',
 				'src/UnicryptJS/Unicrypt/Math/Algebra/General/Abstracts/AbstractSemiGroup.js','src/UnicryptJS/Unicrypt/Math/Algebra/General/Abstracts/AbstractMonoid.js',
 				'src/UnicryptJS/Unicrypt/Math/Algebra/General/Abstracts/AbstractGroup.js', 'src/UnicryptJS/Unicrypt/Math/Algebra/General/Abstracts/AbstractCyclicGroup.js',
+				//GStarMod
 				'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Abstracts/AbstractMultiplicativeCyclicGroup.js', 'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Classes/GStarMod.js',
 				'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Classes/GStarModPrime.js', 'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Classes/GStarModSafePrime.js',
 				'src/UnicryptJS/Unicrypt/Math/Algebra/General/Abstracts/AbstractElement.js', 'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Abstracts/AbstractMultiplicativeElement.js',
@@ -36,6 +37,11 @@ module.exports = function(grunt) {
 				//ZStarMod
 				'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Abstracts/AbstractMultiplicativeGroup.js', 'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Classes/ZStarMod.js',
 				'src/UnicryptJS/Unicrypt/Math/Algebra/Multiplicative/Classes/ZStarModPrime.js',
+				//ZMod
+				'src/UnicryptJS/Unicrypt/Math/Algebra/Additive/Abstracts/AbstractAdditiveMonoid.js','src/UnicryptJS/Unicrypt/Math/Algebra/Additive/Abstracts/AbstractAdditiveElement.js',
+				'src/UnicryptJS/Unicrypt/Math/Algebra/Dualistic/Abstracts/AbstractSemiRing.js','src/UnicryptJS/Unicrypt/Math/Algebra/Dualistic/Abstracts/AbstractRing.js',
+				'src/UnicryptJS/Unicrypt/Math/Algebra/Dualistic/Abstracts/AbstractCyclicRing.js', 'src/UnicryptJS/Unicrypt/Math/Algebra/Dualistic/Abstracts/AbstractDualisticElement.js',
+				'src/UnicryptJS/Unicrypt/Math/Algebra/Dualistic/Classes/ZMod.js','src/UnicryptJS/Unicrypt/Math/Algebra/Dualistic/Classes/ZModElement.js',
 				//Scheme
 				'src/UnicryptJS/Unicrypt/Crypto/Schemes/Commitment/Classes/PedersenCommitmentScheme.js',
 				//Tester

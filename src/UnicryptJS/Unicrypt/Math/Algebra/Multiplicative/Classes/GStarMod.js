@@ -23,6 +23,40 @@ unicrypt.math.algebra.multiplicative.classes.GStarMod =  Op.Class('GStarMod', {
 	getOrderFactorization: function() {
 		return this._orderFactorization;		
 	}.returnType('BigInteger'),
+	_defaultSelfApplyAlgorithm: function(element,posAmount) {
+		return this._abstractGetElement(element.getValue().modPow(posAmount, this._modulus));
+	}.paramType(['GStarModElement','BigInteger']).returnType('GStarModElement'),
+	_abstractContains: function(value) {
+		return value.signum() > 0
+			   && value.compareTo(this._modulus) < 0
+			   && unicrypt.helper.math.MathUtil.areRelativelyPrime(value, this._modulus)
+			   && value.modPow(this.getOrder(), this._modulus).equals(u.BigInteger.ONE());
+	}.paramType(['BigInteger']).returnType('boolean'),
+	_abstractGetElement: function(value) {
+		return new unicrypt.math.algebra.multiplicative.classes.GStarModElement(this, value);
+	}.paramType(['BigInteger']).returnType('GStarModElement'),
+	_abstractGetOrder: function() {
+		return this.getOrderFactorization();
+	}.returnType('BigInteger'),
+	_abstractGetIdentityElement: function() {
+		return this._abstractGetElement(u.BigInteger.ONE);
+	}.returnType('GStarModElement'),
+	_abstractApply: function(element1,element2) {
+		return this._abstractGetElement(element1.getValue().multiply(element2.getValue()).mod(this._modulus));
+	}.paramType(['GStarModElement','GStarModElement']).returnType('GStarModElement'),
+	_abstractInvert: function(element) {
+		return this._abstractGetElement(element.getValue().modInverse(this._modulus));
+	}.paramType(['GStarModElement']).returnType('GStarModElement'),
+	// _abstractGetBigIntegerConverter: function() {
+	// 	return BigIntegerToBigInteger.getInstance(0);
+	// }.returnType('Converter'),
+	// _abstractGetRandomElement: function(randomByteSequence) {
+	// 	var randomElement = this.getZStarMod().getRandomElement(randomByteSequence);
+	// 	return this.getElement(randomElement.power(this.getCoFactor()).convertToBigInteger());
+	// }.paramType(['RandomByteSequence']).returnType('GStarModElement'),
+	// _defaultToStringContent: function() {
+	// 	return this.getModulus().toString() + "," + this.getOrder().toString();
+	// }.returnType('string'),
 	// getZStarMod: function() {
 	// 	if (this._superGroup == null) {
 	// 		this._superGroup = ZStarMod.getInstance(this.getModuloFactorization());
@@ -38,40 +72,6 @@ unicrypt.math.algebra.multiplicative.classes.GStarMod =  Op.Class('GStarMod', {
 	// getCoFactor: function() {
 	// 	return this.getZStarMod().getOrder().divide(this.getOrder());
 	// }.returnType('BigInteger'),
-	_defaultSelfApplyAlgorithm: function(element,posAmount) {
-		return this._abstractGetElement(element.getValue().modPow(posAmount, this._modulus));
-	}.paramType(['GStarModElement','BigInteger']).returnType('GStarModElement'),
-	// _defaultToStringContent: function() {
-	// 	return this.getModulus().toString() + "," + this.getOrder().toString();
-	// }.returnType('string'),
-	_abstractContains: function(value) {
-		return value.signum() > 0
-			   && value.compareTo(this._modulus) < 0
-			   && unicrypt.helper.math.MathUtil.areRelativelyPrime(value, this._modulus)
-			   && value.modPow(this.getOrder(), this._modulus).equals(u.BigInteger.ONE());
-	}.paramType(['BigInteger']).returnType('boolean'),
-	_abstractGetElement: function(value) {
-		return new unicrypt.math.algebra.multiplicative.classes.GStarModElement(this, value);
-	}.paramType(['BigInteger']).returnType('GStarModElement'),
-	// _abstractGetBigIntegerConverter: function() {
-	// 	return BigIntegerToBigInteger.getInstance(0);
-	// }.returnType('Converter'),
-	// _abstractGetRandomElement: function(randomByteSequence) {
-	// 	var randomElement = this.getZStarMod().getRandomElement(randomByteSequence);
-	// 	return this.getElement(randomElement.power(this.getCoFactor()).convertToBigInteger());
-	// }.paramType(['RandomByteSequence']).returnType('GStarModElement'),
-	_abstractGetOrder: function() {
-		return this.getOrderFactorization();
-	}.returnType('BigInteger'),
-	_abstractGetIdentityElement: function() {
-		return this._abstractGetElement(u.BigInteger.ONE);
-	}.returnType('GStarModElement'),
-	_abstractApply: function(element1,element2) {
-		return this._abstractGetElement(element1.getValue().multiply(element2.getValue()).mod(this._modulus));
-	}.paramType(['GStarModElement','GStarModElement']).returnType('GStarModElement'),
-	_abstractInvert: function(element) {
-		return this._abstractGetElement(element.getValue().modInverse(this._modulus));
-	}.paramType(['GStarModElement']).returnType('GStarModElement'),
 	// _abstractGetDefaultGenerator: function() {
 	// 	var alpha = u.BigInteger.ZERO;
 	// 	var element;

@@ -144,3 +144,24 @@ $(function() {
 		}
 	});
 });
+
+//Message => Text ASCII
+//Werte vorbereiten -> grosse Safeprime aus UniCrypt 
+//Webseite: Settings (generator, Modulo)
+// 			KeyGen (Pulbic, Secret)
+//			ElGamal Encript Decript
+//			Commit
+
+// Präsentation: Demo mit Text
+// Code Beispiel: Gleich Java wie JavaScript
+
+/*
+		 * Represents a bigInt for Zq in Gq
+		 *                 -
+		 *                / m' + 1      if (m'+1)^q = 1
+		 *   m = G(m') = <
+		 *                \ p - (m'+1)  otherwise
+		 *                 -
+		 * @param bigIntInZq - The bigInt in Zq (m')
+		 * @return The bigInt in Gq (m)
+		 */

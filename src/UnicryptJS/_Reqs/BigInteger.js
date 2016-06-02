@@ -64,7 +64,12 @@ u.BigInteger = Op.Class('BigInteger',null, {
 		newBigInt = new u.BigInteger(1);
 		newBigInt.bigInt = this.bigInt.modPow(exponent.bigInt, m.bigInt);
 		return newBigInt;
-	}.paramType(['BigInteger', 'BigInteger']),
+	}.paramType(['BigInteger', 'BigInteger']).returnType('BigInteger'),
+	abs: function() {
+		newBigInt = new u.BigInteger(1);
+		newBigInt.bigInt = this.bigInt.abs();
+		return newBigInt;
+	}.returnType('BigInteger'),
 	static: {
 		valueOf: function(long) {
 			return new u.BigInteger(long)

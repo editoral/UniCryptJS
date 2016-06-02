@@ -30,9 +30,9 @@ unicrypt.math.algebra.general.abstracts.AbstractSet = Op.AbstractClass('Abstract
 	// isSemiRing: function() {
 	// 	 return this instanceof SemiRing;
 	// }.returnType('boolean'),
-	// isRing: function() {
-	// 	 return this instanceof Ring;
-	// }.returnType('boolean'),
+	isRing: function() {
+		 return this instanceof unicrypt.math.algebra.dualistic.abstracts.AbstractRing;
+	}.returnType('boolean'),
 	// isField: function() {
 	// 	 return this instanceof Field;
 	// }.returnType('boolean'),
@@ -71,9 +71,9 @@ unicrypt.math.algebra.general.abstracts.AbstractSet = Op.AbstractClass('Abstract
 		}
 		return false;		
 	}.paramType(['AbstractSet']).returnType('boolean'),
-	// hasKnownOrder: function() {
-	// 	return !this.getOrder().equals(Set.UNKNOWN);
-	// }.returnType('boolean'),
+	hasKnownOrder: function() {
+		return !this.getOrder().equals(AbstractSet.UNKNOWN);
+	}.returnType('boolean'),
 	getOrder: function() {
 		if (this.order == null) {
 			this.order = this._abstractGetOrder();
