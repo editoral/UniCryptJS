@@ -70,6 +70,9 @@ u.BigInteger = Op.Class('BigInteger',null, {
 		newBigInt.bigInt = this.bigInt.abs();
 		return newBigInt;
 	}.returnType('BigInteger'),
+	toString: function() {
+		return this.bigInt.toString();
+	}.returnType('string'),
 	static: {
 		valueOf: function(long) {
 			return new u.BigInteger(long)

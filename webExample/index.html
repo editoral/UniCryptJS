@@ -9,6 +9,67 @@
 	<script language="javascript" type="text/javascript" src="./js.js"></script>
 </head>
 <body>
+<div class='container parameters'>
+<h1>Parameters</h1>
+	<div class='inputBox'>
+		<label class='inputLabel' for='modulo'>SafePrime:</label>
+		<textarea type="number" class='modulo'  name="modulo">173973498755694104291191874278768406528070650663238908813293913972103191057153675328208330724279271297622774797353706010621214034005684616382179590062252030254475785201643964399020823569357995087968272603441151674893066557538258751887866435682702100763643657110102320416878543208353823050593439490331410586547</textarea><br>
+	</div>
+	<div class='inputBox'>
+		<label class='inputLabel' for='generator1'>Generator:</label>
+		<input type="number" value='4' class='generator1'  name="generator1"><br>
+	</div>	
+	<div class='inputBox'>
+		<label class='inputLabel' for='generator2'>Generator2:</label>
+		<input type="number" value='9' class='generator2'  name="generator2"><br>
+	</div>	
+	<button type="button" class='eval'>KeyGen</button>
+	<div class='inputBox'>
+		<label class='inputLabel' for='secret'>Secret Key: </label>
+		<textarea class='secret'>118362729158607333081785813292424099927000382236866080140117690349067742686200180072983667047311659865909704497036110724170827770468885850563686076126300081684018855565807168800751250267023120631479325803933526728807007425297523978515903022290204154993734387557779824167953834421716494513768662206755067523840</textarea><br>
+	</div>
+	<div class='inputBox'>
+		<label class='inputLabel' for='publicKey'>Public Key: </label>
+		<textarea class='publicKey'></textarea><br>
+	</div>
+</div>
+
+
+<div class='container elGamal'>
+<h1>ElGamal Encryption</h1>
+	<div class='inputBox'>
+		<label class='inputLabel' for='message'>Message:</label>
+		<input type="text" value='8' class='message'  name="message"><br>
+	</div>
+	<div class='inputBox'>
+		<label class='inputLabel' for='r'>Randomization:</label>
+		<input type="number" value='3' class='r' name="r"><br>
+	</div>
+	<button type="button" class='enc'>Encrypt</button>
+	<div class='inputBox'>
+		<label class='inputLabel' for='result'>encrypted: </label>
+		<textarea class='result'></textarea><br>
+	</div>
+</div>
+
+<div class='container elGamaldec'>
+<h1>ElGamal Decryption</h1>
+	<div class='inputBox'>
+		<label class='inputLabel' for='cypher'>Cypher Text:</label>
+		<textarea class='cypher'  name="cypher"></textarea><br>
+	</div>
+	<div class='inputBox'>
+		<label class='inputLabel' for='r'>Randomization:</label>
+		<input type="number" value='3' class='r' name="r"><br>
+	</div>
+	<button  type="button" class='dec'>Decrypt</button>
+	<div class='inputBox'>
+		<label class='inputLabel' for='decrypted'>decrypted: </label>
+		<textarea class='decrypted'></textarea><br>
+	</div>	
+</div>
+
+
 <div class='container pederson'>
 <h1>Pederson Commitment</h1>
 	<div class='inputBox'>
@@ -19,18 +80,6 @@
 		<label class='inputLabel' for='r'>Randomization:</label>
 		<input type="number" class='r' value='3' name="r"><br>
 	</div>
-	<div class='inputBox'>
-		<label class='inputLabel' for='generator1'>Generator1:</label>
-		<input type="number" value='2' class='generator1' name="generator1"><br>
-	</div>
-	<div class='inputBox'>
-		<label class='inputLabel' for='generator2'>Generator2:</label>
-		<input type="number" value='4' class='generator2' name="generator2"><br>
-	</div>
-	<div class='inputBox'>
-		<label class='inputLabel' for='mod'>Modulo:</label>
-		<input type="number" value='23' class='mod' name="mod"><br>
-	</div>	
 	<button type="button" class='eval'>Commit</button>
 	<div class='inputBox'>
 		<label class='inputLabel' for='result'>Commitment: </label>
@@ -45,40 +94,6 @@
 </div>
 
 
-<div class='container elGamal'>
-<h1>ElGamal Encryption</h1>
-	<div class='inputBox'>
-		<label class='inputLabel' for='message'>Message:</label>
-		<input type="number" value='8' class='message'  name="message"><br>
-	</div>
-	<div class='inputBox'>
-		<label class='inputLabel' for='r'>Randomization:</label>
-		<input type="number" value='3' class='r' name="r"><br>
-	</div>
-	<div class='inputBox'>
-		<label class='inputLabel' for='secret'>Secret:</label>
-		<input type="number" value='2' class='secret' name="secret"><br>
-	</div>
-	<div class='inputBox'>
-		<label class='inputLabel' for='generator'>Generator:</label>
-		<input type="number" value='4' class='generator' name="generator"><br>
-	</div>
-	<div class='inputBox'>
-		<label class='inputLabel' for='mod'>Modulo:</label>
-		<input type="number" value='23' class='mod' name="mod"><br>
-	</div>		
-	<button type="button" class='enc'>Encrypt</button>
-	<div class='inputBox'>
-		<label class='inputLabel' for='result'>encrypted: </label>
-		<textarea class='result'></textarea><br>
-	</div>
-	<hr width="100%">
-	<button  type="button" class='dec'>Decrypt</button>
-	<div class='inputBox'>
-		<label class='inputLabel' for='decrypted'>decrypted: </label>
-		<textarea class='decrypted'></textarea><br>
-	</div>	
-</div>
 
 <div class='container getElements'>
 <h1>Get group Elements</h1>

@@ -2478,7 +2478,7 @@ demo.fw.ExtendsAbstract = Op.Class('ExtendsAbstract',  {
 })
 
 var abstractClass = new demo.fw.ExtendsAbstract(20);
-var abstractClass2 = new demo.fw.AbstractClass(20);
+//var abstractClass2 = new demo.fw.AbstractClass(20);
 
 demo.fw.GenericClass1 = Op.Class('GenericClass', {
 	'generic': [
@@ -2949,3 +2949,83 @@ var childClass1 = new ChildClass1('Nr. ');
 var childClass2 = new ChildClass2(['int', 'string'],2);
 console.log(childClass1.testFuncOne(1));
 console.log(childClass2.testFuncTwo('Nr. '));
+
+
+// //Dem übergeordneten Host-Objekt zugewiesene Funktion
+// //In Node beispielsweise GLOBAL.myFunction()
+// //Im Browser window.myFunction()
+// function myFunction() {}
+
+// //Einer Variable zugewiesene Funktion
+// //Im Browser window.x.myFunction
+// var x = function myFunction() {}
+
+// //Eine Private Funktion die einer anderen Funktion zugewiesen ist. Existiert nur innerhalb dieser
+// //Lässt sich nicht von ausserhalb aufrufen. 
+// function myFunction() {
+// 	function myInnerFunction() {}
+// }
+
+// //Eine Funktion innerhalb eines Objektes. Ist über den Namen der Eigenschaft ansprechbar
+// //-> Assozierters Array
+// // Resultiert im Browser in window.x.myFunction
+// x = {
+// 	'myFunction': function myFunction(){}
+// }
+
+// //Vollständigkeit halber exotische Funktionsdefinitionsart
+// x = new Function('param1', 'param2', 'var variableInsideFunctionBody = param1 + param2; return variableInsideFunctionBody;');
+
+// console.log(x(10,20)) // Log: 30
+
+// var functionToObject = function functionToObject() {
+// 	this.x = 99;
+// 	//Existiert für jedes Objekt im Memory
+// 	//Funktioniert, ist aber nicht performant. 
+// 	this.instanceFunc = function instanceFunc() {
+// 		return 'innerhalb des Konstruktors';
+// 	}
+// }
+// //Exisitert nur auf dem prototypen. Diesen gibt es für alle Objekte nur einmal
+// //Obwohl beide Arten zugelassen sind, empfiehlt sich doch diese zu verwenden.
+// functionToObject.prototype.prototypeFunc = function prototypeFunc() {
+// 	return 'Liegt auf dem prototype';
+// }
+// var newObject = new functionToObject();
+// console.log(newObject.constructor.name); // Log: functionToObject()
+// console.log(newObject.x); //Log: 99
+// console.log(newObject.instanceFunc()); // Log: innerhalb des Konstruktors
+// console.log(newObject.prototypeFunc()); // Log: Liegt auf dem prototype
+
+
+ var myParentFunction = function myParentFunction(param1) {
+ 	this.var = null;
+ }
+
+var myChildFunction = function myChildFunction(param1) {
+	this.var = param1;
+}
+
+myChildFunction.prototype = new myParentFunction();
+var instance1 = new myChildFunction('Param');
+console.log('Instance 1: ' + instance1.constructor.name);
+myChildFunction.prototype.constructor = myChildFunction;
+var instance2 = new myChildFunction('Param');
+console.log('Instance 2: ' + instance1.constructor.name);
+
+// Dokumentation
+// Dinge die nicht leicht verständlich sind weglassen
+// Kein Try-Catch-Statement
+// Probleme und Lösungsvorschläge im Code Inline Dokumentiert
+// Einfach abstrakter beschreiben und nicht so detailiert. 
+// 5. Improvements TODO - In codesnippets findet man lösung zu den Problem.
+// test Beschreibung. 
+// 5.2 Sectiontitel umbenennen. 
+// Erwähnen, dass mit einem Punkt noch nicht beschäftigt hat. Oder zuwenig Zeit dem Problem wittmen könne.
+// Zeitplan in Bericht einfügen.
+// Static[Methodenname] ist nicht gut.
+// Im Text Codefragmente in anderer Farb oder in anderer Schrift. \texttt{Text} Teletyp!
+// Keine \\ im Latex!!!
+
+//Nice to have
+//Platzhalter mit spizigen Klammern markieren.

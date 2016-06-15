@@ -4,9 +4,9 @@ unicrypt.math.algebra.multiplicative.classes.GStarModPrime = Op.Class('GStarModP
 	_init: function(modulus, orderFactor) {	
 		this.$$super(modulus, orderFactor);
 	}.paramType(['BigInteger','BigInteger']),
-	// func: function() {
-
-	// }.paramType(['E']).returnType(''),
+	getZModOrder: function() {
+		return ZModPrime.getInstance(this.getOrder());
+	}.returnType('ZModPrime'),
 	static: {
 		// getInstance: function(modulus, orderFactor) {
 		// 	if (modulus == null || orderFactor == null) {
