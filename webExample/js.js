@@ -29,8 +29,8 @@ $('.parameters .eval').click(function() {
 			alert('Insert Values');
 		}
 		
-		m = Helper.convertStrToBinary(m);
-
+		//m = Helper.convertStrToBinary(m);
+		//m = '1' + m;
 		m = new u.BigInteger(m);
 		r = new u.BigInteger(r);
 		g = new u.BigInteger(g);
@@ -54,6 +54,7 @@ $('.parameters .eval').click(function() {
 		//window.y = y;
 		$('.elGamal .result').val(tuple.print());
 	});	
+
 	$('.elGamaldec .dec').click(function() {
 		var x = $('.parameters .secret').val();
 		var enc = $('.elGamaldec .cypher').val();
@@ -67,6 +68,8 @@ $('.parameters .eval').click(function() {
 
 		var m = b.divide(a.selfApply(x));
 		var m = m.getValue().subtract(new u.BigInteger(1));
+
+		var m = Helper.convertBinaryToString(m);
 
 		$('.elGamaldec .decrypted').val(m.toString());
 	});
@@ -193,6 +196,9 @@ var Helper = Op.Class('Helper', {}, {
             }
         	//reverse all bits again.
         	return arr.reverse().join("");	
+    	},
+    	convertBinaryToString: function(str) {
+
     	}
 }
 });
