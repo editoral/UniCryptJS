@@ -2998,19 +2998,17 @@ console.log(childClass2.testFuncTwo('Nr. '));
 // console.log(newObject.prototypeFunc()); // Log: Liegt auf dem prototype
 
 
- var myParentFunction = function myParentFunction(param1) {
- 	this.var = null;
- }
+var myParentFunction = function myParentFunction() {
+}
 
-var myChildFunction = function myChildFunction(param1) {
-	this.var = param1;
+var myChildFunction = function myChildFunction() {
 }
 
 myChildFunction.prototype = new myParentFunction();
-var instance1 = new myChildFunction('Param');
+var instance1 = new myChildFunction();
 console.log('Instance 1: ' + instance1.constructor.name);
 myChildFunction.prototype.constructor = myChildFunction;
-var instance2 = new myChildFunction('Param');
+var instance2 = new myChildFunction();
 console.log('Instance 2: ' + instance1.constructor.name);
 
 // Dokumentation

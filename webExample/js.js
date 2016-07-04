@@ -29,8 +29,8 @@ $('.parameters .eval').click(function() {
 			alert('Insert Values');
 		}
 		
-		//m = Helper.convertStrToBinary(m);
-		//m = '1' + m;
+		m = Helper.convertStrToBinary(m);
+		m = '1' + m;
 		m = new u.BigInteger(m);
 		r = new u.BigInteger(r);
 		g = new u.BigInteger(g);
@@ -141,9 +141,13 @@ $('.getElements .eval').click(function() {
 	for(var i = 0; i < mod.intValue(); i++) {
 		try {
 			var el = gStarMod.getElement(new u.BigInteger(i));
-			result = result + el.getValue().intValue() +'; ';
+			result = result + el.getValue().toString() +'; ';
 		} catch (err) {
 
+		}
+		$('.getElements .result').val(result);
+		if(i > 1000) {
+			break;
 		}
 	}
 
